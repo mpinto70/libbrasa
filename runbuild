@@ -1,0 +1,56 @@
+#!/bin/bash
+
+check() {
+    if [ $? -ne 0 ]; then
+        echo "Error processing: $1"
+        exit 1
+    fi
+}
+
+do_build() {
+    if [ ! -d "build" ]; then
+        mkdir build
+    fi
+    cd build
+    echo "Building ..."
+    cmake ..
+    check "cmake"
+    make
+    check "make"
+    cd ..
+}
+
+if [ "$#" = "0" ]; then
+    # With no parameter: build
+    do_build
+elif [ "$1" = "clean" ]; then
+    rm -rf \
+        build \
+        bin \
+        lib \
+
+    echo "Done."
+elif [ "$1" = "distclean" ]; then
+    rm -rf \
+        build \
+        bin \
+        lib \
+        gtest \
+
+    echo "Done."
+elif [ "$1" = "test" ]; then
+    do_build
+    echo "Testing... "
+    for test in `ls bin/test*`
+    do
+        $test "$@"
+        check "$test"
+    done
+elif [ "$1" = "demo" ]; then
+    do_build
+    echo "Nothing to demo yet"
+elif [ "$1" = "check" ]; then
+    cppcheck --enable=warning,style,unusedFunction src test
+else
+    echo "Usage: `basename $0` [test|clean|distclean|demo|check]"
+fi
