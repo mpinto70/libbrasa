@@ -66,5 +66,22 @@ TEST(ChronometerTest, markWithFunctor) {
     EXPECT_EQ(t2.end, 50u);
 }
 
+TEST(ChronometerTest, reset) {
+    auto chron = make_chronometer(NowFunctor(100), 1234);
+    const auto t1 = chron.mark(4321);
+    chron.reset();
+    const auto t2 = chron.mark(32);
+
+    EXPECT_EQ(t1.chrono_id, 1234u);
+    EXPECT_EQ(t1.mark_id, 4321u);
+    EXPECT_EQ(t2.chrono_id, 1234u);
+    EXPECT_EQ(t2.mark_id, 32u);
+
+    EXPECT_EQ(t1.begin, 100u);
+    EXPECT_EQ(t1.end, 101u);
+    EXPECT_EQ(t2.begin, 102u);
+    EXPECT_EQ(t2.end, 103u);
+}
+
 }
 
