@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <ctime>
-
 namespace chronometer {
 namespace {
 class NowFunctor {
@@ -19,8 +17,6 @@ public:
 private:
     mutable uint64_t initial_;
 };
-
-constexpr timespec SLEEP = {0, 50000}; ///< 50 microseconds
 }
 
 TEST(ChronometerTest, create) {
@@ -32,9 +28,7 @@ TEST(ChronometerTest, create) {
 
 TEST(ChronometerTest, mark) {
     const auto chron = make_chronometer(NowStd, 1234);
-    EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0);
     const auto t1 = chron.mark(4321);
-    EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0);
     const auto t2 = chron.mark(32);
 
     EXPECT_EQ(t1.chrono_id, 1234u);

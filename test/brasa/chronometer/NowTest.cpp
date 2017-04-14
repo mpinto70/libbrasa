@@ -8,26 +8,26 @@
 
 namespace chronometer {
 namespace {
-constexpr timespec SLEEP = {0, 10}; ///< 10 nanoseconds (the system will sleep more)
+template <typename NOW_FUNC>
+void verifyNow(NOW_FUNC func) {
+    for (unsigned i = 0; i < 100; ++i) {
+        const uint64_t t0 = func();
+        const uint64_t t1 = func();
+        EXPECT_LT(t0, t1) << "iteration " << i;
+    }
+}
 }
 
 TEST(NowTest, nowStd) {
-    for (unsigned i = 0; i < 100; ++i) {
-        const uint64_t t0 = NowStd();
-        EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0) << "iteration " << i;
-        const uint64_t t1 = NowStd();
-        EXPECT_LT(t0, t1) << "iteration " << i;
-    }
+    verifyNow(NowStd);
 }
 
 TEST(NowTest, nowClockRealTime) {
-    const NowClock<CLOCK_REALTIME> now;
-    for (unsigned i = 0; i < 100; ++i) {
-        const uint64_t t0 = now();
-        EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0) << "iteration " << i;
-        const uint64_t t1 = now();
-        EXPECT_LT(t0, t1) << "iteration " << i;
-    }
+    verifyNow(NowClock<CLOCK_REALTIME>());
+}
+
+TEST(NowTest, nowClockProcessTime) {
+    verifyNow(NowClock<CLOCK_PROCESS_CPUTIME_ID>());
 }
 
 }
