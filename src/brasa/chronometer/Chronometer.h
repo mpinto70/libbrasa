@@ -15,19 +15,22 @@ struct Elapsed {
 template<typename NOW_FUNC>
 class Chronometer {
 public:
-    Chronometer(NOW_FUNC&& func, uint32_t id)
-        : func_(std::move(func)),
+    Chronometer(NOW_FUNC&& now, uint32_t id)
+        : now_(std::move(now)),
           id_(id),
-          begin_(func_()) {
+          begin_(now_()) {
     }
     Chronometer(Chronometer&&) = default;
     Chronometer& operator =(Chronometer&&) = default;
     uint32_t id() const { return id_; }
     Elapsed mark(uint32_t mark_id) const {
-        return { id_, mark_id, begin_, func_() };
+        return { id_, mark_id, begin_, now_() };
+    }
+    void reset() {
+        begin_ = now_();
     }
 private:
-    const NOW_FUNC func_;
+    const NOW_FUNC now_;
     const uint32_t id_;
     uint64_t begin_;
 
