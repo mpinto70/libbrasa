@@ -6,8 +6,6 @@
 
 #include <ctime>
 
-using chronometer::NowStd;
-
 namespace chronometer {
 namespace {
 class NowFunctor {
@@ -82,4 +80,3 @@ TEST(ChronometerTest, reset) {
 }
 
 }
-
