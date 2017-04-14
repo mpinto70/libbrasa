@@ -3,9 +3,14 @@
 #include <ctime>
 
 namespace chronometer {
-inline uint64_t NowWallClock() {
-    static timespec now;
-    ::clock_gettime(CLOCK_REALTIME, &now);
-    return now.tv_sec * 1000 * 1000 * 1000 + now.tv_nsec;
-}
+
+template <clockid_t CLOCK_ID>
+struct NowClock {
+    uint64_t operator()() const {
+        static timespec now;
+        ::clock_gettime(CLOCK_ID, &now);
+        return now.tv_sec * 1000 * 1000 * 1000 + now.tv_nsec;
+    }
+};
+
 }
