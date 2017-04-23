@@ -1,4 +1,3 @@
-
 #include "brasa/chronometer/NowClock.h"
 #include "brasa/chronometer/NowStd.h"
 
@@ -6,6 +5,7 @@
 
 #include <ctime>
 
+namespace brasa {
 namespace chronometer {
 namespace {
 template <typename NOW_FUNC>
@@ -43,4 +43,5 @@ TEST(NowTest, nowClockProcessTime) {
     verifyNow(NowClock<CLOCK_PROCESS_CPUTIME_ID>());
 }
 
+}
 }

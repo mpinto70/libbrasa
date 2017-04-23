@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <ctime>
 
+namespace brasa {
 namespace chronometer {
 
 template<typename NOW_FUNC>
@@ -36,5 +37,4 @@ Waiter<NOW_FUNC> make_waiter(NOW_FUNC&& func) {
 }
 
 }
-
-
+}

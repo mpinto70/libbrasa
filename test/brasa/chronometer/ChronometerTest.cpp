@@ -1,9 +1,9 @@
-
 #include "brasa/chronometer/NowStd.h"
 #include "brasa/chronometer/Chronometer.h"
 
 #include <gtest/gtest.h>
 
+namespace brasa {
 namespace chronometer {
 namespace {
 class NowFunctor {
@@ -73,4 +73,5 @@ TEST(ChronometerTest, reset) {
     EXPECT_EQ(t2.end, 103u);
 }
 
+}
 }

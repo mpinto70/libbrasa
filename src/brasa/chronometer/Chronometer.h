@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 
+namespace brasa {
 namespace chronometer {
 
 struct Elapsed {
@@ -41,5 +42,6 @@ private:
 template<typename NOW_FUNC>
 Chronometer<NOW_FUNC> make_chronometer(NOW_FUNC&& func, uint32_t id) {
     return Chronometer<NOW_FUNC>(std::forward<NOW_FUNC>(func), id);
+}
 }
 }
