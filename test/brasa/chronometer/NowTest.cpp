@@ -1,5 +1,4 @@
 
-#include "brasa/chronometer/Constants.h"
 #include "brasa/chronometer/NowClock.h"
 #include "brasa/chronometer/NowStd.h"
 

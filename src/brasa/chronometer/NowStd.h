@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 
 namespace chronometer {
 inline uint64_t NowStd() {

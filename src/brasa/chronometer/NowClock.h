@@ -1,6 +1,7 @@
 #pragma once
 
-#include "brasa/chronometer/Chronometer.h"
+#include "brasa/chronometer/Constants.h"
+#include <cstdint>
 #include <ctime>
 
 namespace chronometer {
