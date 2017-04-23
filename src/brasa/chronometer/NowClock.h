@@ -1,5 +1,6 @@
 #pragma once
 
+#include "brasa/chronometer/Chronometer.h"
 #include <ctime>
 
 namespace chronometer {
@@ -9,7 +10,7 @@ struct NowClock {
     uint64_t operator()() const {
         static timespec now;
         ::clock_gettime(CLOCK_ID, &now);
-        return now.tv_sec * 1000 * 1000 * 1000 + now.tv_nsec;
+        return now.tv_sec * NSECS_PER_SEC + now.tv_nsec;
     }
 };
 
