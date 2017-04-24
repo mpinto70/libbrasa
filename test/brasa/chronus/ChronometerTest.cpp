@@ -1,5 +1,5 @@
-#include "brasa/chronometer/NowStd.h"
-#include "brasa/chronometer/Chronometer.h"
+#include "brasa/chronus/NowStd.h"
+#include "brasa/chronus/Chronometer.h"
 
 #include <gtest/gtest.h>
 
