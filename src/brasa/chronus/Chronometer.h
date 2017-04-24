@@ -4,7 +4,7 @@
 #include <cstdint>
 
 namespace brasa {
-namespace chronometer {
+namespace chronus {
 
 struct Elapsed {
     uint32_t chrono_id;

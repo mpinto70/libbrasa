@@ -5,7 +5,7 @@
 #include <ctime>
 
 namespace brasa {
-namespace chronometer {
+namespace chronus {
 
 template <clockid_t CLOCK_ID>
 struct NowClock {

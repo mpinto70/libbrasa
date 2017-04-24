@@ -7,7 +7,7 @@
 #include <ctime>
 
 namespace brasa {
-namespace chronometer {
+namespace chronus {
 
 template<typename NOW_FUNC>
 class Waiter {

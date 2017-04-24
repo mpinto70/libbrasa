@@ -6,7 +6,7 @@
 #include <ctime>
 
 namespace brasa {
-namespace chronometer {
+namespace chronus {
 namespace {
 template <typename NOW_FUNC>
 void verifyWait(NOW_FUNC func) {

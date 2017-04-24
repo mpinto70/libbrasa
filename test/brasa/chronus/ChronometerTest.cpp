@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 namespace brasa {
-namespace chronometer {
+namespace chronus {
 namespace {
 class NowFunctor {
 public:
