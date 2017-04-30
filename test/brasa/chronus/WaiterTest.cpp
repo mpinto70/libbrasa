@@ -1,5 +1,6 @@
+#include "brasa/chronus/Sleeper.h"
 #include "brasa/chronus/NowStd.h"
-#include "brasa/chronus/Wait.h"
+#include "brasa/chronus/Waiter.h"
 
 #include <gtest/gtest.h>
 
@@ -8,12 +9,15 @@
 namespace brasa {
 namespace chronus {
 namespace {
-template <typename NOW_FUNC>
-void verifyWait(NOW_FUNC func) {
-    const auto waiter = make_waiter<NOW_FUNC>(std::move(func));
+template <typename NOW_FUNC, typename SLEEPER>
+void verifyWait(NOW_FUNC func, SLEEPER sleeper) {
+    auto waiter = make_waiter<NOW_FUNC, SLEEPER>(std::move(func), 1 * NSECS_PER_MSEC, std::move(sleeper));
     for (unsigned i = 0; i < 100; ++i) {
         const auto t0 = NowStd();
-        waiter.wait(1 * NSECS_PER_MSEC);
+        waiter.reset();
+        EXPECT_FALSE(waiter.elapsed());
+        waiter.wait();
+        EXPECT_TRUE(waiter.elapsed());
         const auto t1 = NowStd();
         uint64_t diff = t1 - t0;
         EXPECT_GT(diff, 1 * NSECS_PER_MSEC) << "iteration " << i;
@@ -23,7 +27,7 @@ void verifyWait(NOW_FUNC func) {
 }
 
 TEST(WaitTest, wait) {
-    verifyWait(NowStd);
+    verifyWait(NowStd, NanoSleeper());
 }
 
 }

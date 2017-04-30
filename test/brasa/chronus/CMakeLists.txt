@@ -4,7 +4,8 @@ add_executable(
     ../../gtest_main.cpp
     ChronometerTest.cpp
     NowTest.cpp
-    WaitTest.cpp
+    WaiterTest.cpp
+    SleeperTest.cpp
 )
 
 target_link_libraries(
