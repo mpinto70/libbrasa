@@ -30,8 +30,8 @@ void verifyUniformity(NOW_FUNC func) {
 }
 
 TEST(NowTest, nowStd) {
-    verifyNow(NowStd);
-    verifyUniformity(NowStd);
+    verifyNow(NanoNow);
+    verifyUniformity(NanoNow);
 }
 
 TEST(NowTest, nowClockRealTime) {

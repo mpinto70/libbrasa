@@ -13,9 +13,9 @@ namespace {
 template <typename SLEEP_FUNC>
 void veriffySleep(SLEEP_FUNC func, const uint32_t MULT_NSEC, const uint32_t sleep_size) {
     for (unsigned i = 0; i < 100; ++i) {
-        const auto t0 = NowStd();
+        const auto t0 = NanoNow();
         func(sleep_size);
-        const auto t1 = NowStd();
+        const auto t1 = NanoNow();
         uint64_t diff = t1 - t0;
         EXPECT_GT(diff, sleep_size * MULT_NSEC) << "iteration " << i;
     }

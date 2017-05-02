@@ -20,14 +20,14 @@ private:
 }
 
 TEST(ChronometerTest, create) {
-    const auto chron1 = make_chronometer(NowStd, 1);
+    const auto chron1 = make_chronometer(NanoNow, 1);
     EXPECT_EQ(chron1.id(), 1u);
-    const auto chron2 = make_chronometer(NowStd, 7865);
+    const auto chron2 = make_chronometer(NanoNow, 7865);
     EXPECT_EQ(chron2.id(), 7865u);
 }
 
 TEST(ChronometerTest, mark) {
-    const auto chron = make_chronometer(NowStd, 1234);
+    const auto chron = make_chronometer(NanoNow, 1234);
     const auto t1 = chron.mark(4321);
     const auto t2 = chron.mark(32);
 
