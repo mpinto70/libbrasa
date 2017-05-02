@@ -1,4 +1,4 @@
-#include "brasa/chronus/Sleeper.h"
+#include "brasa/chronus/SleepStd.h"
 #include "brasa/chronus/Constants.h"
 #include "brasa/chronus/NowStd.h"
 
@@ -27,9 +27,19 @@ TEST(SleepTest, usleep) {
     veriffySleep(::usleep, NSECS_PER_USEC, 200);
 }
 
-TEST(SleepTest, nanosleep) {
-    veriffySleep(NanoSleeper(), 1, 1 * NSECS_PER_MSEC);
-    veriffySleep(NanoSleeper(), 1, 2 * NSECS_PER_MSEC);
+TEST(SleepTest, NanoSleep) {
+    veriffySleep(NanoSleep, 1, 1 * NSECS_PER_MSEC);
+    veriffySleep(NanoSleep, 1, 2 * NSECS_PER_MSEC);
+}
+
+TEST(SleepTest, MicroSleep) {
+    veriffySleep(MicroSleep, NSECS_PER_USEC, 100);
+    veriffySleep(MicroSleep, NSECS_PER_USEC, 200);
+}
+
+TEST(SleepTest, MilliSleep) {
+    veriffySleep(MilliSleep, NSECS_PER_MSEC, 1);
+    veriffySleep(MilliSleep, NSECS_PER_MSEC, 2);
 }
 
 }

@@ -1,4 +1,4 @@
-#include "brasa/chronus/Sleeper.h"
+#include <brasa/chronus/SleepStd.h>
 #include "brasa/chronus/NowStd.h"
 #include "brasa/chronus/Waiter.h"
 
@@ -9,10 +9,12 @@
 namespace brasa {
 namespace chronus {
 namespace {
-template <typename NOW_FUNC, typename SLEEPER>
-void verifyWait(NOW_FUNC now_func, SLEEPER sleeper_func, const uint32_t wait_size) {
+template <typename NOW_FUNC, typename SLEEPER_FUNC>
+void verifyWait(NOW_FUNC now_func,
+                SLEEPER_FUNC sleeper_func,
+                const uint32_t wait_size) {
     NOW_FUNC now = now_func;
-    auto waiter = make_waiter<NOW_FUNC, SLEEPER>(std::move(now_func), wait_size, std::move(sleeper_func));
+    auto waiter = make_waiter<NOW_FUNC, SLEEPER_FUNC>(std::move(now_func), wait_size, std::move(sleeper_func));
     for (unsigned i = 0; i < 100; ++i) {
         const auto t0 = now();
         waiter.reset();
@@ -21,18 +23,22 @@ void verifyWait(NOW_FUNC now_func, SLEEPER sleeper_func, const uint32_t wait_siz
         EXPECT_TRUE(waiter.elapsed());
         const auto t1 = now();
         uint64_t diff = t1 - t0;
-        EXPECT_GT(diff, wait_size) << "iteration " << i;
-        EXPECT_LT(diff, 10 * wait_size) << "iteration " << i;
+        EXPECT_GE(diff, wait_size) << "iteration " << i;
+        EXPECT_LE(diff, 3 * wait_size) << "iteration " << i;
     }
 }
 }
 
-TEST(WaitTest, nano) {
-    verifyWait(NanoNow, NanoSleeper(), 1 * NSECS_PER_MSEC);
+TEST(WaitTest, Nano) {
+    verifyWait(NanoNow, NanoSleep, 1 * NSECS_PER_MSEC);
 }
 
-TEST(WaitTest, micro) {
-    verifyWait(MicroNow, ::usleep, 1 * USECS_PER_MSEC);
+TEST(WaitTest, Micro) {
+    verifyWait(MicroNow, MicroSleep, 500);
+}
+
+TEST(WaitTest, Milli) {
+    verifyWait(MilliNow, MilliSleep, 1);
 }
 
 }

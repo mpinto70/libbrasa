@@ -6,16 +6,23 @@
 
 namespace brasa {
 namespace chronus {
+
+template <typename DURATION_TYPE>
+inline uint64_t StdNow() {
+    using namespace std::chrono;
+    return duration_cast<DURATION_TYPE>(high_resolution_clock::now().time_since_epoch()).count();
+}
+
 inline uint64_t NanoNow() {
-    return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    return StdNow<std::chrono::nanoseconds>();
 }
 
 inline uint64_t MicroNow() {
-    return std::chrono::high_resolution_clock::now().time_since_epoch().count() / NSECS_PER_USEC;
+    return StdNow<std::chrono::microseconds>();
 }
 
 inline uint64_t MilliNow() {
-    return std::chrono::high_resolution_clock::now().time_since_epoch().count() / NSECS_PER_MSEC;
+    return StdNow<std::chrono::milliseconds>();
 }
 }
 }

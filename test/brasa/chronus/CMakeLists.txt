@@ -5,7 +5,7 @@ add_executable(
     ChronometerTest.cpp
     NowTest.cpp
     WaiterTest.cpp
-    SleeperTest.cpp
+    SleepStdTest.cpp
 )
 
 target_link_libraries(

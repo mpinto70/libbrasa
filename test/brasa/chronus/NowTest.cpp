@@ -24,12 +24,12 @@ void verifyUniformity(NOW_FUNC func) {
     EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0);
     const auto t2 = func();
     uint64_t diff = t2 - t1;
-    EXPECT_LT(diff, 54 * NSECS_PER_MSEC);
+    EXPECT_LT(diff, 51 * NSECS_PER_MSEC);
     EXPECT_GT(diff, 50 * NSECS_PER_MSEC);
 }
 }
 
-TEST(NowTest, nowStd) {
+TEST(NowTest, NanoNow) {
     verifyNow(NanoNow);
     verifyUniformity(NanoNow);
 }
