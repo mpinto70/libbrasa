@@ -62,6 +62,8 @@ TEST(CircularTest, create_initialized) {
     read_head->lap = 11;
     write_head->lap = 17;
 
+    // if the buffer is already initialized, the creation of a circular buffer does not alter
+    // underlying memory
     EXPECT_EQ(read_head->offset, sizeof(data));
     EXPECT_EQ(read_head->lap, 11u);
     EXPECT_EQ(write_head->offset, 2 * sizeof(data));
