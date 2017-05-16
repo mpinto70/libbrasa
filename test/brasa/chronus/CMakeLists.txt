@@ -1,6 +1,6 @@
 
 add_executable(
-    testchronometer
+    testchronus
     ../../gtest_main.cpp
     ChronometerTest.cpp
     NowTest.cpp
@@ -9,7 +9,7 @@ add_executable(
 )
 
 target_link_libraries(
-    testchronometer
+    testchronus
     libgtest
     libgmock
 )
