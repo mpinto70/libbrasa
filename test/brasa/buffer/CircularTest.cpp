@@ -16,7 +16,7 @@ public:
 struct data {
     int value;
     char character;
-} __attribute__ ((packed));
+} __attribute__((packed));
 }
 
 TEST(CircularTest, create_uninitialized) {
@@ -64,14 +64,14 @@ TEST(CircularTest, create_initialized) {
 
     EXPECT_EQ(read_head->offset, sizeof(data));
     EXPECT_EQ(read_head->lap, 11u);
-    EXPECT_EQ(write_head->offset, 2*sizeof(data));
+    EXPECT_EQ(write_head->offset, 2 * sizeof(data));
     EXPECT_EQ(write_head->lap, 17u);
 
     CircularHelper<data, 150> circular2(buffer, KEY);
 
     EXPECT_EQ(read_head->offset, sizeof(data));
     EXPECT_EQ(read_head->lap, 11u);
-    EXPECT_EQ(write_head->offset, 2*sizeof(data));
+    EXPECT_EQ(write_head->offset, 2 * sizeof(data));
     EXPECT_EQ(write_head->lap, 17u);
 }
 
