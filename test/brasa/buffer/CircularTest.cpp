@@ -27,8 +27,8 @@ struct data {
 } __attribute__((packed));
 
 bool operator == (const data& lhs, const data& rhs) {
-	return lhs.character == rhs.character
-			&& lhs.value == rhs.value;
+    return lhs.character == rhs.character
+           && lhs.value == rhs.value;
 }
 
 template <typename TYPE, uint32_t N>
@@ -209,19 +209,19 @@ void verify_many_laps_one_read(uint64_t key) {
     }
 
     for (size_t i = 0; i < N; ++i) {
-    	TYPE t2;
-    	::memset(&t2, i + MAX - N, sizeof(t2));
-    	EXPECT_TRUE(circular.do_read(t1)) << i << '/' << key;
-    	EXPECT_EQ(t1, t2) << i << '/' << key;
+        TYPE t2;
+        ::memset(&t2, i + MAX - N, sizeof(t2));
+        EXPECT_TRUE(circular.do_read(t1)) << i << '/' << key;
+        EXPECT_EQ(t1, t2) << i << '/' << key;
     }
 }
 }
 
 TEST(CircularTest, manyLapsOneRead) {
-	verify_many_laps_one_read<data, 278>(12);
-	verify_many_laps_one_read<data, 27>(13);
-	verify_many_laps_one_read<int, 278>(14);
-	verify_many_laps_one_read<int, 27>(15);
+    verify_many_laps_one_read<data, 278>(12);
+    verify_many_laps_one_read<data, 27>(13);
+    verify_many_laps_one_read<int, 278>(14);
+    verify_many_laps_one_read<int, 27>(15);
 }
 
 }
