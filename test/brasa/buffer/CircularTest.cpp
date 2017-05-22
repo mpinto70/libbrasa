@@ -26,6 +26,11 @@ struct data {
     char character;
 } __attribute__((packed));
 
+bool operator == (const data& lhs, const data& rhs) {
+	return lhs.character == rhs.character
+			&& lhs.value == rhs.value;
+}
+
 template <typename TYPE, uint32_t N>
 void initialize_buffer(uint8_t (&buffer)[Circular<TYPE, N>::BUFFER_SIZE], uint64_t key) {
     ::memset(buffer, 0, sizeof(buffer));
@@ -162,30 +167,61 @@ void verify_laps(uint64_t key) {
     for (size_t i = 0; i < 3 * N; ++i) {
         const size_t off_idx = i % N;
         ::memset(&t1, i, sizeof(t1));
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
         circular.do_write(t1);
-        EXPECT_NE(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
+        EXPECT_NE(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
 
         h.offset = ((i + 1) % N) * sizeof(t1);
         h.lap = (i + 1) / N;
         ::memcpy(&buffer2[off_idx * sizeof(t1)], &t1, sizeof(t1));
         ::memcpy(&buffer2[CircularBuffer::OFFSET_WRITE_HEAD], &h, sizeof(h));
 
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
 
-        EXPECT_TRUE(circular.do_read(t2));
-        EXPECT_EQ(::memcmp(&t1, &t2, sizeof(t1)), 0);
+        EXPECT_TRUE(circular.do_read(t2)) << i << '/' << key;
+        EXPECT_EQ(t1, t2) << i << '/' << key;
 
         ::memcpy(&buffer2[CircularBuffer::OFFSET_READ_HEAD], &h, sizeof(h));
 
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
     }
 }
 }
 
 TEST(CircularTest, laps) {
     verify_laps<data, 29>(12345678);
-    verify_laps<int, 17>(12345678);
+    verify_laps<int, 17>(87654321);
+}
+
+namespace {
+template <typename TYPE, uint32_t N>
+void verify_many_laps_one_read(uint64_t key) {
+    using CircularBuffer = CircularHelper<TYPE, N>;
+    uint8_t buffer[CircularBuffer::BUFFER_SIZE];
+    initialize_buffer<TYPE, N>(buffer, key);
+    const CircularBuffer circular(buffer, key);
+
+    constexpr size_t MAX = 3 * N + 7;
+    TYPE t1;
+    for (size_t i = 0; i < MAX; ++i) {
+        ::memset(&t1, i, sizeof(t1));
+        circular.do_write(t1);
+    }
+
+    for (size_t i = 0; i < N; ++i) {
+    	TYPE t2;
+    	::memset(&t2, i + MAX - N, sizeof(t2));
+    	EXPECT_TRUE(circular.do_read(t1)) << i << '/' << key;
+    	EXPECT_EQ(t1, t2) << i << '/' << key;
+    }
+}
+}
+
+TEST(CircularTest, manyLapsOneRead) {
+	verify_many_laps_one_read<data, 278>(12);
+	verify_many_laps_one_read<data, 27>(13);
+	verify_many_laps_one_read<int, 278>(14);
+	verify_many_laps_one_read<int, 27>(15);
 }
 
 }
