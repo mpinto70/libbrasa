@@ -4,8 +4,6 @@ add_executable(
     ../../gtest_main.cpp
     CRCTest.cpp
     CircularTest.cpp
-    CircularReaderTest.cpp
-    CircularWriterTest.cpp
 )
 
 target_link_libraries(
