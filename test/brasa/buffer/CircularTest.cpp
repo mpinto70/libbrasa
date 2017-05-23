@@ -8,15 +8,7 @@ namespace buffer {
 
 namespace {
 
-struct data {
-    int value;
-    char character;
-} __attribute__((packed));
-
-bool operator == (const data& lhs, const data& rhs) {
-    return lhs.character == rhs.character
-           && lhs.value == rhs.value;
-}
+using data = SimpleData;
 
 template <typename TYPE, uint32_t N>
 void initialize_buffer(uint8_t (&buffer)[Circular<TYPE, N>::BUFFER_SIZE], uint64_t key) {
@@ -96,7 +88,7 @@ TEST(CircularTest, read_fail) {
     EXPECT_EQ(::memcmp(buffer, buffer2, sizeof(buffer)), 0);
 
     data d;
-    EXPECT_FALSE(circular.do_read(d));
+    EXPECT_FALSE(circular.read(d));
 
     EXPECT_EQ(::memcmp(buffer, buffer2, sizeof(buffer)), 0);
 }
@@ -114,7 +106,7 @@ TEST(CircularTest, write) {
     EXPECT_EQ(::memcmp(buffer, buffer2, sizeof(buffer)), 0);
 
     data d = { 1234, 'a' };
-    circular.do_write(d);
+    circular.write(d);
 
     EXPECT_NE(::memcmp(buffer, buffer2, sizeof(buffer)), 0);
 
@@ -127,7 +119,7 @@ TEST(CircularTest, write) {
     d.value += 1;
     d.character += 3;
 
-    circular.do_write(d);
+    circular.write(d);
 
     EXPECT_NE(::memcmp(buffer, buffer2, sizeof(buffer)), 0);
 
@@ -155,7 +147,7 @@ void verify_laps(uint64_t key) {
         const size_t off_idx = i % N;
         ::memset(&t1, i, sizeof(t1));
         EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
-        circular.do_write(t1);
+        circular.write(t1);
         EXPECT_NE(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
 
         h.offset = ((i + 1) % N) * sizeof(t1);
@@ -165,7 +157,7 @@ void verify_laps(uint64_t key) {
 
         EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
 
-        EXPECT_TRUE(circular.do_read(t2)) << i << '/' << key;
+        EXPECT_TRUE(circular.read(t2)) << i << '/' << key;
         EXPECT_EQ(t1, t2) << i << '/' << key;
 
         ::memcpy(&buffer2[CircularBuffer::OFFSET_READ_HEAD], &h, sizeof(h));
@@ -192,13 +184,13 @@ void verify_many_laps_one_read(uint64_t key) {
     TYPE t1;
     for (size_t i = 0; i < MAX; ++i) {
         ::memset(&t1, i, sizeof(t1));
-        circular.do_write(t1);
+        circular.write(t1);
     }
 
     for (size_t i = 0; i < N; ++i) {
         TYPE t2;
         ::memset(&t2, i + MAX - N, sizeof(t2));
-        EXPECT_TRUE(circular.do_read(t1)) << i << '/' << key;
+        EXPECT_TRUE(circular.read(t1)) << i << '/' << key;
         EXPECT_EQ(t1, t2) << i << '/' << key;
     }
 }

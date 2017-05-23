@@ -42,13 +42,13 @@ protected:
         }
     }
 
-    void write(const TYPE& data) const {
+    void do_write(const TYPE& data) const {
         const auto write_head = reinterpret_cast<Head*>(&buffer_[OFFSET_WRITE_HEAD]);
         ::memcpy(&buffer_[write_head->offset], &data, sizeof(TYPE));
         advance(*write_head);
     }
 
-    bool read(TYPE& data) const {
+    bool do_read(TYPE& data) const {
         const auto write_head = reinterpret_cast<const Head*>(&buffer_[OFFSET_WRITE_HEAD]);
         const auto read_head = reinterpret_cast<Head*>(&buffer_[OFFSET_READ_HEAD]);
 
