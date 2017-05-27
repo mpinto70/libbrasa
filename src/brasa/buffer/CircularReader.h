@@ -11,7 +11,7 @@ public:
     using Base = Circular<TYPE_, N_>;
 
     CircularReader(uint8_t* buffer, uint64_t key)
-        : Circular<TYPE_, N_>(buffer, key) {
+        : Base(buffer, key) {
     }
 
     bool read(TYPE_& data) const {
