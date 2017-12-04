@@ -40,6 +40,7 @@ elif [ "$1" = "distclean" ]; then
     echo "Done."
 elif [ "$1" = "test" ]; then
     do_build
+    shift
     echo "Testing... "
     for test in `ls bin/test*`
     do
