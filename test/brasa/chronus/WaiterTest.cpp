@@ -24,7 +24,7 @@ void verifyWait(NOW_FUNC now_func,
         const auto t1 = now();
         uint64_t diff = t1 - t0;
         EXPECT_GE(diff, wait_size) << "iteration " << i;
-        EXPECT_LE(diff, 3 * wait_size) << "iteration " << i;
+        EXPECT_LE(diff, 10 * wait_size) << "iteration " << i;
     }
 }
 }

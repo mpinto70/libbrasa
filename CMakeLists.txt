@@ -3,7 +3,7 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (libbrasa)
 
-set(CMAKE_CXX_FLAGS "-Werror -Wall -O2 -finline-functions -std=c++14 -Wno-unused-local-typedefs")
+set(CMAKE_CXX_FLAGS "-Werror -Wall -O3 -finline-functions -std=c++14 -Wno-unused-local-typedefs")
 
 #set (CMAKE_VERBOSE_MAKEFILE on)
 

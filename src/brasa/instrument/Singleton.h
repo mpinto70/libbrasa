@@ -13,14 +13,14 @@ public:
     using value_type = T;
 
     // conversions
-    explicit Singleton(const T& x) : value(x) {}
-    explicit Singleton(T&& x) : value(std::move(x)) {}
+    explicit constexpr Singleton(const T& x) : value(x) {}
+    explicit constexpr Singleton(T&& x) : value(std::move(x)) {}
     explicit operator T() const { return value; }
 
     // semi-regular operations
-    Singleton(const Singleton& x) : value(x.value) {}
-    Singleton(Singleton&& x) : value(std::move(x.value)) {}
-    Singleton() = default;
+    constexpr Singleton(const Singleton& x) : value(x.value) {}
+    constexpr Singleton(Singleton&& x) : value(std::move(x.value)) {}
+    constexpr Singleton() = default;
     ~Singleton() = default;
     Singleton& operator=(const Singleton& rhs) {
         value = rhs.value;
@@ -29,29 +29,29 @@ public:
 
     // regular operations
     friend
-    bool operator == (const Singleton& lhs, const Singleton& rhs) {
+    constexpr bool operator == (const Singleton& lhs, const Singleton& rhs) {
         return lhs.value == rhs.value;
     }
     friend
-    bool operator != (const Singleton& lhs, const Singleton& rhs) {
-        return not(lhs.value == rhs.value);
+    constexpr bool operator != (const Singleton& lhs, const Singleton& rhs) {
+        return not(lhs == rhs);
     }
 
     // totally ordered operations
     friend
-    bool operator < (const Singleton& lhs, const Singleton& rhs) {
+    constexpr bool operator < (const Singleton& lhs, const Singleton& rhs) {
         return lhs.value < rhs.value;
     }
     friend
-    bool operator > (const Singleton& lhs, const Singleton& rhs) {
+    constexpr bool operator > (const Singleton& lhs, const Singleton& rhs) {
         return rhs < lhs;
     }
     friend
-    bool operator <= (const Singleton& lhs, const Singleton& rhs) {
+    constexpr bool operator <= (const Singleton& lhs, const Singleton& rhs) {
         return not(rhs < lhs);
     }
     friend
-    bool operator >= (const Singleton& lhs, const Singleton& rhs) {
+    constexpr bool operator >= (const Singleton& lhs, const Singleton& rhs) {
         return not(lhs < rhs);
     }
 };
