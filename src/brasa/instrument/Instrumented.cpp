@@ -7,16 +7,16 @@ constexpr size_t InstrumentedCounter::NUMBER_OPS;
 size_t InstrumentedCounter::counts[];
 const char* InstrumentedCounter::counter_names[NUMBER_OPS] = {
     "n",
-    "destruction",
-    "default construction",
-    "conversion construction",
-    "conversion move construction",
-    "copy construction",
-    "move construction",
-    "conversion",
-    "assignment",
-    "equality",
-    "comparison",
+    "dtor",
+    "default ctor",
+    "conv ctor",
+    "conv move ctor",
+    "copy ctor",
+    "move ctor",
+    "conv",
+    "assign",
+    "equal",
+    "compare",
 };
 
 void InstrumentedCounter::initialize(size_t m) {

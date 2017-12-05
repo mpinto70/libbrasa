@@ -25,7 +25,7 @@ struct InstrumentedCounter {
     static constexpr size_t NUMBER_OPS = TOTAL;
     static size_t counts[NUMBER_OPS];
     static const char* counter_names[NUMBER_OPS];
-    static void initialize(size_t);
+    static void initialize(size_t m);
 };
 
 template <typename T>

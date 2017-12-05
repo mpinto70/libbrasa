@@ -37,16 +37,16 @@ TEST(InstrumentedTest, names) {
 
     const char** names = InstrumentedCounter::counter_names;
     EXPECT_EQ(std::string(names[InstrumentedCounter::n]), "n");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::destruction]), "destruction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::default_construction]), "default construction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_construction]), "conversion construction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_move_construction]), "conversion move construction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::copy_construction]), "copy construction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::move_construction]), "move construction");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion]), "conversion");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::assignment]), "assignment");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::equality]), "equality");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::comparison]), "comparison");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::destruction]), "dtor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::default_construction]), "default ctor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_construction]), "conv ctor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_move_construction]), "conv move ctor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::copy_construction]), "copy ctor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::move_construction]), "move ctor");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion]), "conv");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::assignment]), "assign");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::equality]), "equal");
+    EXPECT_EQ(std::string(names[InstrumentedCounter::comparison]), "compare");
 }
 
 namespace {
