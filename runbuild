@@ -15,7 +15,7 @@ do_build() {
     echo "Building ..."
     cmake ..
     check "cmake"
-    make
+    make -j4
     check "make"
     cd ..
 }
