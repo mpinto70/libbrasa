@@ -3,6 +3,10 @@
 cmake_minimum_required (VERSION 2.8.11)
 project (libbrasa)
 
+# add support for CTest
+enable_testing()
+include(CTest)
+
 set(CMAKE_CXX_FLAGS "-Werror -Wall -O3 -finline-functions -std=c++14 -Wno-unused-local-typedefs")
 
 #set (CMAKE_VERBOSE_MAKEFILE on)
@@ -14,10 +18,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src"
                     "${CMAKE_CURRENT_SOURCE_DIR}/gtest/src/gtest/googletest/include"
                     "${CMAKE_CURRENT_SOURCE_DIR}/gtest/src/gtest/googlemock/include"
                     )
-
-# Recurse subdirectories
-add_subdirectory (src)
-add_subdirectory (test)
 
 ################################################################################
 # Google Test Setup - BEGIN ####################################################
@@ -64,3 +64,36 @@ set_target_properties(libgmock PROPERTIES
 ################################################################################
 # Google Test Setup - END ######################################################
 ################################################################################
+
+function(add_unit_test testname sources_var libs_var)
+    add_executable(
+        unit_${testname}
+        ${PROJECT_SOURCE_DIR}/test/gtest_main.cpp
+        ${${sources_var}}
+    )
+
+    install(
+        TARGETS unit_${testname}
+        RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        COMPONENT devel
+    )
+
+    set_target_properties(
+        unit_${testname}
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+    )
+
+    target_link_libraries(
+        unit_${testname}
+        ${${libs_var}}
+        libgtest
+        libgmock
+    )
+
+    add_test(NAME unit_${testname} COMMAND ${PROJECT_SOURCE_DIR}/bin/unit_${testname})
+endfunction(add_unit_test)
+
+# Recurse subdirectories
+add_subdirectory (src)
+add_subdirectory (test)

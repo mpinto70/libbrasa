@@ -1,14 +1,14 @@
-
-add_executable(
-    testbuffer
-    ../../gtest_main.cpp
+set(buffer_srcs
     CRCTest.cpp
     CircularTest.cpp
 )
 
-target_link_libraries(
-    testbuffer
+set(buffer_libs
     buffer
-    libgtest
-    libgmock
+)
+
+add_unit_test(
+    buffer
+    buffer_srcs
+    buffer_libs
 )

@@ -1,15 +1,15 @@
-
-add_executable(
-    testchronus
-    ../../gtest_main.cpp
+set(chronus_srcs
     ChronometerTest.cpp
     NowTest.cpp
     WaiterTest.cpp
     SleepStdTest.cpp
 )
 
-target_link_libraries(
-    testchronus
-    libgtest
-    libgmock
+set(chronus_libs
+)
+
+add_unit_test(
+    chronus
+    chronus_srcs
+    chronus_libs
 )

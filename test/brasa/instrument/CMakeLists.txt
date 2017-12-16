@@ -1,14 +1,14 @@
-
-add_executable(
-    testinstrument
-    ../../gtest_main.cpp
+set(instrument_srcs
     SingletonTest.cpp
     InstrumentedTest.cpp
 )
 
-target_link_libraries(
-    testinstrument
+set(instrument_libs
     instrument
-    libgtest
-    libgmock
+)
+
+add_unit_test(
+    instrument
+    instrument_srcs
+    instrument_libs
 )
