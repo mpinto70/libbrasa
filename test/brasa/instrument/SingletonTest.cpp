@@ -39,7 +39,7 @@ struct TotallyOrdered {
 
 template<typename T>
 Singleton<T> create(const T& t) {
-    Singleton<T> a;
+    Singleton<T> a{};
     a.value = t;
     return a;
 }

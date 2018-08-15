@@ -20,9 +20,8 @@ struct InstrumentedCounter {
         assignment,
         equality,
         comparison,
-        TOTAL // this has to be the last
+        NUMBER_OPS // this has to be the last
     };
-    static constexpr size_t NUMBER_OPS = TOTAL;
     static size_t counts[NUMBER_OPS];
     static const char* counter_names[NUMBER_OPS];
     static void initialize(size_t m);
@@ -50,10 +49,10 @@ public:
     constexpr Instrumented(const Instrumented& x) : value(x.value) {
         ++counts[copy_construction];
     }
-    constexpr Instrumented(Instrumented&& x) : value(std::move(x.value)) {
+    constexpr Instrumented(Instrumented&& x) noexcept : value(std::move(x.value)) {
         ++counts[move_construction];
     }
-    constexpr Instrumented() {
+    constexpr Instrumented() noexcept {
         ++counts[default_construction];
     }
     ~Instrumented() {

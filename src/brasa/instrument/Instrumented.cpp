@@ -3,9 +3,8 @@
 
 namespace brasa {
 namespace instrument {
-constexpr size_t InstrumentedCounter::NUMBER_OPS;
 size_t InstrumentedCounter::counts[];
-const char* InstrumentedCounter::counter_names[NUMBER_OPS] = {
+const char* InstrumentedCounter::counter_names[InstrumentedCounter::NUMBER_OPS] = {
     "n",
     "dtor",
     "default ctor",
@@ -20,7 +19,7 @@ const char* InstrumentedCounter::counter_names[NUMBER_OPS] = {
 };
 
 void InstrumentedCounter::initialize(size_t m) {
-    std::fill(counts, counts + NUMBER_OPS, 0);
+    std::fill(counts, counts + sizeof(counts) / sizeof(counts[0]), 0);
     counts[n] = m;
 }
 
