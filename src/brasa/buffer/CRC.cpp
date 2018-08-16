@@ -3,6 +3,7 @@
 namespace brasa {
 namespace buffer {
 
+// clang-format off
 constexpr uint32_t CRC_TABLE[256] = {
     0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L, 0x706af48fL, 0xe963a535L, 0x9e6495a3L,
     0x0edb8832L, 0x79dcb8a4L, 0xe0d5e91eL, 0x97d2d988L, 0x09b64c2bL, 0x7eb17cbdL, 0xe7b82d07L, 0x90bf1d91L,
@@ -35,13 +36,14 @@ constexpr uint32_t CRC_TABLE[256] = {
     0xa00ae278L, 0xd70dd2eeL, 0x4e048354L, 0x3903b3c2L, 0xa7672661L, 0xd06016f7L, 0x4969474dL, 0x3e6e77dbL,
     0xaed16a4aL, 0xd9d65adcL, 0x40df0b66L, 0x37d83bf0L, 0xa9bcae53L, 0xdebb9ec5L, 0x47b2cf7fL, 0x30b5ffe9L,
     0xbdbdf21cL, 0xcabac28aL, 0x53b39330L, 0x24b4a3a6L, 0xbad03605L, 0xcdd70693L, 0x54de5729L, 0x23d967bfL,
-    0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL
+    0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL,
 };
 
 #define DO1(buf) crc = CRC_TABLE[((int)crc ^ (*buf++)) & 0xff] ^ (crc >> 8);
 #define DO2(buf)  DO1(buf); DO1(buf);
 #define DO4(buf)  DO2(buf); DO2(buf);
 #define DO8(buf)  DO4(buf); DO4(buf);
+// clang-format on
 
 uint32_t crc32(const uint8_t* buf, size_t len) {
     uint32_t crc = 0;
@@ -54,13 +56,12 @@ uint32_t crc32(const uint8_t* buf, size_t len) {
             DO1(buf);
         } while (--len);
     }
-    return crc ^ 0xffffffffL;
+    return crc ^ 0xffffffff;
 }
 
 uint32_t crc(const uint64_t value) {
     const auto buf = reinterpret_cast<const uint8_t*>(&value);
     return crc32(buf, sizeof(value));
 }
-
 }
 }

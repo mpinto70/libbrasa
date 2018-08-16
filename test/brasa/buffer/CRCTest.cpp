@@ -1,16 +1,11 @@
 #include "brasa/buffer/CRC.h"
 
-#include <gtest/gtest.h>
 #include <cstdio>
 #include <cstdlib>
+#include <gtest/gtest.h>
 
 namespace brasa {
 namespace buffer {
-
-namespace {
-
-
-}
 
 TEST(CRCTest, crc) {
     const uint8_t little_endian[] = {
@@ -26,6 +21,5 @@ TEST(CRCTest, crc) {
     };
     EXPECT_EQ(crc(0x0123456789abcdef), crc32(little_endian, 8));
 }
-
 }
 }

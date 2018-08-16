@@ -41,6 +41,5 @@ TEST(SleepTest, MilliSleep) {
     veriffySleep(MilliSleep, NSECS_PER_MSEC, 1);
     veriffySleep(MilliSleep, NSECS_PER_MSEC, 2);
 }
-
 }
 }

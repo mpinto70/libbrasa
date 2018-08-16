@@ -15,7 +15,7 @@ struct Head {
     uint32_t lap;
 };
 
-template<typename TYPE_, uint32_t N_>
+template <typename TYPE_, uint32_t N_>
 class Circular {
 public:
     static_assert(std::is_pod<TYPE_>::value, "TYPE must be POD");
@@ -31,12 +31,13 @@ public:
 
     // no copies no moves
     Circular(const Circular& other) = delete;
-    Circular& operator =(const Circular& other) = delete;
+    Circular& operator=(const Circular& other) = delete;
+
 protected:
     Circular(uint8_t* buffer, const uint64_t key)
-        : buffer_(buffer),
-          key_(key),
-          crc_(crc(key)) {
+          : buffer_(buffer),
+            key_(key),
+            crc_(crc(key)) {
         if (not is_initialized()) {
             initialize();
         }
@@ -56,16 +57,16 @@ protected:
             return false;
         }
         switch (write_head->lap - read_head->lap) {
-        case 0: // same lap
-            break;
-        case 1: // one lap ahead
-            if (write_head->offset > read_head->offset) {
+            case 0: // same lap
+                break;
+            case 1: // one lap ahead
+                if (write_head->offset > read_head->offset) {
+                    read_head->offset = write_head->offset;
+                }
+                break;
+            default: // more than one lap ahead
                 read_head->offset = write_head->offset;
-            }
-            break;
-        default: // more than one lap ahead
-            read_head->offset = write_head->offset;
-            read_head->lap = write_head->lap - 1;
+                read_head->lap = write_head->lap - 1;
         }
         ::memcpy(&data, &buffer_[read_head->offset], sizeof(TYPE));
         advance(*read_head);
@@ -73,6 +74,7 @@ protected:
     }
 
     ~Circular() = default;
+
 private:
     uint8_t* buffer_;
     const uint64_t key_;
@@ -123,7 +125,7 @@ private:
         const auto write_head = reinterpret_cast<Head*>(buffer_ + OFFSET_WRITE_HEAD);
         const auto key = reinterpret_cast<uint64_t*>(buffer_ + OFFSET_KEY);
         const auto crc = reinterpret_cast<uint32_t*>(buffer_ + OFFSET_CRC);
-        const Head zero = {OFFSET_BEGIN_OF_DATA, 0};
+        const Head zero = { OFFSET_BEGIN_OF_DATA, 0 };
         ::memcpy(read_head, &zero, sizeof(Head));
         ::memcpy(write_head, &zero, sizeof(Head));
         ::memcpy(key, &key_, sizeof(key_));

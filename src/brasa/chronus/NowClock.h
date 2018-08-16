@@ -15,6 +15,5 @@ struct NowClock {
         return now.tv_sec * NSECS_PER_SEC + now.tv_nsec;
     }
 };
-
 }
 }

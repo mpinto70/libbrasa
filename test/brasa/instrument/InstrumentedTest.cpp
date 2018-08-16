@@ -104,64 +104,70 @@ void verify_operations(F f, const std::vector<int>& ops) {
 TEST(InstrumentedTest, count_default_construction) {
     verify_operations([]() {
         const Instrumented<int> x;
-    }, {
-        InstrumentedCounter::default_construction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::default_construction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_conversion_construction) {
     verify_operations([]() {
         int i = 13;
         const Instrumented<int> x(i);
-    }, {
-        InstrumentedCounter::conversion_construction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_construction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_conversion_move_construction) {
     verify_operations([]() {
         const auto x = Instrumented<int>(129);
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_copy_construction) {
     verify_operations([]() {
         const auto x = Instrumented<int>(129);
         const Instrumented<int> y(x);
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::copy_construction,
-        InstrumentedCounter::destruction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::copy_construction,
+                InstrumentedCounter::destruction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_move_construction) {
     verify_operations([]() {
         Instrumented<int> a(123);
         Instrumented<int> b(std::move(a));
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::move_construction,
-        InstrumentedCounter::destruction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::move_construction,
+                InstrumentedCounter::destruction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_conversion) {
     verify_operations([]() {
         const auto x = Instrumented<int>(129);
         static_cast<int>(x);
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::conversion,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::conversion,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_assignment) {
@@ -169,13 +175,14 @@ TEST(InstrumentedTest, count_assignment) {
         const auto x = Instrumented<int>(129);
         Instrumented<int> y;
         y = x;
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::default_construction,
-        InstrumentedCounter::assignment,
-        InstrumentedCounter::destruction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::default_construction,
+                InstrumentedCounter::assignment,
+                InstrumentedCounter::destruction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_equality) {
@@ -185,15 +192,16 @@ TEST(InstrumentedTest, count_equality) {
         y = x;
         y == x;
         y != x;
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::default_construction,
-        InstrumentedCounter::assignment,
-        InstrumentedCounter::equality,
-        InstrumentedCounter::equality,
-        InstrumentedCounter::destruction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::default_construction,
+                InstrumentedCounter::assignment,
+                InstrumentedCounter::equality,
+                InstrumentedCounter::equality,
+                InstrumentedCounter::destruction,
+                InstrumentedCounter::destruction,
+          });
 }
 
 TEST(InstrumentedTest, count_comparison) {
@@ -205,18 +213,18 @@ TEST(InstrumentedTest, count_comparison) {
         y > x;
         y <= x;
         y >= x;
-    }, {
-        InstrumentedCounter::conversion_move_construction,
-        InstrumentedCounter::default_construction,
-        InstrumentedCounter::assignment,
-        InstrumentedCounter::comparison,
-        InstrumentedCounter::comparison,
-        InstrumentedCounter::comparison,
-        InstrumentedCounter::comparison,
-        InstrumentedCounter::destruction,
-        InstrumentedCounter::destruction,
-    });
+    },
+          {
+                InstrumentedCounter::conversion_move_construction,
+                InstrumentedCounter::default_construction,
+                InstrumentedCounter::assignment,
+                InstrumentedCounter::comparison,
+                InstrumentedCounter::comparison,
+                InstrumentedCounter::comparison,
+                InstrumentedCounter::comparison,
+                InstrumentedCounter::destruction,
+                InstrumentedCounter::destruction,
+          });
 }
-
 }
 }

@@ -1,5 +1,5 @@
-#include "brasa/chronus/NowStd.h"
 #include "brasa/chronus/Chronometer.h"
+#include "brasa/chronus/NowStd.h"
 
 #include <gtest/gtest.h>
 
@@ -9,11 +9,12 @@ namespace {
 class NowFunctor {
 public:
     NowFunctor(uint64_t initial)
-        : initial_(initial) {
+          : initial_(initial) {
     }
     uint64_t operator()() const {
         return initial_++;
     }
+
 private:
     mutable uint64_t initial_;
 };
@@ -72,6 +73,5 @@ TEST(ChronometerTest, reset) {
     EXPECT_EQ(t2.begin, 102u);
     EXPECT_EQ(t2.end, 103u);
 }
-
 }
 }

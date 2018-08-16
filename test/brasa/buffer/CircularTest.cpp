@@ -1,5 +1,5 @@
-#include "CircularHelper.h"
 #include "brasa/buffer/Circular.h"
+#include "CircularHelper.h"
 #include "brasa/buffer/CircularReader.h"
 #include "brasa/buffer/CircularWriter.h"
 
@@ -85,7 +85,6 @@ void verify_create_initialized(const uint64_t KEY) {
     EXPECT_EQ(write_head->offset, 2 * sizeof(TYPE)) << "key = " << KEY;
     EXPECT_EQ(write_head->lap, 17u) << "key = " << KEY;
 }
-
 }
 
 TEST(CircularTest, create_initialized) {
@@ -224,6 +223,5 @@ TEST(CircularTest, manyLapsOneRead) {
     verify_many_laps_one_read<int, 278>(14);
     verify_many_laps_one_read<int, 27>(15);
 }
-
 }
 }

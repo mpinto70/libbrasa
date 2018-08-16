@@ -15,8 +15,7 @@ struct Regular {
     int x;
     int y;
 
-    friend
-    bool operator == (const Regular& lhs, const Regular& rhs) {
+    friend bool operator==(const Regular& lhs, const Regular& rhs) {
         return lhs.x == rhs.x && lhs.y == rhs.y;
     }
 };
@@ -25,25 +24,27 @@ struct TotallyOrdered {
     int x;
     int y;
 
-    friend
-    bool operator == (const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
+    friend bool operator==(const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
         return lhs.x == rhs.x && lhs.y == rhs.y;
     }
-    friend
-    bool operator < (const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
-        if (lhs.x < rhs.x) { return true; }
-        if (lhs.x > rhs.x) { return false; }
+
+    friend bool operator<(const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
+        if (lhs.x < rhs.x) {
+            return true;
+        }
+        if (lhs.x > rhs.x) {
+            return false;
+        }
         return lhs.y < rhs.y;
     }
 };
 
-template<typename T>
+template <typename T>
 Singleton<T> create(const T& t) {
     Singleton<T> a{};
     a.value = t;
     return a;
 }
-
 }
 
 TEST(SingletonTest, static_invariants) {
@@ -51,8 +52,8 @@ TEST(SingletonTest, static_invariants) {
     EXPECT_EQ(sizeof(SemiRegular), sizeof(Singleton<SemiRegular>));
 
     const auto a = create<int>(23);
-    const auto sra = create<SemiRegular>({23, 42});
-    const auto ra = create<Regular>({23, 42});
+    const auto sra = create<SemiRegular>({ 23, 42 });
+    const auto ra = create<Regular>({ 23, 42 });
     const Singleton<int> b(a);
     const Singleton<SemiRegular> srb(sra);
     const Singleton<Regular> rb(ra);
@@ -63,7 +64,7 @@ TEST(SingletonTest, static_invariants) {
 }
 
 namespace {
-template<typename T>
+template <typename T>
 void verify_creation_assignment(const T& v0, const T& v1) {
     const std::string msg = typeid(T).name();
     Singleton<T> a;
@@ -83,13 +84,13 @@ void verify_creation_assignment(const T& v0, const T& v1) {
 
 TEST(SingletonTest, default_creation_assignment) {
     verify_creation_assignment<int>(3, 5);
-    verify_creation_assignment<SemiRegular>({12, 47}, {28, -89});
-    verify_creation_assignment<Regular>({12, 47}, {28, -89});
-    verify_creation_assignment<TotallyOrdered>({12, 47}, {28, -89});
+    verify_creation_assignment<SemiRegular>({ 12, 47 }, { 28, -89 });
+    verify_creation_assignment<Regular>({ 12, 47 }, { 28, -89 });
+    verify_creation_assignment<TotallyOrdered>({ 12, 47 }, { 28, -89 });
 }
 
 namespace {
-template<typename T>
+template <typename T>
 void verify_equality(const T& v0, const T& v1) {
     const std::string msg = typeid(T).name();
     EXPECT_FALSE(v0 == v1) << msg;
@@ -110,12 +111,12 @@ void verify_equality(const T& v0, const T& v1) {
 
 TEST(SingletonTest, equality) {
     verify_equality<int>(3, 5);
-    verify_equality<Regular>({12, 47}, {28, -89});
-    verify_equality<TotallyOrdered>({12, 47}, {28, -89});
+    verify_equality<Regular>({ 12, 47 }, { 28, -89 });
+    verify_equality<TotallyOrdered>({ 12, 47 }, { 28, -89 });
 }
 
 namespace {
-template<typename T>
+template <typename T>
 void verify_ordering(const T& v0, const T& v1, const T& v2) {
     const std::string msg = typeid(T).name();
     EXPECT_FALSE(v0 == v1) << msg;
@@ -149,11 +150,11 @@ void verify_ordering(const T& v0, const T& v1, const T& v2) {
 
 TEST(SingletonTest, total_ordering) {
     verify_ordering<int>(3, 5, 7);
-    verify_ordering<TotallyOrdered>({12, 47}, {28, -89}, {50, 300});
+    verify_ordering<TotallyOrdered>({ 12, 47 }, { 28, -89 }, { 50, 300 });
 }
 
 namespace {
-template<typename T>
+template <typename T>
 void verify_conversions(const T& v) {
     const std::string msg = typeid(T).name();
 
@@ -167,10 +168,9 @@ void verify_conversions(const T& v) {
 
 TEST(SingletonTest, conversions) {
     verify_conversions<int>(3);
-    verify_conversions<SemiRegular>({12, 47});
-    verify_conversions<Regular>({12, 47});
-    verify_conversions<TotallyOrdered>({12, 47});
+    verify_conversions<SemiRegular>({ 12, 47 });
+    verify_conversions<Regular>({ 12, 47 });
+    verify_conversions<TotallyOrdered>({ 12, 47 });
 }
-
 }
 }

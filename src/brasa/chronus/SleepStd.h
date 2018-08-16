@@ -1,8 +1,8 @@
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <thread>
-#include <chrono>
 
 namespace brasa {
 namespace chronus {

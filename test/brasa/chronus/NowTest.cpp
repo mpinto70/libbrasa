@@ -19,7 +19,7 @@ void verifyNow(NOW_FUNC func) {
 
 template <typename NOW_FUNC>
 void verifyUniformity(NOW_FUNC func) {
-    constexpr timespec SLEEP = {0, 50 * NSECS_PER_MSEC};
+    constexpr timespec SLEEP = { 0, 50 * NSECS_PER_MSEC };
     const auto t1 = func();
     EXPECT_EQ(::nanosleep(&SLEEP, nullptr), 0);
     const auto t2 = func();
@@ -42,6 +42,5 @@ TEST(NowTest, nowClockRealTime) {
 TEST(NowTest, nowClockProcessTime) {
     verifyNow(NowClock<CLOCK_PROCESS_CPUTIME_ID>());
 }
-
 }
 }
