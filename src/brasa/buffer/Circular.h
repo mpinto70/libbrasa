@@ -87,10 +87,7 @@ private:
         if ((head.offset - OFFSET_BEGIN_OF_DATA) % sizeof(TYPE) != 0) {
             return false;
         }
-        if (head.offset >= OFFSET_END_OF_DATA) {
-            return false;
-        }
-        return true;
+        return head.offset < OFFSET_END_OF_DATA;
     }
 
     bool is_valid(const Head& read_head, const Head& write_head) const {
@@ -100,10 +97,7 @@ private:
         if (read_head.lap > write_head.lap) {
             return false;
         }
-        if (read_head.lap == write_head.lap && read_head.offset > write_head.offset) {
-            return false;
-        }
-        return true;
+        return read_head.lap != write_head.lap || read_head.offset <= write_head.offset;
     }
 
     bool is_initialized() const {
@@ -114,10 +108,8 @@ private:
         if (not is_valid(*read_head, *write_head)) {
             return false;
         }
-        if (*key != key_ || *crc != crc_) {
-            return false;
-        }
-        return true;
+
+        return *key == key_ && *crc == crc_;
     }
 
     void initialize() const {
@@ -125,7 +117,7 @@ private:
         const auto write_head = reinterpret_cast<Head*>(buffer_ + OFFSET_WRITE_HEAD);
         const auto key = reinterpret_cast<uint64_t*>(buffer_ + OFFSET_KEY);
         const auto crc = reinterpret_cast<uint32_t*>(buffer_ + OFFSET_CRC);
-        const Head zero = { OFFSET_BEGIN_OF_DATA, 0 };
+        constexpr Head zero = { OFFSET_BEGIN_OF_DATA, 0 };
         ::memcpy(read_head, &zero, sizeof(Head));
         ::memcpy(write_head, &zero, sizeof(Head));
         ::memcpy(key, &key_, sizeof(key_));
