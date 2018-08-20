@@ -1,5 +1,6 @@
 #pragma once
 // based in work from Alex Stepanov https://www.youtube.com/watch?v=aIHAEYyoTUc&list=PLHxtyCq_WDLXryyw91lahwdtpZsmo4BGD
+// this is not a Singleton pattern.
 
 #include <utility>
 
@@ -13,21 +14,19 @@ public:
     using value_type = T;
 
     // conversions
-    explicit constexpr Singleton(const T& x)
-          : value(x) {}
-    explicit constexpr Singleton(T&& x)
+    explicit constexpr Singleton(T x)
           : value(std::move(x)) {}
     explicit operator T() const { return value; }
 
     // semi-regular operations
     constexpr Singleton(const Singleton& x)
           : value(x.value) {}
-    constexpr Singleton(Singleton&& x)
-          : value(std::move(x.value)) {}
+    constexpr Singleton(Singleton&& x) = default;
     constexpr Singleton() = default;
-    ~Singleton() = default;
+    ~Singleton() noexcept = default;
     Singleton& operator=(const Singleton& rhs) {
-        value = rhs.value;
+        T tmp = rhs.value;
+        value = std::move(tmp);
         return *this;
     }
 
