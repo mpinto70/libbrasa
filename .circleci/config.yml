@@ -14,6 +14,3 @@ jobs:
       - run:
           name: Test system
           command: ./runbuild test
-      - run:
-          name: Cppcheck system
-          command: ./runbuild check
