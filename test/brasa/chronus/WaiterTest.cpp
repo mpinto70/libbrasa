@@ -29,15 +29,15 @@ void verifyWait(NOW_FUNC now_func,
 }
 
 TEST(WaitTest, Nano) {
-    verifyWait(NanoNow, NanoSleep, 1 * NSECS_PER_MSEC);
+    verifyWait(nano_now, nano_sleep, 1 * NSECS_PER_MSEC);
 }
 
 TEST(WaitTest, Micro) {
-    verifyWait(MicroNow, MicroSleep, 500);
+    verifyWait(micro_now, micro_sleep, 500);
 }
 
 TEST(WaitTest, Milli) {
-    verifyWait(MilliNow, MilliSleep, 1);
+    verifyWait(milli_now, milli_sleep, 1);
 }
 }
 }

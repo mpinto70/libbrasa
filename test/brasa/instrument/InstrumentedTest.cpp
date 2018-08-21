@@ -89,7 +89,7 @@ void verify_operations(F f, const std::vector<int>& ops) {
     }
     InstrumentedCounter::initialize(0);
     f();
-    for (size_t i = 0; i < InstrumentedCounter::NUMBER_OPS; ++i) {
+    for (int i = 0; i < InstrumentedCounter::NUMBER_OPS; ++i) {
         const std::string msgi = InstrumentedCounter::counter_names[i];
         const auto it = operations.find(i);
         if (it == operations.end()) {

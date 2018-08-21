@@ -67,7 +67,7 @@ namespace {
 template <typename T>
 void verify_creation_assignment(const T& v0, const T& v1) {
     const std::string msg = typeid(T).name();
-    Singleton<T> a{T()};
+    Singleton<T> a{ T() };
     a.value = v0;
     EXPECT_EQ(memcmp(&a.value, &v0, sizeof(T)), 0) << msg;
 

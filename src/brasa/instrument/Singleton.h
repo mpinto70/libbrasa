@@ -19,16 +19,16 @@ public:
     explicit operator T() const { return value; }
 
     // semi-regular operations
+    constexpr Singleton() = default;
     constexpr Singleton(const Singleton& x)
           : value(x.value) {}
-    constexpr Singleton(Singleton&& x) = default;
-    constexpr Singleton() = default;
-    ~Singleton() noexcept = default;
+    constexpr Singleton(Singleton&& x) noexcept = default;
     Singleton& operator=(const Singleton& rhs) {
         T tmp = rhs.value;
         value = std::move(tmp);
         return *this;
     }
+    Singleton& operator=(Singleton&& x) noexcept = default;
 
     // regular operations
     friend constexpr bool operator==(const Singleton& lhs, const Singleton& rhs) {

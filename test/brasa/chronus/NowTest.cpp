@@ -28,9 +28,9 @@ void verifyUniformity(NOW_FUNC func) {
 }
 }
 
-TEST(NowTest, NanoNow) {
-    verifyNow(NanoNow);
-    verifyUniformity(NanoNow);
+TEST(NowTest, nano_now) {
+    verifyNow(nano_now);
+    verifyUniformity(nano_now);
 }
 
 TEST(NowTest, nowClockRealTime) {
