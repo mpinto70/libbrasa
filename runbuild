@@ -48,6 +48,13 @@ elif [ "$1" = "test" ]; then
         $test "$@"
         check "$test"
     done
+elif [ "$1" = "ctest" ]; then
+    shift
+    do_build
+    cd build
+    ctest $@
+    check "ctest"
+    cd ..
 elif [ "$1" = "demo" ]; then
     do_build
     echo "Nothing to demo yet"
