@@ -1,10 +1,5 @@
-
-add_library(
-    instrument
+set(instrument_srcs
     Instrumented.cpp
 )
 
-target_include_directories(
-    instrument
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-)
+add_lib(instrument instrument_srcs)

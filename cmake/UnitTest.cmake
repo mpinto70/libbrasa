@@ -49,6 +49,12 @@ set_target_properties(
 function(add_unit_test test_name sources_var libs_var)
     set(unit_test_name unit_${test_name})
 
+    # add brasa_ prefix to all libs
+    set(prefixed_libs "")
+    foreach(f ${${libs_var}})
+        list(APPEND prefixed_libs "brasa_${f}")
+    endforeach(f)
+
     add_executable(
         ${unit_test_name}
         ${PROJECT_SOURCE_DIR}/test/gtest_main.cpp
@@ -71,7 +77,7 @@ function(add_unit_test test_name sources_var libs_var)
 
     target_link_libraries(
         ${unit_test_name}
-        ${${libs_var}}
+        ${prefixed_libs}
         libgtest
         libgmock
     )

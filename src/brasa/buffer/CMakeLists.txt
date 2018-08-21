@@ -1,10 +1,6 @@
 
-add_library(
-    buffer
+set(buffer_srcs
     CRC.cpp
 )
 
-target_include_directories(
-    buffer
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-)
+add_lib(buffer buffer_srcs)

@@ -1,10 +1,27 @@
 #!/bin/bash
 
-check() {
+_check() {
     if [ $? -ne 0 ]; then
         echo "Error processing: $1"
         exit 1
     fi
+}
+
+_clean() {
+    rm -rf \
+        build \
+        bin \
+        install \
+        lib \
+        test/bin \
+
+}
+
+_distclean() {
+    _clean
+    rm -rf \
+        gtest \
+
 }
 
 do_build() {
@@ -14,9 +31,9 @@ do_build() {
     cd build
     echo "Building ..."
     cmake ..
-    check "cmake"
+    _check "cmake"
     make -j8
-    check "make"
+    _check "make"
     cd ..
 }
 
@@ -24,20 +41,10 @@ if [ "$#" = "0" ]; then
     # With no parameter: build
     do_build
 elif [ "$1" = "clean" ]; then
-    rm -rf \
-        build \
-        bin \
-        lib \
-
+    _clean
     echo "Done."
 elif [ "$1" = "distclean" ]; then
-    rm -rf \
-        build \
-        bin \
-        lib \
-        gtest \
-        test/bin \
-
+    _distclean
     echo "Done."
 elif [ "$1" = "test" ]; then
     do_build
@@ -46,14 +53,14 @@ elif [ "$1" = "test" ]; then
     for test in `ls test/bin/*`
     do
         $test "$@"
-        check "$test"
+        _check "$test"
     done
 elif [ "$1" = "ctest" ]; then
     shift
     do_build
     cd build
     ctest $@
-    check "ctest"
+    _check "ctest"
     cd ..
 elif [ "$1" = "demo" ]; then
     do_build
@@ -62,6 +69,10 @@ elif [ "$1" = "check" ]; then
     do_build
     cd build
     make cppcheck
+elif [ "$1" = "install" ]; then
+    do_build
+    cd build
+    make install
 else
     echo "Usage: `basename $0` [test|clean|distclean|demo|check]"
 fi
