@@ -163,8 +163,8 @@ void verify_laps(uint64_t key) {
 
     TYPE t1, t2;
     Head h;
-    for (size_t i = 0; i < 3 * N; ++i) {
-        const size_t off_idx = i % N;
+    for (uint32_t i = 0; i < 3 * N; ++i) {
+        const uint32_t off_idx = i % N;
         ::memset(&t1, i, sizeof(t1));
         EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
         writer.write(t1);
@@ -201,14 +201,14 @@ void verify_many_laps_one_read(uint64_t key) {
     const CircularWriter<TYPE, N> writer(buffer, key);
     const CircularReader<TYPE, N> reader(buffer, key);
 
-    constexpr size_t MAX = 3 * N + 7;
+    constexpr uint32_t MAX = 3 * N + 7;
     TYPE t1;
-    for (size_t i = 0; i < MAX; ++i) {
+    for (uint32_t i = 0; i < MAX; ++i) {
         ::memset(&t1, i, sizeof(t1));
         writer.write(t1);
     }
 
-    for (size_t i = 0; i < N; ++i) {
+    for (uint32_t i = 0; i < N; ++i) {
         TYPE t2;
         ::memset(&t2, i + MAX - N, sizeof(t2));
         EXPECT_TRUE(reader.read(t1)) << i << '/' << key;

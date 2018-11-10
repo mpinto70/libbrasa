@@ -11,9 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_FLAGS "-Werror \
     -Wall \
+    -Wextra \
+    -pedantic-errors \
     -O3 \
     -finline-functions \
-    -Wno-unused-local-typedefs \
     -D PROJECT_DIR=\"\\\"${CMAKE_SOURCE_DIR}\\\"\"")
 
 # set (CMAKE_VERBOSE_MAKEFILE on)
