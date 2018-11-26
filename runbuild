@@ -3,31 +3,14 @@
 SCRIPT_DIR="$(realpath "$(dirname "${BASH_SOURCE[0]}")")"
 
 _check() {
-    if [ $? -ne 0 ]; then
+    if [[ $? -ne 0 ]]; then
         echo "Error processing: $1"
         exit 1
     fi
 }
 
-_clean() {
-    rm -rf \
-        build \
-        bin \
-        install \
-        lib \
-        test/bin \
-
-}
-
-_distclean() {
-    _clean
-    rm -rf \
-        gtest \
-
-}
-
-do_build() {
-    if [ ! -d "build" ]; then
+_do_build() {
+    if [[ ! -d "build" ]]; then
         mkdir build
     fi
     cd build
@@ -39,17 +22,25 @@ do_build() {
     cd ..
 }
 
-if [ "$#" = "0" ]; then
+_clean() {
+    rm -rf \
+        build \
+        bin \
+        lib \
+        test/bin \
+        test/lib \
+        mck/lib \
+
+}
+
+if [[ "$#" = "0" ]]; then
     # With no parameter: build
-    do_build
-elif [ "$1" = "clean" ]; then
+    _do_build
+elif [[ "$1" = "clean" ]]; then
     _clean
     echo "Done."
-elif [ "$1" = "distclean" ]; then
-    _distclean
-    echo "Done."
-elif [ "$1" = "test" ]; then
-    do_build
+elif [[ "$1" = "test" ]]; then
+    _do_build
     shift
     echo "Testing... "
     for test in `ls test/bin/*`
@@ -57,24 +48,24 @@ elif [ "$1" = "test" ]; then
         $test "$@"
         _check "$test"
     done
-elif [ "$1" = "ctest" ]; then
+elif [[ "$1" = "ctest" ]]; then
     shift
-    do_build
+    _do_build
     cd build
     ctest $@
     _check "ctest"
     cd ..
-elif [ "$1" = "demo" ]; then
-    do_build
+elif [[ "$1" = "demo" ]]; then
+    _do_build
     echo "Nothing to demo yet"
-elif [ "$1" = "check" ]; then
-    do_build
+elif [[ "$1" = "check" ]]; then
+    _do_build
     cd build
     make cppcheck
-elif [ "$1" = "install" ]; then
-    do_build
+elif [[ "$1" = "install" ]]; then
+    _do_build
     cd build
     make DESTDIR="${SCRIPT_DIR}/install" install
 else
-    echo "Usage: `basename $0` [test|clean|distclean|demo|check]"
+    echo "Usage: `basename $0` [test|ctest|clean|demo|check|install]"
 fi
