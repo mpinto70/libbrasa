@@ -26,7 +26,6 @@ function(add_unit_test test_name sources_var libs_var)
 
     add_executable(
         ${unit_test_name}
-        ${PROJECT_SOURCE_DIR}/test/gtest_main.cpp
         ${${sources_var}}
     )
 
@@ -55,6 +54,8 @@ function(_add_lib lib_name sources_var directory)
     target_include_directories(
         ${lib_name}
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+        PUBLIC ${gtest_SOURCE_DIR}/include
+        PUBLIC ${gmock_SOURCE_DIR}/include
     )
 
     set_target_properties(
