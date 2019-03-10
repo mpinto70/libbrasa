@@ -2,12 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <algorithm>
-#include <iomanip>
-#include <memory>
-#include <type_traits>
-#include <unordered_set>
-
 namespace brasa {
 namespace type_safe {
 ////////// trivial //////////

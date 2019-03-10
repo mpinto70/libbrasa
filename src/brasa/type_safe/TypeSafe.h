@@ -1,9 +1,7 @@
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
-#include <functional>
 #include <type_traits>
-#include <utility>
 
 namespace brasa {
 namespace type_safe {
