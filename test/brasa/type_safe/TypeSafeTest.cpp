@@ -22,8 +22,8 @@ void check_trivial(const safe_type& value, const typename safe_type::underlying_
     EXPECT_TRUE(std::is_pod<safe_type>::value);
     // is packable
     struct test_struct {
-        safe_type value1;
         uint8_t value2;
+        safe_type value1;
     } __attribute__((packed));
 
     EXPECT_EQ(sizeof(test_struct), sizeof(typename safe_type::underlying_type) + 1);
@@ -38,6 +38,37 @@ TEST(TypeSafeTest, trivial_is_viable) {
     TRIVIAL value{ 18 };
     uint16_t underlying = 18;
     check_trivial(value, underlying);
+}
+
+namespace {
+template <typename safe_type>
+void check_trivial_array(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
+    auto reinterpreted_value = reinterpret_cast<const safe_type*>(&stored_value);
+    EXPECT_EQ(static_cast<const void*>(reinterpreted_value), static_cast<const void*>(&stored_value));
+
+    EXPECT_EQ(sizeof(value), sizeof(stored_value));
+    EXPECT_EQ(memcmp(value.value, stored_value, sizeof(stored_value)), 0);
+    safe_type equal{};
+    std::copy(stored_value, stored_value + sizeof(equal.value), equal.value);
+    safe_type different{};
+    std::copy(stored_value, stored_value + sizeof(equal.value), equal.value);
+    different.value[0] += 1;
+    EXPECT_EQ(value, equal);
+    EXPECT_NE(value, different);
+    struct test_struct {
+        uint8_t value2;
+        safe_type value1;
+    } __attribute__((packed));
+
+    EXPECT_EQ(sizeof(test_struct), sizeof(typename safe_type::underlying_type) + 1);
+}
+}
+
+TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
+    using TRIVIAL = trivial<char[5], struct TRIVIAL_>;
+    TRIVIAL value = { { 'A', 'B', 'C', 'D', 'E' } };
+    const char underlying[] = { 'A', 'B', 'C', 'D', 'E' };
+    check_trivial_array(value, underlying);
 }
 
 ////////// ordered //////////
@@ -152,9 +183,10 @@ TEST(TypeSafeUsageTest, type_punning_works) {
 
     const Source source = { 0x11223344, { 'A', 'B', 'C', 'D', 'E' }, 0x8877665544332211 };
     memcpy(buffer, &source, sizeof(source));
+    Name expected_name = { { 'A', 'B', 'C', 'D', 'E' } };
 
     auto destination = reinterpret_cast<const Destination*>(buffer);
     EXPECT_EQ(destination->price, Price{ 0x11223344 });
-    EXPECT_EQ(memcmp(destination->name.value, "ABCDE", 5), 0);
+    EXPECT_EQ(destination->name, expected_name);
     EXPECT_EQ(destination->time, Time{ 0x8877665544332211 });
 }

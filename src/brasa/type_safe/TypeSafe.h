@@ -1,6 +1,7 @@
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
+#include <cstring>
 #include <type_traits>
 
 namespace brasa {
@@ -12,6 +13,7 @@ enum class Category {
     Scalar,
 };
 }
+
 template <typename T, typename Tag, impl::Category category>
 struct base_type {
     using underlying_type = T;
@@ -53,6 +55,13 @@ template <typename T, typename Tag, impl::Category category>
       const base_type<T, Tag, category>& lh,
       const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value == rh.value)) {
     return not(lh == rh);
+}
+
+template <typename T, typename Tag, impl::Category category, size_t N>
+[[nodiscard]] constexpr bool operator==(
+      const base_type<T[N], Tag, category>& lh,
+      const base_type<T[N], Tag, category>& rh) noexcept(noexcept(lh.value[0] == rh.value[0])) {
+    return std::memcmp(lh.value, rh.value, sizeof(lh.value)) == 0;
 }
 
 template <typename T, typename Tag, impl::Category category>
