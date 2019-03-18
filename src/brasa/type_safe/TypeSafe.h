@@ -61,7 +61,11 @@ template <typename T, typename Tag, impl::Category category, size_t N>
 constexpr bool operator==(
       const base_type<T[N], Tag, category>& lh,
       const base_type<T[N], Tag, category>& rh) noexcept(noexcept(lh.value[0] == rh.value[0])) {
-    return std::memcmp(lh.value, rh.value, sizeof(lh.value)) == 0;
+    for (size_t i = 0; i < N; ++i) {
+        if (lh.value[i] != rh.value[i])
+            return false;
+    }
+    return true;
 }
 
 template <typename T, typename Tag, impl::Category category>

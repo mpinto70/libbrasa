@@ -69,6 +69,11 @@ TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
     TRIVIAL value = { { 'A', 'B', 'C', 'D', 'E' } };
     const char underlying[] = { 'A', 'B', 'C', 'D', 'E' };
     check_trivial_array(value, underlying);
+
+    constexpr TRIVIAL value_eq = { { 'A', 'B', 'C', 'D', 'E' } };
+    constexpr TRIVIAL value_ne = { { 'a', 'B', 'C', 'D', 'E' } };
+    static_assert(value_eq == value_eq);
+    static_assert(value_eq != value_ne);
 }
 
 ////////// ordered //////////
