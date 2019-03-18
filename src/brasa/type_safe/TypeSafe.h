@@ -44,28 +44,28 @@ struct base_type<T, Tag, impl::Category::Scalar> {
 };
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr bool operator==(
+constexpr bool operator==(
       const base_type<T, Tag, category>& lh,
       const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value == rh.value)) {
     return lh.value == rh.value;
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr bool operator!=(
+constexpr bool operator!=(
       const base_type<T, Tag, category>& lh,
       const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value == rh.value)) {
     return not(lh == rh);
 }
 
 template <typename T, typename Tag, impl::Category category, size_t N>
-[[nodiscard]] constexpr bool operator==(
+constexpr bool operator==(
       const base_type<T[N], Tag, category>& lh,
       const base_type<T[N], Tag, category>& rh) noexcept(noexcept(lh.value[0] == rh.value[0])) {
     return std::memcmp(lh.value, rh.value, sizeof(lh.value)) == 0;
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Ordered || category == impl::Category::Scalar, bool>::type
       operator<(
             const base_type<T, Tag, category>& lh,
@@ -74,31 +74,28 @@ template <typename T, typename Tag, impl::Category category>
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr bool
-      operator>(
-            const base_type<T, Tag, category>& lh,
-            const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
+constexpr bool operator>(
+      const base_type<T, Tag, category>& lh,
+      const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
     return rh < lh;
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr bool
-      operator<=(
-            const base_type<T, Tag, category>& lh,
-            const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
+constexpr bool operator<=(
+      const base_type<T, Tag, category>& lh,
+      const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
     return not(rh < lh);
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr bool
-      operator>=(
-            const base_type<T, Tag, category>& lh,
-            const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
+constexpr bool operator>=(
+      const base_type<T, Tag, category>& lh,
+      const base_type<T, Tag, category>& rh) noexcept(noexcept(lh.value < rh.value)) {
     return not(lh < rh);
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator+(
             const base_type<T, Tag, category>& lh,
@@ -108,7 +105,7 @@ template <typename T, typename Tag, impl::Category category>
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator-(
             const base_type<T, Tag, category>& lh,
@@ -118,7 +115,7 @@ template <typename T, typename Tag, impl::Category category>
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator*(
             const base_type<T, Tag, category>& lh,
@@ -128,7 +125,7 @@ template <typename T, typename Tag, impl::Category category>
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator*(
             const T& lh,
@@ -138,7 +135,7 @@ template <typename T, typename Tag, impl::Category category>
 }
 
 template <typename T, typename Tag, impl::Category category>
-[[nodiscard]] constexpr
+constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator/(
             const base_type<T, Tag, category>& lh,
