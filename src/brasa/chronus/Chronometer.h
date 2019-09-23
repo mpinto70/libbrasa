@@ -27,9 +27,9 @@ public:
     Chronometer(Chronometer&&) noexcept = default;
     Chronometer& operator=(Chronometer&&) noexcept = default;
 
-    uint32_t id() const noexcept { return id_; }
+    [[nodiscard]] uint32_t id() const noexcept { return id_; }
 
-    Elapsed mark(uint32_t mark_id) const {
+    [[nodiscard]] Elapsed mark(uint32_t mark_id) const {
         return { id_, mark_id, begin_, now_() };
     }
 

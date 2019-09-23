@@ -24,7 +24,7 @@ public:
     Waiter& operator=(const Waiter&) = delete;
     Waiter(Waiter&&) noexcept = default;
     Waiter& operator=(Waiter&&) noexcept = default;
-    bool elapsed() const {
+    [[nodiscard]] bool elapsed() const {
         return now_() >= end_of_time_;
     }
     void wait() const {

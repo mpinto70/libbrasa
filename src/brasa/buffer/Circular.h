@@ -80,7 +80,7 @@ private:
     const uint64_t key_;
     const uint32_t crc_;
 
-    bool is_valid(const Head& head) const {
+    [[nodiscard]] bool is_valid(const Head& head) const {
         if (head.offset < OFFSET_BEGIN_OF_DATA) {
             return false;
         }
@@ -90,7 +90,7 @@ private:
         return head.offset < OFFSET_END_OF_DATA;
     }
 
-    bool is_valid(const Head& read_head, const Head& write_head) const {
+    [[nodiscard]] bool is_valid(const Head& read_head, const Head& write_head) const {
         if (not is_valid(read_head) || not is_valid(write_head)) {
             return false;
         }
@@ -100,7 +100,7 @@ private:
         return read_head.lap != write_head.lap || read_head.offset <= write_head.offset;
     }
 
-    bool is_initialized() const {
+    [[nodiscard]] bool is_initialized() const {
         const auto read_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_READ_HEAD);
         const auto write_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_WRITE_HEAD);
         const auto key = reinterpret_cast<const uint64_t*>(buffer_ + OFFSET_KEY);
