@@ -6,6 +6,7 @@ set(chronus_srcs
 )
 
 set(chronus_libs
+    chronus
 )
 
 add_unit_test(

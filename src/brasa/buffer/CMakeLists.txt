@@ -1,5 +1,8 @@
 
 set(buffer_srcs
+    Circular.cpp
+    CircularReader.cpp
+    CircularWriter.cpp
     CRC.cpp
 )
 

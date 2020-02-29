@@ -1,4 +1,4 @@
-#include "brasa/instrument/Instrumented.h"
+#include <brasa/instrument/Instrumented.h>
 
 #include <gtest/gtest.h>
 

@@ -1,7 +1,7 @@
-#include "brasa/buffer/Circular.h"
-#include "CircularHelper.h"
-#include "brasa/buffer/CircularReader.h"
-#include "brasa/buffer/CircularWriter.h"
+#include <brasa/buffer/Circular.h>
+#include <brasa/buffer/CircularReader.h>
+#include <brasa/buffer/CircularWriter.h>
+#include <../test/brasa/buffer/CircularHelper.h>
 
 #include <gtest/gtest.h>
 

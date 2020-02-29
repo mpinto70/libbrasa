@@ -1,4 +1,4 @@
-#include "brasa/instrument/Singleton.h"
+#include <brasa/instrument/Singleton.h>
 
 #include <gtest/gtest.h>
 

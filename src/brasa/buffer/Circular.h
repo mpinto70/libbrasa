@@ -1,6 +1,6 @@
 #pragma once
 
-#include "brasa/buffer/CRC.h"
+#include <brasa/buffer/CRC.h>
 
 #include <cstdint>
 #include <cstdio>

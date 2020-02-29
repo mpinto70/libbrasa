@@ -1,5 +1,5 @@
-#include "brasa/chronus/NowClock.h"
-#include "brasa/chronus/NowStd.h"
+#include <brasa/chronus/NowClock.h>
+#include <brasa/chronus/NowStd.h>
 
 #include <gtest/gtest.h>
 

@@ -1,5 +1,5 @@
 add_subdirectory (argparse)
-add_subdirectory (chronus)
 add_subdirectory (buffer)
+add_subdirectory (chronus)
 add_subdirectory (instrument)
 add_subdirectory (type_safe)
