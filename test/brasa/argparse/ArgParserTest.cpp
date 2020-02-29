@@ -121,4 +121,65 @@ TEST(ArgParserTest, test_usage_multiple_parameters_and_no_options) {
                                        "    PARAMETER2              a second parameter to process\n";
     EXPECT_EQ(parser.usage("executable"), expected_usage);
 }
+
+namespace {
+auto create_parser() {
+    return make_parser("program description",
+          std::make_tuple(
+                SingleValue<std::string>("PARAMETER1", "a parameter"),
+                SingleValue<std::string>("PARAMETER2", "another parameter"),
+                SingleValue<int>("PARAMETER3", "yet another parameter")),
+          std::make_tuple(
+                BooleanParser('l', "list-files", "list the files"),
+                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark the file to be ignored"),
+                ValueParser<SingleValue<int>>('n', "number", "number-of-times", "set the number of times")));
+}
+
+void check_error_in_parser(const std::vector<std::string>& options, const std::string& error_msg) {
+    auto parser = create_parser();
+
+    int argc = 0;
+    char* argv[50];
+    char buffer[4096];
+    build(options, buffer, argc, argv);
+    std::ostringstream out;
+    EXPECT_EQ(parser.parse(argc, argv, out), ParseResult::Error);
+    EXPECT_EQ(out.str(), error_msg + "\n\n" + parser.usage(options[0]));
+}
+}
+
+TEST(ArgParserTest, test_parse_error_insufficient_values) {
+    const std::vector<std::string> options = {
+            "command",
+            "parameter1",
+            "parameter2",
+    };
+
+    check_error_in_parser(options, "ERROR processing command line arguments: missing arguments for PARAMETER3");
+}
+
+TEST(ArgParserTest, test_parse_error_too_many_values) {
+    const std::vector<std::string> options = {
+            "command",
+            "parameter1",
+            "parameter2",
+            "789",
+            "excess",
+            "value",
+    };
+
+    check_error_in_parser(options, "ERROR processing command line arguments: too many arguments 'excess' 'value'");
+}
+
+TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
+    const std::vector<std::string> options = {
+            "command",
+            "parameter1",
+            "parameter2",
+            "text",
+    };
+
+    check_error_in_parser(options, "ERROR processing command line arguments: could not convert value 'text' of PARAMETER3");
+}
+
 }

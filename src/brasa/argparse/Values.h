@@ -53,7 +53,7 @@ public:
         std::istringstream out(argument);
         out >> t_;
         if (not out) {
-            throw InvalidArgument("Could not convert value " + argument + " of " + name());
+            throw InvalidArgument("could not convert value '" + argument + "' of " + name());
         }
         mark_digested();
     }

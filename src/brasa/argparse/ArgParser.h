@@ -132,7 +132,7 @@ public:
             }
             return parse_result;
         } catch (const InvalidArgument& error) {
-            err << "ERROR processing command line arguments: " << error.what() << "\n\n"
+            err << ERROR_MSG_ << error.what() << "\n\n"
                 << usage(argv[0]);
             return ParseResult::Error;
         }
@@ -146,6 +146,7 @@ private:
     std::string short_options_;
 
     static constexpr const char HELP_[] = "help";
+    static constexpr const char ERROR_MSG_[] = "ERROR processing command line arguments: ";
 
 private: // functions
     ParseResult do_parse(int argc, char* const argv[], std::ostream& err) {
@@ -169,16 +170,16 @@ private: // functions
         if (not detail::accumulate_tuple<ParseValues, bool, std::logical_and<bool>>(values_, true, index, argc, argv)) {
             const size_t num_values_processed = index - first_value_index;
             const auto missing_arguments = detail::accumulate_tuple<BuildMissingParameters, std::string>(values_, "", num_values_processed);
-            err << "Missing arguments for:" << missing_arguments << "\n\n";
+            err << ERROR_MSG_ << "missing arguments for" << missing_arguments << "\n\n";
             return ParseResult::Error;
         }
 
         if (index == argc) { // everything was consumed without error
             return ParseResult::Ok;
         } else { // there are still arguments in the command line
-            err << "Too many arguments:";
+            err << ERROR_MSG_ << "too many arguments";
             for (; index < argc; ++index) {
-                err << " " << argv[index];
+                err << " '" << argv[index] << "'";
             }
             err << "\n\n";
             return ParseResult::Error;
