@@ -1,8 +1,7 @@
 set(chronus_srcs
     Chronometer.cpp
     Constants.cpp
-    NowClock.cpp
-    NowStd.cpp
+    Now.cpp
     SleepStd.cpp
     Waiter.cpp
 )

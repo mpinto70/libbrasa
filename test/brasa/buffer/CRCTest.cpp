@@ -7,19 +7,13 @@
 namespace brasa {
 namespace buffer {
 
-TEST(CRCTest, crc) {
-    const uint8_t little_endian[] = {
-        0xef,
-        0xcd,
-        0xab,
-        0x89,
-        0x67,
-        0x45,
-        0x23,
-        0x01,
-        0x00
-    };
-    EXPECT_EQ(crc(0x0123456789abcdef), crc32(little_endian, 8));
+TEST(CRCTest, crc32) {
+    srand(time(nullptr));
+    for (size_t i = 0; i < 1000; ++i) {
+        const uint64_t val = uint64_t(rand()) << 32 + rand();
+        auto buffer = reinterpret_cast<const uint8_t*>(&val);
+        EXPECT_EQ(crc32(val), crc32(buffer, sizeof(val)));
+    }
 }
 }
 }

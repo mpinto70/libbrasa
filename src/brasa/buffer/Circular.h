@@ -10,23 +10,30 @@
 namespace brasa {
 namespace buffer {
 
+/// Read and write head marker
 struct Head {
-    uint32_t offset;
-    uint32_t lap;
+    uint32_t offset; ///< offset from begin of buffer
+    uint32_t lap;    ///< lap number in the buffer
 };
 
+/** Circular buffer base class. It should be extended by Writer and Reader.
+ * `TYPE_` is the struct that will be stored in the buffer
+ * `N_` is the number of objects of type `TYPE_` that can be stored in the buffer
+ */
 template <typename TYPE_, uint32_t N_>
 class Circular {
-public:
-    static_assert(std::is_pod<TYPE_>::value, "TYPE must be POD");
-    using TYPE = TYPE_;
-    constexpr static uint32_t N = N_;
+protected:
     constexpr static uint32_t OFFSET_BEGIN_OF_DATA = 0;
-    constexpr static uint32_t OFFSET_END_OF_DATA = OFFSET_BEGIN_OF_DATA + N * sizeof(TYPE);
+    constexpr static uint32_t OFFSET_END_OF_DATA = OFFSET_BEGIN_OF_DATA + N_ * sizeof(TYPE_);
     constexpr static uint32_t OFFSET_READ_HEAD = OFFSET_END_OF_DATA;
     constexpr static uint32_t OFFSET_WRITE_HEAD = OFFSET_READ_HEAD + sizeof(Head);
     constexpr static uint32_t OFFSET_KEY = OFFSET_WRITE_HEAD + sizeof(Head);
     constexpr static uint32_t OFFSET_CRC = OFFSET_KEY + sizeof(uint64_t);
+
+public:
+    static_assert(std::is_pod<TYPE_>::value, "TYPE must be POD");
+    using TYPE = TYPE_;
+    constexpr static uint32_t N = N_;
     constexpr static uint32_t BUFFER_SIZE = OFFSET_CRC + sizeof(uint32_t);
 
     // no copies no moves
@@ -34,22 +41,27 @@ public:
     Circular& operator=(const Circular& other) = delete;
 
 protected:
+    /** Creates the object informing the buffer and the key.
+     * The buffer has to be at least `BUFFER_SIZE` in length.
+     */
     Circular(uint8_t* buffer, const uint64_t key)
           : buffer_(buffer),
             key_(key),
-            crc_(crc(key)) {
+            crc_(crc32(key)) {
         if (not is_initialized()) {
             initialize();
         }
     }
 
-    void do_write(const TYPE& data) const {
+    /// Writes `data` to the buffer
+    void do_write(const TYPE& data) const noexcept {
         const auto write_head = reinterpret_cast<Head*>(&buffer_[OFFSET_WRITE_HEAD]);
         ::memcpy(&buffer_[write_head->offset], &data, sizeof(TYPE));
         advance(*write_head);
     }
 
-    bool do_read(TYPE& data) const {
+    /// Reads `data` from the buffer and returns true. If there is no data in the buffer, returns false.
+    bool do_read(TYPE& data) const noexcept {
         const auto write_head = reinterpret_cast<const Head*>(&buffer_[OFFSET_WRITE_HEAD]);
         const auto read_head = reinterpret_cast<Head*>(&buffer_[OFFSET_READ_HEAD]);
 
@@ -73,14 +85,14 @@ protected:
         return true;
     }
 
-    ~Circular() = default;
+    ~Circular() noexcept = default;
 
 private:
     uint8_t* buffer_;
     const uint64_t key_;
     const uint32_t crc_;
 
-    [[nodiscard]] bool is_valid(const Head& head) const {
+    [[nodiscard]] bool is_valid(const Head& head) const noexcept {
         if (head.offset < OFFSET_BEGIN_OF_DATA) {
             return false;
         }
@@ -90,7 +102,7 @@ private:
         return head.offset < OFFSET_END_OF_DATA;
     }
 
-    [[nodiscard]] bool is_valid(const Head& read_head, const Head& write_head) const {
+    [[nodiscard]] bool is_valid(const Head& read_head, const Head& write_head) const noexcept {
         if (not is_valid(read_head) || not is_valid(write_head)) {
             return false;
         }
@@ -100,7 +112,7 @@ private:
         return read_head.lap != write_head.lap || read_head.offset <= write_head.offset;
     }
 
-    [[nodiscard]] bool is_initialized() const {
+    [[nodiscard]] bool is_initialized() const noexcept {
         const auto read_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_READ_HEAD);
         const auto write_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_WRITE_HEAD);
         const auto key = reinterpret_cast<const uint64_t*>(buffer_ + OFFSET_KEY);
@@ -112,7 +124,7 @@ private:
         return *key == key_ && *crc == crc_;
     }
 
-    void initialize() const {
+    void initialize() const noexcept {
         const auto read_head = reinterpret_cast<Head*>(buffer_ + OFFSET_READ_HEAD);
         const auto write_head = reinterpret_cast<Head*>(buffer_ + OFFSET_WRITE_HEAD);
         const auto key = reinterpret_cast<uint64_t*>(buffer_ + OFFSET_KEY);
@@ -124,7 +136,7 @@ private:
         ::memcpy(crc, &crc_, sizeof(crc_));
     }
 
-    void advance(Head& head) const {
+    void advance(Head& head) const noexcept {
         head.offset += sizeof(TYPE);
         if (head.offset == OFFSET_END_OF_DATA) {
             head.offset = OFFSET_BEGIN_OF_DATA;

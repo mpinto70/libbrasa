@@ -1,5 +1,4 @@
-#include <brasa/chronus/NowClock.h>
-#include <brasa/chronus/NowStd.h>
+#include <brasa/chronus/Now.h>
 
 #include <gtest/gtest.h>
 
@@ -33,13 +32,5 @@ TEST(NowTest, nano_now) {
     verifyUniformity(nano_now);
 }
 
-TEST(NowTest, nowClockRealTime) {
-    verifyNow(NowClock<CLOCK_REALTIME>());
-    verifyUniformity(NowClock<CLOCK_REALTIME>());
-}
-
-TEST(NowTest, nowClockProcessTime) {
-    verifyNow(NowClock<CLOCK_PROCESS_CPUTIME_ID>());
-}
 }
 }

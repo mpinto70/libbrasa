@@ -7,19 +7,26 @@
 namespace brasa {
 namespace type_safe {
 namespace impl {
+/// Categories of wrapped values
 enum class Category {
-    Trivial,
-    Ordered,
-    Scalar,
+    Trivial, ///< only identity (== and !=)
+    Ordered, ///< ordering (<, >, <= and >=)
+    Scalar,  ///< arithmetic (+, -, * and /)
 };
 }
 
+/** A wrapper to make POD types different types.
+ * `T`: is the underlying type
+ * `Tag`: is a type to make the wrapper unique
+ * `Category`: is used to enable/disable operations
+ */
 template <typename T, typename Tag, impl::Category category>
 struct base_type {
     using underlying_type = T;
     T value;
 };
 
+/// A wrapper that adds the ability to make arithmetic operations
 template <typename T, typename Tag>
 struct base_type<T, Tag, impl::Category::Scalar> {
     using underlying_type = T;
@@ -43,6 +50,7 @@ struct base_type<T, Tag, impl::Category::Scalar> {
     }
 };
 
+/// comparison: enabled to all categories
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator==(
       const base_type<T, Tag, category>& lh,
@@ -50,6 +58,7 @@ constexpr bool operator==(
     return lh.value == rh.value;
 }
 
+/// comparison: enabled to all categories
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator!=(
       const base_type<T, Tag, category>& lh,
@@ -57,6 +66,7 @@ constexpr bool operator!=(
     return not(lh == rh);
 }
 
+/// comparison: enabled to all categories (specialization for arrays)
 template <typename T, typename Tag, impl::Category category, size_t N>
 constexpr bool operator==(
       const base_type<T[N], Tag, category>& lh,
@@ -68,6 +78,7 @@ constexpr bool operator==(
     return true;
 }
 
+/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Ordered || category == impl::Category::Scalar, bool>::type
@@ -77,6 +88,7 @@ constexpr
     return lh.value < rh.value;
 }
 
+/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator>(
       const base_type<T, Tag, category>& lh,
@@ -84,6 +96,7 @@ constexpr bool operator>(
     return rh < lh;
 }
 
+/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator<=(
       const base_type<T, Tag, category>& lh,
@@ -91,6 +104,7 @@ constexpr bool operator<=(
     return not(rh < lh);
 }
 
+/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator>=(
       const base_type<T, Tag, category>& lh,
@@ -98,6 +112,7 @@ constexpr bool operator>=(
     return not(lh < rh);
 }
 
+/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
@@ -108,6 +123,7 @@ constexpr
     return base_type<T, Tag, category>{ tmp };
 }
 
+/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
@@ -118,6 +134,7 @@ constexpr
     return base_type<T, Tag, category>{ tmp };
 }
 
+/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
@@ -128,6 +145,7 @@ constexpr
     return base_type<T, Tag, category>{ tmp };
 }
 
+/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
@@ -138,6 +156,7 @@ constexpr
     return base_type<T, Tag, category>{ tmp };
 }
 
+/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
@@ -159,6 +178,7 @@ using ordered = base_type<T, Tag, impl::Category::Ordered>;
 template <typename T, typename Tag>
 using scalar = base_type<T, Tag, impl::Category::Scalar>;
 
+/// cast from underlying to wrapped type
 template <typename TYPE>
 constexpr TYPE type_cast(typename TYPE::underlying_type value) noexcept {
     return TYPE{ value };

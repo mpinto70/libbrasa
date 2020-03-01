@@ -4,6 +4,7 @@ namespace brasa {
 namespace buffer {
 
 // clang-format off
+// see https://rosettacode.org/wiki/CRC-32
 constexpr uint32_t CRC_TABLE[256] = {
     0x00000000L, 0x77073096L, 0xee0e612cL, 0x990951baL, 0x076dc419L, 0x706af48fL, 0xe963a535L, 0x9e6495a3L,
     0x0edb8832L, 0x79dcb8a4L, 0xe0d5e91eL, 0x97d2d988L, 0x09b64c2bL, 0x7eb17cbdL, 0xe7b82d07L, 0x90bf1d91L,
@@ -38,6 +39,8 @@ constexpr uint32_t CRC_TABLE[256] = {
     0xbdbdf21cL, 0xcabac28aL, 0x53b39330L, 0x24b4a3a6L, 0xbad03605L, 0xcdd70693L, 0x54de5729L, 0x23d967bfL,
     0xb3667a2eL, 0xc4614ab8L, 0x5d681b02L, 0x2a6f2b94L, 0xb40bbe37L, 0xc30c8ea1L, 0x5a05df1bL, 0x2d02ef8dL,
 };
+}
+}
 
 #define DO1(buf) crc = CRC_TABLE[((int)crc ^ (*buf++)) & 0xff] ^ (crc >> 8);
 #define DO2(buf)  DO1(buf); DO1(buf);
@@ -45,7 +48,8 @@ constexpr uint32_t CRC_TABLE[256] = {
 #define DO8(buf)  DO4(buf); DO4(buf);
 // clang-format on
 
-uint32_t crc32(const uint8_t* buf, size_t len) {
+/// calculates the CRC-32 of the buffer
+uint32_t brasa::buffer::crc32(const uint8_t* buf, size_t len) noexcept {
     uint32_t crc = 0;
     while (len >= 8) {
         DO8(buf);
@@ -59,9 +63,23 @@ uint32_t crc32(const uint8_t* buf, size_t len) {
     return crc ^ 0xffffffff;
 }
 
-uint32_t crc(const uint64_t value) {
-    const auto buf = reinterpret_cast<const uint8_t*>(&value);
-    return crc32(buf, sizeof(value));
-}
-}
+/// calculates the CRC-32 of the number passed
+uint32_t brasa::buffer::crc32(uint64_t value) noexcept {
+    uint32_t crc = 0;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    value >>= 8;
+    crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
+    return crc ^ 0xffffffff;
 }

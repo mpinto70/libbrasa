@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cassert>
+
 namespace brasa {
 namespace type_safe {
 ////////// trivial //////////
@@ -10,12 +12,15 @@ namespace {
 template <typename safe_type>
 void check_trivial(const safe_type& value, const typename safe_type::underlying_type stored_value) {
     typename safe_type::underlying_type buffer = stored_value;
+    // check that safe_type does not add any storage
     auto reinterpreted_value = reinterpret_cast<safe_type*>(&buffer);
     EXPECT_EQ(static_cast<void*>(reinterpreted_value), static_cast<void*>(&buffer));
     EXPECT_EQ(reinterpreted_value->value, buffer);
 
+    // check the value is correct
     EXPECT_EQ(value.value, stored_value);
     EXPECT_EQ(value, safe_type{ stored_value });
+
     typename safe_type::underlying_type different_value = stored_value + 1;
     EXPECT_NE(value, safe_type{ different_value });
     EXPECT_TRUE(std::is_trivial<safe_type>::value);
@@ -26,6 +31,7 @@ void check_trivial(const safe_type& value, const typename safe_type::underlying_
         safe_type value1;
     } __attribute__((packed));
 
+    // there is no additional space allocated for `safe_type`
     EXPECT_EQ(sizeof(test_struct), sizeof(typename safe_type::underlying_type) + 1);
 
     static_assert(safe_type{ 5 } == safe_type{ 5 });
@@ -175,7 +181,7 @@ TEST(TypeSafeUsageTest, type_punning_works) {
 
     using Price = brasa::type_safe::scalar<uint32_t, struct Price_>;
     using Name = brasa::type_safe::trivial<char[5], struct Name_>;
-    using Time = brasa::type_safe::ordered<uint64_t, struct Name_>;
+    using Time = brasa::type_safe::ordered<uint64_t, struct Time_>;
     struct Destination {
         Price price;
         Name name;
@@ -184,14 +190,19 @@ TEST(TypeSafeUsageTest, type_punning_works) {
 
     static_assert(sizeof(Source) == sizeof(Destination));
 
-    char* buffer[sizeof(Source)] = {};
+    char buffer[sizeof(Source)] = {};
 
     const Source source = { 0x11223344, { 'A', 'B', 'C', 'D', 'E' }, 0x8877665544332211 };
     memcpy(buffer, &source, sizeof(source));
     Name expected_name = { { 'A', 'B', 'C', 'D', 'E' } };
 
     auto destination = reinterpret_cast<const Destination*>(buffer);
-    EXPECT_EQ(destination->price, Price{ 0x11223344 });
+    EXPECT_EQ(destination->price.value, source.price);
+    EXPECT_EQ(memcmp(destination->name.value, source.name, sizeof(source.name)), 0);
     EXPECT_EQ(destination->name, expected_name);
     EXPECT_EQ(destination->time, Time{ 0x8877665544332211 });
+    assert(destination->price.value == source.price);
+    assert(memcmp(destination->name.value, source.name, sizeof(source.name)) == 0);
+    assert(destination->name == expected_name);
+    assert(destination->time.value == source.time);
 }

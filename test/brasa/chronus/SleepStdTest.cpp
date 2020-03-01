@@ -1,6 +1,6 @@
-#include <brasa/chronus/SleepStd.h>
 #include <brasa/chronus/Constants.h>
-#include <brasa/chronus/NowStd.h>
+#include <brasa/chronus/Now.h>
+#include <brasa/chronus/SleepStd.h>
 
 #include <gtest/gtest.h>
 #include <unistd.h>

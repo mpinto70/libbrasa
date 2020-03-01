@@ -150,9 +150,9 @@ void check_error_in_parser(const std::vector<std::string>& options, const std::s
 
 TEST(ArgParserTest, test_parse_error_insufficient_values) {
     const std::vector<std::string> options = {
-            "command",
-            "parameter1",
-            "parameter2",
+        "command",
+        "parameter1",
+        "parameter2",
     };
 
     check_error_in_parser(options, "ERROR processing command line arguments: missing arguments for PARAMETER3");
@@ -160,12 +160,12 @@ TEST(ArgParserTest, test_parse_error_insufficient_values) {
 
 TEST(ArgParserTest, test_parse_error_too_many_values) {
     const std::vector<std::string> options = {
-            "command",
-            "parameter1",
-            "parameter2",
-            "789",
-            "excess",
-            "value",
+        "command",
+        "parameter1",
+        "parameter2",
+        "789",
+        "excess",
+        "value",
     };
 
     check_error_in_parser(options, "ERROR processing command line arguments: too many arguments 'excess' 'value'");
@@ -173,10 +173,10 @@ TEST(ArgParserTest, test_parse_error_too_many_values) {
 
 TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
     const std::vector<std::string> options = {
-            "command",
-            "parameter1",
-            "parameter2",
-            "text",
+        "command",
+        "parameter1",
+        "parameter2",
+        "text",
     };
 
     check_error_in_parser(options, "ERROR processing command line arguments: could not convert value 'text' of PARAMETER3");

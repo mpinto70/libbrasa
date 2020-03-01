@@ -6,17 +6,26 @@
 namespace brasa {
 namespace chronus {
 
+/** A struct to register the instants in time from `Chronometer` objects. */
 struct Elapsed {
-    uint32_t chrono_id;
-    uint32_t mark_id;
-    uint64_t begin;
-    uint64_t end;
-} __attribute__((packed));
+    uint32_t chrono_id; ///< chronometer identifier
+    uint32_t mark_id;   ///< instant identifier
+    uint64_t begin;     ///< start of timing
+    uint64_t end;       ///< instant timing
+};
 
-template <typename NOW_FUNC>
+/** A class to mark serve as a chronometer
+ * NOW_FUNC is a function or functor that returns a suitable representation of current instant in time
+ * ELAPSED is a structure in which the two first members are compatible with uint32_t and the third 
+ *      and fourth members compatible with the return type of `NOW_FUNC`.
+ */
+template <typename NOW_FUNC, typename ELAPSED>
 class Chronometer {
 public:
-    Chronometer(NOW_FUNC now, uint32_t id)
+    using TimeT = std::invoke_result_t<NOW_FUNC>; ///< the return of NOW_FUNC is stored in `begin_`
+
+    /// Creates the object registering its id and the `NOW_FUNC`
+    Chronometer(NOW_FUNC&& now, uint32_t id)
           : now_(std::move(now)),
             id_(id),
             begin_(now_()) {
@@ -29,10 +38,12 @@ public:
 
     [[nodiscard]] uint32_t id() const noexcept { return id_; }
 
-    [[nodiscard]] Elapsed mark(uint32_t mark_id) const {
+    /// Marks the current instant and returns an `ELAPSED` struct
+    [[nodiscard]] ELAPSED mark(uint32_t mark_id) const {
         return { id_, mark_id, begin_, now_() };
     }
 
+    /// Restarts the chronometer
     void reset() noexcept {
         begin_ = now_();
     }
@@ -40,12 +51,12 @@ public:
 private:
     const NOW_FUNC now_;
     const uint32_t id_;
-    uint64_t begin_;
+    TimeT begin_;
 };
 
-template <typename NOW_FUNC>
-Chronometer<NOW_FUNC> make_chronometer(NOW_FUNC func, uint32_t id) {
-    return Chronometer<NOW_FUNC>(std::forward<NOW_FUNC>(func), id);
+template <typename ELAPSED = Elapsed, typename NOW_FUNC>
+Chronometer<NOW_FUNC, ELAPSED> make_chronometer(NOW_FUNC&& func, uint32_t id) {
+    return Chronometer<NOW_FUNC, ELAPSED>(std::forward<NOW_FUNC>(func), id);
 }
 }
 }
