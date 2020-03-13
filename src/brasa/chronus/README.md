@@ -8,6 +8,7 @@ There are two main classes (`Elapsed` and `Chronometer`) and one helper function
 
 The `Elapsed` class serves to register elapsed times from a chronometer. The
 information registered are: 
+
 * `chrono_id`: chronometer identifier passed to `Chronometer` construction.
 * `mark_id`: identifier for a specific instant in time when `Chronometer::mark`
   is called.
@@ -47,6 +48,7 @@ const auto chronometer = brasa::chronus::make_chronometer(brasa::chronus::nano_n
 The returned `chronometer` from the above command marks time in nanoseconds.
 
 `Chronometer` has the following (important) functions:
+
 * `mark`: returns information for the current instant (now).
 * `reset`: sets the begin of the timing to the current instant (now).
 
@@ -54,11 +56,13 @@ The returned `chronometer` from the above command marks time in nanoseconds.
 
 `Now` component has a set of functions to pass to `Chronometer`. These functions
 use the facilities in STL chrono library:
+
 * `nano_now`: returns the current instant in nanoseconds.
 * `micro_now`: returns the current instant in microseconds.
 * `milli_now`: returns the current instant in milliseconds.
 
 One could implement a class based in `clock_gettime` function:
+
 ```cpp
 #include <ctime>
 
@@ -79,7 +83,9 @@ private:
 ## `SleepStd` component
 
 `SleepStd` component has a set of functions to stop the current program for a
-specified amount of time. They are a wrapper around `std::this_thread::sleep_for`:
+specified amount of time. They are a wrapper around
+`std::this_thread::sleep_for`:
+
 * `nano_sleep`: suspends the current thread for `sleep_length` nanoseconds.
 * `micro_sleep`: suspends the current thread for `sleep_length` microseconds.
 * `milli_sleep`: suspends the current thread for `sleep_length` milliseconds.
@@ -104,6 +110,7 @@ waiter.wait(); // assure that current thread will wait until 15ms have passed
 ```
 
 `Waiter`'s member functions are:
+
 * `elapsed`: returns a boolean indicating if the wait time has passed
 * `wait`: will repeatedly suspend current thread until wait time has passed
 * `reset`: to restart counting wait time

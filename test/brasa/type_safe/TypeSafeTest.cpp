@@ -189,6 +189,9 @@ TEST(TypeSafeUsageTest, type_punning_works) {
     } __attribute__((packed));
 
     static_assert(sizeof(Source) == sizeof(Destination));
+    static_assert(offsetof(Source, price) == offsetof(Destination, price));
+    static_assert(offsetof(Source, name) == offsetof(Destination, name));
+    static_assert(offsetof(Source, time) == offsetof(Destination, time));
 
     char buffer[sizeof(Source)] = {};
 

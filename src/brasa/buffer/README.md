@@ -15,6 +15,7 @@ There are two main components in `buffer` package: `CircularReader` and
 
 `CircularWriter` is the component that writes to the buffer (producer). It
 exposes the following member functions:
+
 * constructor: takes the buffer and a key number that is used to uniquely
   identify the buffer.
 * `write`: that writes `data` to buffer. It **always succeed**.
@@ -25,6 +26,7 @@ The buffer must be at least `CircularWriter::BUFFER_SIZE` bytes long.
 
 `CircularReader` is the component that reads from the buffer (producer). It
 exposes the following member functions:
+
 * constructor: takes the buffer and a key number that is used to uniquely
   identify the buffer.
 * `read`: that reads `data` from buffer. If there is no data to be read, returns
@@ -41,11 +43,13 @@ directly**, thus almost all its contents is `protected`. It contains logic to
 write and read data from the buffer. That is used by its descendants.
 
 In its `public` interface, `Circular` exposes:
+
 * `TYPE`: the type stored
 * `N`: the number of elements it is able to store
 * `BUFFER_SIZE`: the minimum size of the buffer passed to it during construction
 
-Int its `protected` interface, `Circular` exposes:
+In its `protected` interface, `Circular` exposes:
+
 * constructor: taking the buffer and a key number to use in validations. The key
   number should be a unique number to avoid errors in reading/writing.
 * `do_write`: writes data to buffer (always succeed).

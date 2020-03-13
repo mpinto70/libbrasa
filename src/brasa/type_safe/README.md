@@ -15,13 +15,15 @@ There are three different categories (`enum class Category`) of types:
 <sup>*</sup> `*` and `/` operates on native types only.
 
 The important types defined in this package are:
+
 * `trivial`: a type of category `Category::Trivial`
 * `ordered`: a type of category `Category::Ordered`
 * `scalar`: a type of category `Category::Scalar`
 
 The wrappers don't add space to the underlying type, so they can be used in
-structs where the underlying type would have been. For example, the two structs
-below have the same memory representation:
+`struct`s where the underlying type would have been. For example, the two
+`struct`s below have the same memory representation:
+
 ```cpp
 struct WithNativeTypes {
     uint32_t price;
@@ -38,6 +40,9 @@ struct WithWrappedTypes {
 } __attribute__((packed));
 
 static_assert(sizeof(WithNativeTypes) == sizeof(WithWrappedTypes));
+static_assert(offsetof(WithNativeTypes, price) == offsetof(WithWrappedTypes, price));
+static_assert(offsetof(WithNativeTypes, name) == offsetof(WithWrappedTypes, name));
+static_assert(offsetof(WithNativeTypes, time) == offsetof(WithWrappedTypes, time));
 
 char buffer[sizeof(WithNativeTypes)] = {};
 
