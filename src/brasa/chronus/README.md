@@ -1,7 +1,68 @@
 # Chronus package
-This is the package of timing and waiting facilities.
 
-## `Chronometer` component
+This is the package of timing and waiting facilities. 
+
+## Chronometer utilities
+
+You can create chronometers with specific resolutions. Chronometer resolution is
+determined by the function (or functor) passed during construction:
+
+* to create a chronometer with nanosecond resolution (`brasa::chronus::nano_now`
+  has nanosecond resolution):
+```cpp
+    const auto nano_chron = brasa::chronus::make_chronometer(brasa::chronus::nano_now, 1); // 1 is the chronometer identifier
+```
+* to create a chronometer with millisecond resolution (`brasa::chronus::milli_now`
+  has millisecond resolution):
+```cpp
+    const auto nano_chron = brasa::chronus::make_chronometer(brasa::chronus::milli_now, 2); // 2 is the chronometer identifier
+```
+
+In order to get the elapsed time with full information, you can use the `mark` function:
+
+```cpp
+const auto chron = make_chronometer(nano_now, 1234); // chronometer id is 1234
+// make some computation
+const auto t1 = chron.mark(4321); // mark id is 4321
+// t1 is a Elapsed struct object with:
+// .chrono_id == 1234
+// .mark_id == 4321
+// .begin == nano_now() at construction/reset time
+// .end == nano_now() at mark time
+```
+
+If you only want the tick count, you should use the `count` function:
+
+```cpp
+const auto chron = make_chronometer(nano_now, 1234); // chronometer id is 1234
+// make some computation
+const auto t1 = chron.count();
+// t1 will hold the number of nanoseconds (because nano_now was used) since construction/reset
+```
+
+## Waiting utilities
+
+Sometimes you need some computations to hold off for a while to avoid
+overloading the systems, or because its results will be timed. In those cases,
+you should use `Waiter` class. To create a `Waiter` object, you have to inform
+the function that represents counts units of time (now function), the amount of
+units of time you want to wait, and the sleep function that will be used to
+avoid a busy wait. The size of the sleep is 1/10 of the size of the full wait
+(not allowed to be less than 1 unit), thus you shouldn't use wait times less
+than 20. If you need wait times that is less than 20, change timing resolution.
+For instance, if you have a process that should emit its results every 15
+milliseconds, instead of creating a waiter of 15 milliseconds, create a waiter
+of 15'000 microseconds.
+
+To create a `Waiter` object to wait for 150 milliseconds:
+```cpp
+auto waiter = make_waiter(brasa::chronus::milli_now, 150, brasa::chronus::milli_sleep);
+// run the fast process
+waiter.wait(); // assure that current thread will wait until 150ms have passed
+```
+
+## Technical aspects
+### `Chronometer` component
 
 There are two main classes (`Elapsed` and `Chronometer`) and one helper function
 (`make_chronometer`) in this component.
@@ -50,9 +111,10 @@ The returned `chronometer` from the above command marks time in nanoseconds.
 `Chronometer` has the following (important) functions:
 
 * `mark`: returns information for the current instant (now).
+* `count`: returns the tick count since timing began.
 * `reset`: sets the begin of the timing to the current instant (now).
 
-## `Now` component
+### `Now` component
 
 `Now` component has a set of functions to pass to `Chronometer`. These functions
 use the facilities in STL chrono library:
@@ -80,7 +142,7 @@ private:
 };
 ```
 
-## `SleepStd` component
+### `SleepStd` component
 
 `SleepStd` component has a set of functions to stop the current program for a
 specified amount of time. They are a wrapper around
@@ -90,7 +152,8 @@ specified amount of time. They are a wrapper around
 * `micro_sleep`: suspends the current thread for `sleep_length` microseconds.
 * `milli_sleep`: suspends the current thread for `sleep_length` milliseconds.
 
-## `Waiter` component
+### `Waiter` component
+
 The `Waiter` class is parameterized by the function or functor that returns the
 current instant in time (`NOW_FUNC`) and the sleep function (`SLEEP_FUNC`) that
 will sleep for one tenth of the wait time. The `Waiter` component is responsible
@@ -99,14 +162,15 @@ to guarantee that a certain amount of time has elapsed before continuing.
 The helper function `make_waiter` creates a `Waiter` without the need to specify
 the types of now and sleep functions (because it is deduced from the arguments).
 For example, suppose you want to guarantee that a certain processing would not
-take less than 15ms. You could create a `waiter` that will wait for 10ms and
-then run the computation, after the computation returned, you would just
-`waiter.wait()` and the total time would be a little more than the 15ms:
+take less than 150ms. You could create a `waiter` that will wait for 150ms (or
+reset the waiter) just before the running the computation, run the computation,
+and, after the computation returned, you would just `waiter.wait()` and the
+total time would be a little more than the 150ms:
 
 ```cpp
-auto waiter = make_waiter(brasa::chronus::milli_now, 15, brasa::chronus::milli_sleep);
+auto waiter = make_waiter(brasa::chronus::milli_now, 150, brasa::chronus::milli_sleep);
 // run the fast process
-waiter.wait(); // assure that current thread will wait until 15ms have passed
+waiter.wait(); // assure that current thread will wait until 150ms have passed
 ```
 
 `Waiter`'s member functions are:

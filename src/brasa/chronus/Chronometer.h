@@ -43,6 +43,11 @@ public:
         return { id_, mark_id, begin_, now_() };
     }
 
+    /// Return the tick count since time began
+    [[nodiscard]] uint64_t count() const {
+        return now_() - begin_;
+    }
+
     /// Restarts the chronometer
     void reset() noexcept {
         begin_ = now_();

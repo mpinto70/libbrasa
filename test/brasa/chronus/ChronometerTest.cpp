@@ -41,6 +41,36 @@ TEST(ChronometerTest, mark) {
     EXPECT_LT(t1.end, t2.end);
 }
 
+TEST(ChronometerTest, count_nano) {
+    const struct timespec tim { 0, 500 };
+
+    const auto chron = make_chronometer(nano_now, 1234);
+    nanosleep(&tim, nullptr);
+    const auto t1 = chron.count();
+
+    EXPECT_GE(t1, 500);
+}
+
+TEST(ChronometerTest, count_micro) {
+    const struct timespec tim { 0, 5000 };
+
+    const auto chron = make_chronometer(micro_now, 1234);
+    nanosleep(&tim, nullptr);
+    const auto t1 = chron.count();
+
+    EXPECT_GE(t1, 5);
+}
+
+TEST(ChronometerTest, count_milli) {
+    const struct timespec tim { 0, 5000000 };
+
+    const auto chron = make_chronometer(milli_now, 1234);
+    nanosleep(&tim, nullptr);
+    const auto t1 = chron.count();
+
+    EXPECT_GE(t1, 5);
+}
+
 TEST(ChronometerTest, markWithFunctor) {
     const auto chron = make_chronometer(NowFunctor(48), 1234);
     const auto t1 = chron.mark(4321);
