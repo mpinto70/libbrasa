@@ -15,7 +15,7 @@ determined by the function (or functor) passed during construction:
 * to create a chronometer with millisecond resolution (`brasa::chronus::milli_now`
   has millisecond resolution):
 ```cpp
-    const auto nano_chron = brasa::chronus::make_chronometer(brasa::chronus::milli_now, 2); // 2 is the chronometer identifier
+    const auto milli_chron = brasa::chronus::make_chronometer(brasa::chronus::milli_now, 2); // 2 is the chronometer identifier
 ```
 
 In order to get the elapsed time with full information, you can use the `mark` function:

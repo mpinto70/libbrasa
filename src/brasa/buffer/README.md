@@ -1,4 +1,5 @@
 # Buffer package
+
 This is the package of buffering facilities. The driving idea behind this
 package is to allow communication between processes for monitoring. The main
 idea is that a memory buffer is allocated by client and passed to two circular
@@ -55,7 +56,6 @@ In its `protected` interface, `Circular` exposes:
 * `do_write`: writes data to buffer (always succeed).
 * `do_read`: reads data from buffer into `data` and returns `true`. If there is
   no data to be read, returns `false` and does not change `data`.
-
 
 The buffer passed to Circular has to have at least `Circular::BUFFER_SIZE` bytes
 in it.

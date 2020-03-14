@@ -70,7 +70,7 @@ Quantity price = safe_sell(quantity, product_id); // wrong return assignment
 
 ## Use in `struct`s
 
-It is also possible to embed this types in structures for serialization. The
+It is also possible to embed these wrappers in structures for serialization. The
 wrappers don't add space to the underlying type, so they can be used in
 `struct`s where the underlying type would have been. For example, the two
 `struct`s below have the same memory representation:
