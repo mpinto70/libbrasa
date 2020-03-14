@@ -1,18 +1,25 @@
 # Buffer package
 
 This is the package of buffering facilities. The driving idea behind this
-package is to allow communication between processes for monitoring. The main
-idea is that a memory buffer is allocated by client and passed to two circular
-buffer to be managed in a producer/consumer environment. `CircularWriter` is the
-producer and `CircularReader` is the consumer. In order to not impact the
-producer, the access is not locked, and the writing is always successful, but
-the reader may read dirty information. With this philosophy, it is necessary
-that the consumer be faster than the producer.
+package is to allow communication between processes to allow monitoring. The
+main idea is that a shared memory buffer is allocated by monitored process and
+passed to a `CircularWriter`, then the monitoring process gets the address of
+the shared memory and pass it to a `CircularReader`. This is a typical
+producer/consumer environment, where the monitored process is the producer and
+the monitoring process is the consumer. In order to not impact the producer, the
+access is not locked, and the writing is always successful, but the reader may
+read dirty information. With this philosophy, it is necessary that the consumer
+be faster than the producer, to avoid reading too many dirt data.
+
+Check [the demo](../../../demos/buffer/buffer.cpp) for a sample usage.
+
+
+## Technical details
 
 There are two main components in `buffer` package: `CircularReader` and
 `CircularWriter`; and two helper components: `Circular` and `CRC`.
 
-## `CircularWriter` component
+### `CircularWriter` component
 
 `CircularWriter` is the component that writes to the buffer (producer). It
 exposes the following member functions:
@@ -23,7 +30,7 @@ exposes the following member functions:
 
 The buffer must be at least `CircularWriter::BUFFER_SIZE` bytes long.
 
-## `CircularReader` component
+### `CircularReader` component
 
 `CircularReader` is the component that reads from the buffer (producer). It
 exposes the following member functions:
@@ -35,7 +42,7 @@ exposes the following member functions:
 
 The buffer must be at least `CircularReader::BUFFER_SIZE` bytes long.
 
-## `Circular` helper component
+### `Circular` helper component
 
 `Circular` helper component is parameterized by the type of values (`TYPE_`)
 that it will store in the buffer and the number of elements (`N_`) the buffer is

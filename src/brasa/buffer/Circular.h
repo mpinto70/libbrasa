@@ -15,6 +15,16 @@ struct Head {
     uint32_t offset; ///< offset from begin of buffer
     uint32_t lap;    ///< lap number in the buffer
 };
+static_assert(std::is_pod_v<Head>, "TYPE must be POD");
+
+template <typename TYPE_, uint32_t N_>
+struct BufferData {
+    uint8_t buffer[N_ * sizeof(TYPE_)];
+    Head write_head;
+    Head read_head;
+    uint64_t key;
+    uint32_t crc;
+};
 
 /** Circular buffer base class. It should be extended by Writer and Reader.
  * `TYPE_` is the struct that will be stored in the buffer
@@ -22,19 +32,15 @@ struct Head {
  */
 template <typename TYPE_, uint32_t N_>
 class Circular {
-protected:
-    constexpr static uint32_t OFFSET_BEGIN_OF_DATA = 0;
-    constexpr static uint32_t OFFSET_END_OF_DATA = OFFSET_BEGIN_OF_DATA + N_ * sizeof(TYPE_);
-    constexpr static uint32_t OFFSET_READ_HEAD = OFFSET_END_OF_DATA;
-    constexpr static uint32_t OFFSET_WRITE_HEAD = OFFSET_READ_HEAD + sizeof(Head);
-    constexpr static uint32_t OFFSET_KEY = OFFSET_WRITE_HEAD + sizeof(Head);
-    constexpr static uint32_t OFFSET_CRC = OFFSET_KEY + sizeof(uint64_t);
+protected: // to allow testing and prevent use outside of the classes
+    using BufferDataT = BufferData<TYPE_, N_>;
 
 public:
-    static_assert(std::is_pod<TYPE_>::value, "TYPE must be POD");
+    static_assert(std::is_pod_v<TYPE_>, "TYPE must be POD");
+    static_assert(std::is_pod_v<BufferDataT>, "BufferT must be POD");
     using TYPE = TYPE_;
     constexpr static uint32_t N = N_;
-    constexpr static uint32_t BUFFER_SIZE = OFFSET_CRC + sizeof(uint32_t);
+    constexpr static uint32_t BUFFER_SIZE = sizeof(BufferDataT);
 
     // no copies no moves
     Circular(const Circular& other) = delete;
@@ -55,33 +61,36 @@ protected:
 
     /// Writes `data` to the buffer
     void do_write(const TYPE& data) const noexcept {
-        const auto write_head = reinterpret_cast<Head*>(&buffer_[OFFSET_WRITE_HEAD]);
-        ::memcpy(&buffer_[write_head->offset], &data, sizeof(TYPE));
-        advance(*write_head);
+        auto buffer_data = reinterpret_cast<BufferDataT*>(buffer_);
+        ::memcpy(&buffer_[buffer_data->write_head.offset], &data, sizeof(TYPE));
+        advance(buffer_data->write_head);
     }
 
     /// Reads `data` from the buffer and returns true. If there is no data in the buffer, returns false.
     bool do_read(TYPE& data) const noexcept {
-        const auto write_head = reinterpret_cast<const Head*>(&buffer_[OFFSET_WRITE_HEAD]);
-        const auto read_head = reinterpret_cast<Head*>(&buffer_[OFFSET_READ_HEAD]);
+        auto buffer_data = reinterpret_cast<BufferDataT*>(buffer_);
+        const auto write_head = buffer_data->write_head;
+        auto read_head = buffer_data->read_head;
 
-        if (read_head->offset == write_head->offset && read_head->lap == write_head->lap) {
+        if (read_head.offset == write_head.offset && read_head.lap == write_head.lap) {
             return false;
         }
-        switch (write_head->lap - read_head->lap) {
+        switch (write_head.lap - read_head.lap) {
             case 0: // same lap
                 break;
             case 1: // one lap ahead
-                if (write_head->offset > read_head->offset) {
-                    read_head->offset = write_head->offset;
+                if (write_head.offset > read_head.offset) {
+                    read_head.offset = write_head.offset;
                 }
                 break;
             default: // more than one lap ahead
-                read_head->offset = write_head->offset;
-                read_head->lap = write_head->lap - 1;
+                read_head.offset = write_head.offset;
+                read_head.lap = write_head.lap - 1;
         }
-        ::memcpy(&data, &buffer_[read_head->offset], sizeof(TYPE));
-        advance(*read_head);
+        ::memcpy(&data, &buffer_[read_head.offset], sizeof(TYPE));
+        advance(read_head);
+        buffer_data->read_head = read_head;
+
         return true;
     }
 
@@ -91,12 +100,10 @@ private:
     uint8_t* buffer_;
     const uint64_t key_;
     const uint32_t crc_;
+    constexpr static uint32_t OFFSET_END_OF_DATA = sizeof(BufferDataT::buffer);
 
     [[nodiscard]] bool is_valid(const Head& head) const noexcept {
-        if (head.offset < OFFSET_BEGIN_OF_DATA) {
-            return false;
-        }
-        if ((head.offset - OFFSET_BEGIN_OF_DATA) % sizeof(TYPE) != 0) {
+        if (head.offset % sizeof(TYPE) != 0) {
             return false;
         }
         return head.offset < OFFSET_END_OF_DATA;
@@ -113,33 +120,28 @@ private:
     }
 
     [[nodiscard]] bool is_initialized() const noexcept {
-        const auto read_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_READ_HEAD);
-        const auto write_head = reinterpret_cast<const Head*>(buffer_ + OFFSET_WRITE_HEAD);
-        const auto key = reinterpret_cast<const uint64_t*>(buffer_ + OFFSET_KEY);
-        const auto crc = reinterpret_cast<const uint32_t*>(buffer_ + OFFSET_CRC);
-        if (not is_valid(*read_head, *write_head)) {
+        const auto buffer_data = reinterpret_cast<BufferDataT*>(buffer_);
+        if (not is_valid(buffer_data->read_head, buffer_data->write_head)) {
             return false;
         }
 
-        return *key == key_ && *crc == crc_;
+        return buffer_data->key == key_ && buffer_data->crc == crc_;
     }
 
     void initialize() const noexcept {
-        const auto read_head = reinterpret_cast<Head*>(buffer_ + OFFSET_READ_HEAD);
-        const auto write_head = reinterpret_cast<Head*>(buffer_ + OFFSET_WRITE_HEAD);
-        const auto key = reinterpret_cast<uint64_t*>(buffer_ + OFFSET_KEY);
-        const auto crc = reinterpret_cast<uint32_t*>(buffer_ + OFFSET_CRC);
-        constexpr Head zero = { OFFSET_BEGIN_OF_DATA, 0 };
-        ::memcpy(read_head, &zero, sizeof(Head));
-        ::memcpy(write_head, &zero, sizeof(Head));
-        ::memcpy(key, &key_, sizeof(key_));
-        ::memcpy(crc, &crc_, sizeof(crc_));
+        auto buffer_data = reinterpret_cast<BufferDataT*>(buffer_);
+        constexpr Head zero = { 0, 0 };
+
+        buffer_data->read_head = zero;
+        buffer_data->write_head = zero;
+        buffer_data->key = key_;
+        buffer_data->crc = crc_;
     }
 
     void advance(Head& head) const noexcept {
         head.offset += sizeof(TYPE);
         if (head.offset == OFFSET_END_OF_DATA) {
-            head.offset = OFFSET_BEGIN_OF_DATA;
+            head.offset = 0;
             ++head.lap;
         }
     }
