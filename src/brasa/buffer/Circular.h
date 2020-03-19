@@ -15,7 +15,7 @@ struct Head {
     uint32_t offset; ///< offset from begin of buffer
     uint32_t lap;    ///< lap number in the buffer
 };
-static_assert(std::is_pod_v<Head>, "TYPE must be POD");
+static_assert(std::is_trivial_v<Head>, "TYPE must be POD");
 
 template <typename TYPE_, uint32_t N_>
 struct BufferData {
@@ -36,8 +36,8 @@ protected: // to allow testing and prevent use outside of the classes
     using BufferDataT = BufferData<TYPE_, N_>;
 
 public:
-    static_assert(std::is_pod_v<TYPE_>, "TYPE must be POD");
-    static_assert(std::is_pod_v<BufferDataT>, "BufferT must be POD");
+    static_assert(std::is_trivial_v<TYPE_>, "TYPE must be POD");
+    static_assert(std::is_trivial_v<BufferDataT>, "BufferT must be POD");
     using TYPE = TYPE_;
     constexpr static uint32_t N = N_;
     constexpr static uint32_t BUFFER_SIZE = sizeof(BufferDataT);

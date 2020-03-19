@@ -24,7 +24,6 @@ void check_trivial(const safe_type& value, const typename safe_type::underlying_
     typename safe_type::underlying_type different_value = stored_value + 1;
     EXPECT_NE(value, safe_type{ different_value });
     EXPECT_TRUE(std::is_trivial<safe_type>::value);
-    EXPECT_TRUE(std::is_pod<safe_type>::value);
     // is packable
     struct test_struct {
         uint8_t value2;
