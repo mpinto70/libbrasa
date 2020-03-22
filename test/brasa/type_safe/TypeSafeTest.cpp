@@ -10,7 +10,18 @@ namespace type_safe {
 
 namespace {
 template <typename safe_type>
-void check_trivial(const safe_type& value, const typename safe_type::underlying_type stored_value) {
+void check_cast(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
+    EXPECT_EQ(value, type_cast<safe_type>(stored_value));
+    EXPECT_EQ(value_cast(value), stored_value);
+
+    safe_type variable = value;
+    EXPECT_EQ(variable, value);
+    value_cast(variable) = stored_value + 3;
+    EXPECT_NE(variable, value);
+}
+
+template <typename safe_type>
+void check_trivial(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
     typename safe_type::underlying_type buffer = stored_value;
     // check that safe_type does not add any storage
     auto reinterpreted_value = reinterpret_cast<safe_type*>(&buffer);
@@ -84,7 +95,7 @@ TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
 ////////// ordered //////////
 namespace {
 template <typename safe_type>
-void check_ordered(const safe_type& value, const typename safe_type::underlying_type stored_value) {
+void check_ordered(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
     check_trivial<safe_type>(value, stored_value);
 
     const typename safe_type::underlying_type stored_plus_one = stored_value + 1;
@@ -114,10 +125,53 @@ TEST(TypeSafeTest, ordered_is_viable) {
     check_ordered(value, underlying);
 }
 
+TEST(TypeSafeTest, ordered_string_is_viable) {
+    constexpr size_t N = 5;
+    using ORDERED = ordered<char[N], struct ORDERED_>;
+
+    constexpr const char cstr_1[N] = "1234";
+    constexpr ORDERED str_1{ "1234" };
+
+    constexpr const char cstr_2[N] = "4321";
+    constexpr ORDERED str_2{ "4321" };
+
+    static_assert(sizeof(ORDERED) == N);
+    static_assert(sizeof(cstr_1) == N);
+    static_assert(sizeof(str_1) == N);
+    static_assert(sizeof(cstr_2) == N);
+    static_assert(sizeof(str_2) == N);
+
+    EXPECT_NE(&str_1.value, &str_2.value);
+
+    EXPECT_STREQ(str_1.value, cstr_1);
+    EXPECT_STREQ(str_2.value, cstr_2);
+    EXPECT_EQ(str_1, str_1);
+    EXPECT_NE(str_1, str_2);
+    EXPECT_NE(str_2, str_1);
+    EXPECT_LT(str_1, str_2);
+    EXPECT_GT(str_2, str_1);
+
+    ORDERED str_3 = str_1;
+    EXPECT_STREQ(str_3.value, cstr_1);
+    EXPECT_STRNE(str_3.value, cstr_2);
+    EXPECT_STREQ(value_cast(str_3), cstr_1);
+    EXPECT_STRNE(value_cast(str_3), cstr_2);
+    EXPECT_EQ(str_1, str_3);
+    EXPECT_NE(str_2, str_3);
+
+    str_3 = str_2;
+    EXPECT_STRNE(str_3.value, cstr_1);
+    EXPECT_STREQ(str_3.value, cstr_2);
+    EXPECT_STRNE(value_cast(str_3), cstr_1);
+    EXPECT_STREQ(value_cast(str_3), cstr_2);
+    EXPECT_NE(str_1, str_3);
+    EXPECT_EQ(str_2, str_3);
+}
+
 ////////// scalar //////////
 namespace {
 template <typename safe_type>
-void check_scalar(const safe_type& value, const typename safe_type::underlying_type stored_value) {
+void check_scalar(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
     check_ordered<safe_type>(value, stored_value);
 
     const typename safe_type::underlying_type scalar = 5;

@@ -1,6 +1,7 @@
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
+#include <array>
 #include <cstring>
 #include <type_traits>
 
@@ -182,6 +183,11 @@ using scalar = base_type<T, Tag, impl::Category::Scalar>;
 template <typename TYPE>
 constexpr TYPE type_cast(typename TYPE::underlying_type value) noexcept {
     return TYPE{ value };
+}
+
+template <typename TYPE>
+constexpr const typename TYPE::underlying_type& value_cast(const TYPE& t) noexcept {
+    return t.value;
 }
 }
 }
