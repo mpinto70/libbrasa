@@ -141,7 +141,7 @@ constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator*(
             const base_type<T, Tag, category>& lh,
-            const T& rh) noexcept(noexcept(lh.value* rh)) {
+            typename base_type<T, Tag, category>::underlying_type rh) noexcept(noexcept(lh.value* rh)) {
     const T tmp = lh.value * rh;
     return base_type<T, Tag, category>{ tmp };
 }
@@ -151,7 +151,7 @@ template <typename T, typename Tag, impl::Category category>
 constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator*(
-            const T& lh,
+            typename base_type<T, Tag, category>::underlying_type lh,
             const base_type<T, Tag, category>& rh) noexcept(noexcept(lh* rh.value)) {
     const T tmp = lh * rh.value;
     return base_type<T, Tag, category>{ tmp };
@@ -163,7 +163,7 @@ constexpr
       typename std::enable_if<category == impl::Category::Scalar, base_type<T, Tag, category>>::type
       operator/(
             const base_type<T, Tag, category>& lh,
-            const T& rh) noexcept(noexcept(lh.value / rh)) {
+            typename base_type<T, Tag, category>::underlying_type rh) noexcept(noexcept(lh.value / rh)) {
     const T tmp = lh.value / rh;
     return base_type<T, Tag, category>{ tmp };
 }

@@ -211,14 +211,18 @@ void check_scalar(const safe_type& value, const typename safe_type::underlying_t
     static_assert(safe_type{ 12 } * FACTOR == safe_type{ 48 });
     static_assert(FACTOR * safe_type{ 15 } == safe_type{ 60 });
     static_assert(safe_type{ 27 } / FACTOR == safe_type{ 6 });
+
+    static_assert(safe_type{ 12 } * int64_t(5) == safe_type{ 60 });
+    static_assert(6 * safe_type{ 15 } == safe_type{ 90 });
+    static_assert(safe_type{ 27 } / 4 == safe_type{ 6 });
 }
 }
 
 TEST(TypeSafeTest, scalar_is_viable) {
-    using SCALAR = scalar<uint16_t, struct SCALAR_>;
+    using SCALAR = scalar<int64_t, struct SCALAR_>;
 
     SCALAR value{ 127 };
-    uint16_t underlying = 127;
+    int64_t underlying = 127;
 
     check_scalar(value, underlying);
 }
