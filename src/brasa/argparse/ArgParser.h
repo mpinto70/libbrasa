@@ -76,10 +76,11 @@ class ArgParser {
 public:
     static constexpr size_t VALUE_SIZE = std::tuple_size_v<ValueTupleT>;
     static constexpr size_t PARSER_SIZE = std::tuple_size_v<ParserTupleT>;
-    ArgParser(std::string description, ValueTupleT value_tuple, ParserTupleT parser_tuple)
+    ArgParser(std::string description, ValueTupleT value_tuple, ParserTupleT parser_tuple, std::string footer)
           : description_(std::move(description)),
             values_(std::move(value_tuple)),
-            parsers_(std::move(parser_tuple)) {
+            parsers_(std::move(parser_tuple)),
+            footer_(std::move(footer)) {
         std::vector<struct option> long_options;
         std::string short_options;
         long_options.reserve(PARSER_SIZE + 2);
@@ -109,12 +110,14 @@ public:
         const auto parsers_usage = detail::accumulate_tuple<BuildUsage, std::string>(parsers_);
         const auto command_line_parameters = detail::accumulate_tuple<BuildCommandLine, std::string>(values_);
         std::string res = description_;
-        res += "\n";
+        res += "\n\n";
         res += executable;
         res += command_line_parameters;
-        res += (PARSER_SIZE > 0 ? " <options>\n" : "\n");
+        res += (PARSER_SIZE > 0 ? " <options>" : "");
+        res += "\n\n";
         res += parameters_usage;
         res += parsers_usage;
+        res += footer_.empty() ? "" : "\n" + footer_ + "\n";
 
         return res;
     }
@@ -142,6 +145,7 @@ private:
     std::string description_;
     ValueTupleT values_;
     ParserTupleT parsers_;
+    std::string footer_;
     std::vector<struct option> long_options_;
     std::string short_options_;
 
@@ -299,9 +303,10 @@ private: // functions
 };
 
 template <typename ValueTupleT, typename ParserTupleT>
-ArgParser<ValueTupleT, ParserTupleT> make_parser(std::string program_description,
+ArgParser<ValueTupleT, ParserTupleT> make_parser(std::string description,
       ValueTupleT value_tuple,
-      ParserTupleT parser_tuple) {
-    return ArgParser<ValueTupleT, ParserTupleT>(std::move(program_description), std::move(value_tuple), std::move(parser_tuple));
+      ParserTupleT parser_tuple,
+      std::string footer = "") {
+    return ArgParser<ValueTupleT, ParserTupleT>(std::move(description), std::move(value_tuple), std::move(parser_tuple), std::move(footer));
 }
 }

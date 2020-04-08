@@ -68,8 +68,8 @@ TEST(ArgParserTest, test_parse) {
 }
 
 TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
-    const std::string program_description = "Some program description";
-    const auto parser = make_parser(program_description,
+    const std::string description = "Some program description";
+    const auto parser = make_parser(description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
@@ -78,7 +78,9 @@ TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
                 ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")));
 
     const std::string expected_usage = "Some program description\n"
+                                       "\n"
                                        "executable PARAMETER1 PARAMETER2 <options>\n"
+                                       "\n"
                                        "Positional parameters:\n"
                                        "    PARAMETER1              a parameter to process\n"
                                        "    PARAMETER2              a second parameter to process\n"
@@ -90,15 +92,17 @@ TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
 }
 
 TEST(ArgParserTest, test_usage_multiple_no_parameters_and_multiple_options) {
-    const std::string program_description = "Some program description";
-    const auto parser = make_parser(program_description,
+    const std::string description = "Some program description";
+    const auto parser = make_parser(description,
           std::make_tuple(),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list files"),
                 ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")));
 
     const std::string expected_usage = "Some program description\n"
+                                       "\n"
                                        "executable <options>\n"
+                                       "\n"
                                        "Options:\n"
                                        "    -l, --list-files        list files\n"
                                        "    -i, --ignore-file  <file-to-ignore>\n"
@@ -107,18 +111,48 @@ TEST(ArgParserTest, test_usage_multiple_no_parameters_and_multiple_options) {
 }
 
 TEST(ArgParserTest, test_usage_multiple_parameters_and_no_options) {
-    const std::string program_description = "Some program description";
-    const auto parser = make_parser(program_description,
+    const std::string description = "Some program description";
+    const auto parser = make_parser(description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
           std::make_tuple());
 
     const std::string expected_usage = "Some program description\n"
+                                       "\n"
                                        "executable PARAMETER1 PARAMETER2\n"
+                                       "\n"
                                        "Positional parameters:\n"
                                        "    PARAMETER1              a parameter to process\n"
                                        "    PARAMETER2              a second parameter to process\n";
+    EXPECT_EQ(parser.usage("executable"), expected_usage);
+}
+
+TEST(ArgParserTest, test_usage_footer) {
+    const std::string description = "Some program description";
+    const std::string footer = "Some footer";
+    const auto parser = make_parser(description,
+          std::make_tuple(
+                SingleValue<std::string>("PARAMETER1", "a parameter to process"),
+                SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
+          std::make_tuple(
+                BooleanParser('l', "list-files", "list files"),
+                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")),
+          footer);
+
+    const std::string expected_usage = "Some program description\n"
+                                       "\n"
+                                       "executable PARAMETER1 PARAMETER2 <options>\n"
+                                       "\n"
+                                       "Positional parameters:\n"
+                                       "    PARAMETER1              a parameter to process\n"
+                                       "    PARAMETER2              a second parameter to process\n"
+                                       "Options:\n"
+                                       "    -l, --list-files        list files\n"
+                                       "    -i, --ignore-file  <file-to-ignore>\n"
+                                       "                            mark a file to be ignored\n"
+                                       "\n"
+                                       "Some footer\n";
     EXPECT_EQ(parser.usage("executable"), expected_usage);
 }
 
@@ -144,7 +178,9 @@ void check_error_in_parser(const std::vector<std::string>& options, const std::s
     build(options, buffer, argc, argv);
     std::ostringstream out;
     EXPECT_EQ(parser.parse(argc, argv, out), ParseResult::Error);
-    EXPECT_EQ(out.str(), error_msg + "\n\n" + parser.usage(options[0]));
+    EXPECT_EQ(out.str(), error_msg + "\n"
+                                     "\n"
+                               + parser.usage(options[0]));
 }
 }
 
