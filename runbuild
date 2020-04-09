@@ -26,10 +26,6 @@ _clean() {
     cd ${SCRIPT_DIR} || _check "cd to root"
     rm -rf \
         build \
-        bin \
-        lib \
-        test/bin \
-        test/lib \
         mck/lib \
 
     cd - || _check "cd back"
@@ -49,7 +45,7 @@ elif [[ "$1" = "test" ]]; then
     _do_build
     shift
     echo "Testing... "
-    for test in "${SCRIPT_DIR}"/test/bin/*
+    for test in "${SCRIPT_DIR}"/build/test/bin/*
     do
         $test "$@"
         _check "$test"
@@ -67,7 +63,7 @@ elif [[ "$1" = "demo" ]]; then
 elif [[ "$1" = "check" ]]; then
     _do_build
     cd ${SCRIPT_DIR}/build || _check "cd to build"
-    make cppcheck
+    make brasa_cppcheck
 elif [[ "$1" = "install" ]]; then
     _do_build
     cd ${SCRIPT_DIR}/build || _check "cd to build"

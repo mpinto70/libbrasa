@@ -1,14 +1,11 @@
-cmake_minimum_required (VERSION 3.0)
-project (libbrasa VERSION 0.1.0 LANGUAGES CXX)
+cmake_minimum_required (VERSION 3.11)
+project (libbrasa VERSION 0.9.0 LANGUAGES CXX)
 
 # add support for CTest
 include(CTest)
+include(FetchContent)
 
-if (CMAKE_VERSION VERSION_LESS 3.2)
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-else()
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-endif()
+set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
@@ -32,23 +29,20 @@ set(CMAKE_CXX_FLAGS " \
 
 # set (CMAKE_VERBOSE_MAKEFILE on)
 
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set (CMAKE_INSTALL_PREFIX /brasa)
+
+install(
+        DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/brasa
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+        FILES_MATCHING PATTERN "*.h"
+)
 
 include_directories(
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/DownloadProject.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/UnitTest.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/UnitTest.cmake PRIVATE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CppCheck.cmake)
-
-INSTALL (
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/brasa
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/include
-    FILES_MATCHING PATTERN "*.h"
-)
 
 function(add_lib lib_name sources_var)
     set(lib_full_name brasa_${lib_name})

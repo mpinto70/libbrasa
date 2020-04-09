@@ -2,14 +2,17 @@
 # Google Test Setup - BEGIN ####################################################
 ################################################################################
 
-download_project(
-    PROJ                googletest
-    GIT_REPOSITORY      https://github.com/google/googletest.git
-    GIT_TAG             release-1.8.1
-    ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        release-1.8.1
 )
 
-add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+    FetchContent_Populate(googletest)
+    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+endif()
 
 ################################################################################
 # Google Test Setup - END ######################################################
@@ -32,17 +35,16 @@ function(add_unit_test test_name sources_var libs_var)
     set_target_properties(
         ${unit_test_name}
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test/bin
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test/bin
     )
 
     target_link_libraries(
         ${unit_test_name}
-        ${prefixed_libs}
-        gtest
-        gmock_main
+        PRIVATE ${prefixed_libs}
+        PRIVATE gtest gmock_main
     )
 
-    add_test(NAME ${unit_test_name} COMMAND ${PROJECT_SOURCE_DIR}/test/bin/${unit_test_name})
+    add_test(NAME ${unit_test_name} COMMAND ${unit_test_name})
 endfunction(add_unit_test)
 
 function(_add_lib lib_name sources_var directory)
@@ -53,15 +55,15 @@ function(_add_lib lib_name sources_var directory)
 
     target_include_directories(
         ${lib_name}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-        PUBLIC ${gtest_SOURCE_DIR}/include
-        PUBLIC ${gmock_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+        PRIVATE ${gtest_SOURCE_DIR}/include
+        PRIVATE ${gmock_SOURCE_DIR}/include
     )
 
     set_target_properties(
         ${lib_name}
         PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${directory}/lib
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test/lib
     )
 endfunction(_add_lib)
 

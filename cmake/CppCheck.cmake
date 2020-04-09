@@ -1,7 +1,7 @@
 # target to perform cppcheck
 
 add_custom_target(
-    cppcheck
+    brasa_cppcheck
     COMMAND cppcheck
         --enable=warning
         --enable=style
