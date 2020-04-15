@@ -57,7 +57,6 @@ function(_add_lib lib_name sources_var directory)
 
     target_include_directories(
         ${lib_name}
-        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
         PRIVATE ${gtest_SOURCE_DIR}/include
         PRIVATE ${gmock_SOURCE_DIR}/include
     )

@@ -1,4 +1,4 @@
-#include <CRC.h>
+#include <brasa/buffer/CRC.h>
 
 namespace brasa {
 namespace buffer {

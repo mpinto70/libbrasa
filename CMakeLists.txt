@@ -6,12 +6,6 @@ include(FetchContent)
 
 set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
 
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif(CCACHE_FOUND)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -45,11 +39,6 @@ function(add_lib lib_name sources_var)
     add_library(
         ${lib_full_name}
         ${${sources_var}}
-    )
-
-    target_include_directories(
-        ${lib_full_name}
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
     install(
