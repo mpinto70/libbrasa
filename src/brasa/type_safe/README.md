@@ -20,7 +20,7 @@ There are three different categories (see `enum class Category`) of types:
 
 The utilities in this package are intended to avoid wrong assignment, wrong
 operations, and passing the wrong parameter to functions. Consider you have a
-function that receives the product code, and quantity of items to compute 
+function that receives the product code, and quantity of items to compute
 the final price and reduce the inventory, also, suppose that all these values
 are represented as `uint32_t` types:
 
@@ -65,7 +65,7 @@ time:
 
 ```cpp
 Price price = safe_sell(quantity, product_id); // wrong parameter order
-Quantity price = safe_sell(quantity, product_id); // wrong return assignment
+Quantity price = safe_sell(product_id, quantity); // wrong return assignment
 ```
 
 ## Use in `struct`s
