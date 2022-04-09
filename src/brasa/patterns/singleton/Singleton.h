@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -27,19 +28,19 @@ public:
 
 private:
     static std::unique_ptr<T> t_;
-    static std::mutex mutex_;
+    static std::shared_mutex mutex_;
 };
 
 template <typename T>
 std::unique_ptr<T> Singleton<T>::t_;
 
 template <typename T>
-std::mutex Singleton<T>::mutex_;
+std::shared_mutex Singleton<T>::mutex_;
 
 template <typename T>
 template <typename... ARGS>
 T& Singleton<T>::create_instance(ARGS&&... args) {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock lock(mutex_);
     if (t_ != nullptr) {
         using namespace std::string_literals;
         throw std::logic_error("brasa::pattern::Singleton::create_instance already created for "s + typeid(T).name());
@@ -50,7 +51,7 @@ T& Singleton<T>::create_instance(ARGS&&... args) {
 
 template <typename T>
 T& Singleton<T>::instance() {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::shared_lock lock(mutex_);
     if (t_ == nullptr) {
         using namespace std::string_literals;
         throw std::logic_error("brasa::pattern::Singleton::instance not created for "s + typeid(T).name());
@@ -60,12 +61,13 @@ T& Singleton<T>::instance() {
 
 template <typename T>
 void Singleton<T>::free_instance() {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock lock(mutex_);
     t_.reset();
 }
 
 template <typename T>
 bool Singleton<T>::has_instance() {
+    std::shared_lock lock(mutex_);
     return t_ != nullptr;
 }
 
