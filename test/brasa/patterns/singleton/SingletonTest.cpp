@@ -21,6 +21,26 @@ struct Object {
     std::array<int, N> values;
 };
 
+struct Base {
+    virtual ~Base() noexcept = default;
+    virtual int f() const = 0;
+};
+
+struct Derived final : public Base {
+    Derived(int a, int b)
+          : val_(a * b) {}
+    ~Derived() noexcept override = default;
+    int f() const override {
+        return val_;
+    }
+    friend bool operator==(const Derived& lhs, const Derived& rhs) {
+        return lhs.val_ == rhs.val_;
+    }
+
+private:
+    int val_;
+};
+
 struct POD {
     char c;
     int i;
@@ -40,6 +60,8 @@ static void free_insts() {
     Singleton<Object<3>>::free_instance();
     Singleton<Object<4>>::free_instance();
     Singleton<POD>::free_instance();
+    Singleton<Base>::free_instance();
+    Singleton<Derived>::free_instance();
 }
 
 template <typename T, typename... ARGS>
@@ -51,6 +73,41 @@ static void test_create(ARGS&&... args) {
     const T expected{ args... };
 
     EXPECT_EQ(instance, expected);
+}
+
+template <typename T, typename... ARGS>
+static void test_create_unique_ptr(ARGS&&... args) {
+    EXPECT_FALSE(Singleton<T>::has_instance());
+    auto& instance = Singleton<T>::create_instance(std::make_unique<T>(args...));
+    EXPECT_TRUE(Singleton<T>::has_instance());
+
+    const T expected{ args... };
+
+    EXPECT_EQ(instance, expected);
+}
+
+template <typename T, typename U, typename... ARGS>
+static void test_create_polymorphic(ARGS&&... args) {
+    const U expected{ args... };
+
+    EXPECT_FALSE(Singleton<T>::has_instance());
+    Singleton<T>::create_instance(std::make_unique<U>(args...));
+    EXPECT_TRUE(Singleton<T>::has_instance());
+    EXPECT_FALSE(Singleton<U>::has_instance());
+
+    auto& real_instance1 = dynamic_cast<U&>(Singleton<T>::instance());
+
+    EXPECT_EQ(real_instance1, expected);
+
+    Singleton<T>::free_instance();
+
+    EXPECT_FALSE(Singleton<T>::has_instance());
+    Singleton<T>::template create_instance<U>(args...);
+    EXPECT_TRUE(Singleton<T>::has_instance());
+
+    auto& real_instance2 = dynamic_cast<U&>(Singleton<T>::instance());
+
+    EXPECT_EQ(real_instance2, expected);
 }
 
 template <typename T, typename... ARGS>
@@ -107,6 +164,21 @@ TEST_F(SingletonTest, create) {
     test_create<Object<3>>(1, 2, 3);
     test_create<Object<4>>(1, 2, 3, 4);
     test_create<POD>(POD{ 'a', 1, 42.7 });
+}
+
+TEST_F(SingletonTest, create_with_unique_ptr) {
+    test_create_unique_ptr<int>(42);
+    test_create_unique_ptr<double>(42.3);
+    test_create_unique_ptr<char>('a');
+    test_create_unique_ptr<Object<1>>(1);
+    test_create_unique_ptr<Object<2>>(1, 2);
+    test_create_unique_ptr<Object<3>>(1, 2, 3);
+    test_create_unique_ptr<Object<4>>(1, 2, 3, 4);
+    test_create_unique_ptr<POD>(POD{ 'a', 1, 42.7 });
+}
+
+TEST_F(SingletonTest, create_polymorphic) {
+    test_create_polymorphic<Base, Derived>(42, 13);
 }
 
 TEST_F(SingletonTest, double_create_throws) {

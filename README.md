@@ -10,7 +10,7 @@ could add the following:
 # libbrasa - BEGIN ################
 ###################################
 
-# point this to the location where 3rd party libraries reside in your project 
+# point this to the location where 3rd party libraries reside in your project
 set(EXTERNAL_INSTALL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 set(BRASA_DIR ${CMAKE_BINARY_DIR}/brasa)
@@ -48,3 +48,4 @@ add_dependencies(brasa_argparse libbrasa)
 * [Circular buffer](./src/brasa/buffer)
 * [Timing and waiting utilities](./src/brasa/chronus)
 * [Type safe utilities](./src/brasa/type_safe)
+* [Design patterns](./src/brasa/patterns)
