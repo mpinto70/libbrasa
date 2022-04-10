@@ -1,5 +1,6 @@
 set(factory_srcs
     ObjectRepositoryTest.cpp
+    ObjectFactoryTest.cpp
 )
 
 set(factory_libs
