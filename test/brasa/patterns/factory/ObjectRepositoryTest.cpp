@@ -82,4 +82,31 @@ TEST_F(ObjectRepositoryTest, create_with_params) {
     EXPECT_EQ(*ptr2, Derived2(13, 32));
 }
 
+TEST_F(ObjectRepositoryTest, remove_has) {
+    ObjectRepository<Base, Types> repo;
+
+    EXPECT_FALSE(repo.has(Types::type1));
+    EXPECT_FALSE(repo.has(Types::type2));
+
+    EXPECT_TRUE(repo.add(Types::type1, std::make_unique<Derived1>(2, 3)));
+
+    EXPECT_TRUE(repo.has(Types::type1));
+    EXPECT_FALSE(repo.has(Types::type2));
+
+    EXPECT_TRUE(repo.add(Types::type2, std::make_unique<Derived2>(12, 42)));
+
+    EXPECT_TRUE(repo.has(Types::type1));
+    EXPECT_TRUE(repo.has(Types::type2));
+
+    EXPECT_TRUE(repo.remove(Types::type1));
+
+    EXPECT_FALSE(repo.has(Types::type1));
+    EXPECT_TRUE(repo.has(Types::type2));
+
+    EXPECT_TRUE(repo.remove(Types::type2));
+
+    EXPECT_FALSE(repo.has(Types::type1));
+    EXPECT_FALSE(repo.has(Types::type2));
+}
+
 }

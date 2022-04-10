@@ -8,31 +8,54 @@
 
 namespace brasa::pattern {
 
-/** A class that implements Singleton pattern. */
+/**
+ * A class that implements a thread safe Singleton pattern.
+ */
 template <typename T>
 class Singleton final {
 public:
+    /**
+     * Creates an instance of type T with args passed to constructor.
+     * @param args  args passed to constructor
+     * @return the singleton
+     */
     template <typename... ARGS>
     static T& create_instance(ARGS&&... args);
+    /**
+     * Creates an instance of type U derived from T with args passed to constructor.
+     *
+     * @tparam U    type of concrete object derived from T
+     * @param args  args passed to constructor
+     * @return the singleton
+     */
     template <typename U, typename... ARGS>
     static T& create_instance(ARGS&&... args);
+    /**
+     * Creates an instance of type U derived from T with args passed to constructor.
+     *
+     * @tparam U    type of concrete object derived from T
+     * @param u     the object of type U
+     * @return the singleton
+     */
     template <typename U>
     static T& create_instance(std::unique_ptr<U> u);
+    /** Return the instance. */
     static T& instance();
+    /** Destroy the instance. */
     static void free_instance();
+    /** Return if there is an instance. */
     static bool has_instance();
 
     Singleton() = delete;
     ~Singleton() = delete;
-
     Singleton(const Singleton&) = delete;
     Singleton(Singleton&&) = delete;
     Singleton& operator=(const Singleton&) = delete;
     Singleton& operator=(Singleton&&) = delete;
 
 private:
-    static std::unique_ptr<T> t_;
-    static std::shared_mutex mutex_;
+    static std::unique_ptr<T> t_;    ///< the instance
+    static std::shared_mutex mutex_; ///< the mutex to protect concurrent access
 };
 
 template <typename T>
