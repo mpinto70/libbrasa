@@ -4,6 +4,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <stdexcept>
+#include <type_traits>
 #include <typeinfo>
 
 namespace brasa::pattern {
@@ -31,7 +32,7 @@ public:
     template <typename U, typename... ARGS>
     static T& create_instance(ARGS&&... args);
     /**
-     * Creates an instance of type U derived from T with args passed to constructor.
+     * Creates an instance of type U derived from T.
      *
      * @tparam U    type of concrete object derived from T
      * @param u     the object of type U
@@ -42,9 +43,15 @@ public:
     /** Return the instance. */
     static T& instance();
     /** Destroy the instance. */
-    static void free_instance();
+    static void free_instance() noexcept;
     /** Return if there is an instance. */
-    static bool has_instance();
+    static bool has_instance() noexcept;
+    /** Return if the instance is of type U or its descendants. */
+    template <typename U>
+    static bool is_instance_of_type() noexcept;
+    /** Return the instance cast to type U or throw an exception if not possible to cast. */
+    template <typename U>
+    static U& instance_of_type();
 
     Singleton() = delete;
     ~Singleton() = delete;
@@ -56,6 +63,10 @@ public:
 private:
     static std::unique_ptr<T> t_;    ///< the instance
     static std::shared_mutex mutex_; ///< the mutex to protect concurrent access
+
+    /** Return a pointer of type U if the instance if of type U or its descendants or nullptr otherwise. */
+    template <typename U>
+    static U* get_pointer() noexcept;
 };
 
 template <typename T>
@@ -111,15 +122,51 @@ T& Singleton<T>::instance() {
 }
 
 template <typename T>
-void Singleton<T>::free_instance() {
+void Singleton<T>::free_instance() noexcept {
     std::unique_lock lock(mutex_);
     t_.reset();
 }
 
 template <typename T>
-bool Singleton<T>::has_instance() {
+bool Singleton<T>::has_instance() noexcept {
     std::shared_lock lock(mutex_);
     return t_ != nullptr;
+}
+
+template <typename T>
+template <typename U>
+bool Singleton<T>::is_instance_of_type() noexcept {
+    std::shared_lock lock(mutex_);
+    return get_pointer<U>() != nullptr;
+}
+
+template <typename T>
+template <typename U>
+U& Singleton<T>::instance_of_type() {
+    std::shared_lock lock(mutex_);
+    U* ptr = get_pointer<U>();
+    if (ptr != nullptr) {
+        return *ptr;
+    } else {
+        using namespace std::string_literals;
+        const std::string msg = "base::pattern::Singleton<"s + typeid(T).name()
+                                + ">::instance_of_type not created for type "s + typeid(U).name();
+        throw std::logic_error(msg);
+    }
+}
+
+template <typename T>
+template <typename U>
+U* Singleton<T>::get_pointer() noexcept {
+    if constexpr (std::is_base_of_v<T, U>) {
+        return dynamic_cast<U*>(t_.get());
+    } else {
+        if constexpr (std::is_same_v<T, U>) {
+            return t_.get();
+        } else {
+            return nullptr;
+        }
+    }
 }
 
 }

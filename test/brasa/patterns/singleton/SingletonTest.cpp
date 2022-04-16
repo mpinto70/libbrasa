@@ -72,6 +72,7 @@ static void test_create(ARGS&&... args) {
 
     const T expected{ args... };
 
+    EXPECT_TRUE(Singleton<T>::template is_instance_of_type<T>());
     EXPECT_EQ(instance, expected);
 }
 
@@ -95,6 +96,10 @@ static void test_create_polymorphic(ARGS&&... args) {
     EXPECT_TRUE(Singleton<T>::has_instance());
     EXPECT_FALSE(Singleton<U>::has_instance());
 
+    EXPECT_TRUE(Singleton<T>::template is_instance_of_type<U>());
+    EXPECT_FALSE(Singleton<T>::template is_instance_of_type<POD>());
+    EXPECT_FALSE(Singleton<T>::template is_instance_of_type<int>());
+
     auto& real_instance1 = dynamic_cast<U&>(Singleton<T>::instance());
 
     EXPECT_EQ(real_instance1, expected);
@@ -108,6 +113,9 @@ static void test_create_polymorphic(ARGS&&... args) {
     auto& real_instance2 = dynamic_cast<U&>(Singleton<T>::instance());
 
     EXPECT_EQ(real_instance2, expected);
+    EXPECT_EQ(Singleton<T>::template instance_of_type<U>(), expected);
+    EXPECT_THROW(Singleton<T>::template instance_of_type<int>(), std::logic_error);
+    EXPECT_THROW(Singleton<T>::template instance_of_type<POD>(), std::logic_error);
 }
 
 template <typename T, typename... ARGS>
