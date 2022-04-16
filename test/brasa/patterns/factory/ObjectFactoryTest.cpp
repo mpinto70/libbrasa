@@ -11,27 +11,18 @@ struct Base {
 };
 
 struct Derived1 final : public Base {
-    Derived1(int a, int b)
-          : val_(a * b) {}
+    Derived1(int a, int b) : val_(a * b) {}
     ~Derived1() noexcept override = default;
-    int f() const override {
-        return val_;
-    }
-    friend bool operator==(const Derived1& lhs, const Derived1& rhs) {
-        return lhs.val_ == rhs.val_;
-    }
+    int f() const override { return val_; }
+    friend bool operator==(const Derived1& x, const Derived1& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
 };
 
 struct Derived1Creator final {
-    Derived1Creator(int a, int b)
-          : a_(a),
-            b_(b) {}
-    std::unique_ptr<Derived1> operator()() {
-        return std::make_unique<Derived1>(a_, b_);
-    }
+    Derived1Creator(int a, int b) : a_(a), b_(b) {}
+    std::unique_ptr<Derived1> operator()() { return std::make_unique<Derived1>(a_, b_); }
 
 private:
     int a_;
@@ -39,27 +30,18 @@ private:
 };
 
 struct Derived2 final : public Base {
-    Derived2(int a, int b)
-          : val_(a * b) {}
+    Derived2(int a, int b) : val_(a * b) {}
     ~Derived2() noexcept override = default;
-    int f() const override {
-        return val_;
-    }
-    friend bool operator==(const Derived2& lhs, const Derived2& rhs) {
-        return lhs.val_ == rhs.val_;
-    }
+    int f() const override { return val_; }
+    friend bool operator==(const Derived2& x, const Derived2& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
 };
 
 struct Derived2Creator final {
-    Derived2Creator(int a, int b)
-          : a_(a),
-            b_(b) {}
-    std::unique_ptr<Derived2> operator()() {
-        return std::make_unique<Derived2>(a_, b_);
-    }
+    Derived2Creator(int a, int b) : a_(a), b_(b) {}
+    std::unique_ptr<Derived2> operator()() { return std::make_unique<Derived2>(a_, b_); }
 
 private:
     int a_;
@@ -76,8 +58,7 @@ std::string to_string(Types t) {
 }
 }
 
-class ObjectFactoryTest : public ::testing::Test {
-};
+class ObjectFactoryTest : public ::testing::Test {};
 
 TEST_F(ObjectFactoryTest, create) {
     ObjectFactory<Base, Types> factory;

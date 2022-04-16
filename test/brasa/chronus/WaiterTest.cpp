@@ -10,11 +10,12 @@ namespace brasa {
 namespace chronus {
 namespace {
 template <typename NOW_FUNC, typename SLEEPER_FUNC>
-void verifyWait(NOW_FUNC now_func,
-      SLEEPER_FUNC sleeper_func,
-      const uint32_t wait_size) {
+void verifyWait(NOW_FUNC now_func, SLEEPER_FUNC sleeper_func, const uint32_t wait_size) {
     NOW_FUNC now = now_func;
-    auto waiter = make_waiter<NOW_FUNC, SLEEPER_FUNC>(std::move(now_func), wait_size, std::move(sleeper_func));
+    auto waiter = make_waiter<NOW_FUNC, SLEEPER_FUNC>(
+          std::move(now_func),
+          wait_size,
+          std::move(sleeper_func));
     for (unsigned i = 0; i < 100; ++i) {
         const auto t0 = now();
         waiter.reset();

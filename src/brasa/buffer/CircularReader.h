@@ -14,14 +14,10 @@ class CircularReader : public Circular<TYPE_, N_> {
 public:
     using Base = Circular<TYPE_, N_>;
 
-    CircularReader(uint8_t* buffer, uint64_t key) noexcept
-          : Base(buffer, key) {
-    }
+    CircularReader(uint8_t* buffer, uint64_t key) noexcept : Base(buffer, key) {}
 
     /// Reads `data` from buffer and returns true. If there is no data in buffer, returns false
-    bool read(TYPE_& data) const noexcept {
-        return Base::do_read(data);
-    }
+    bool read(TYPE_& data) const noexcept { return Base::do_read(data); }
 };
 }
 }

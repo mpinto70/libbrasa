@@ -14,43 +14,33 @@ public:
     using value_type = T;
 
     // conversions
-    explicit constexpr Singleton(T x)
-          : value(std::move(x)) {}
+    explicit constexpr Singleton(T x) : value(std::move(x)) {}
     explicit operator T() const { return value; }
 
     // semi-regular operations
     constexpr Singleton() = default;
-    constexpr Singleton(const Singleton& x)
-          : value(x.value) {}
+    constexpr Singleton(const Singleton& x) : value(x.value) {}
     constexpr Singleton(Singleton&& x) noexcept = default;
-    Singleton& operator=(const Singleton& rhs) {
-        T tmp = rhs.value;
+    Singleton& operator=(const Singleton& y) {
+        T tmp = y.value;
         value = std::move(tmp);
         return *this;
     }
     Singleton& operator=(Singleton&& x) noexcept = default;
 
     // regular operations
-    friend constexpr bool operator==(const Singleton& lhs, const Singleton& rhs) {
-        return lhs.value == rhs.value;
+    friend constexpr bool operator==(const Singleton& x, const Singleton& y) {
+        return x.value == y.value;
     }
-    friend constexpr bool operator!=(const Singleton& lhs, const Singleton& rhs) {
-        return not(lhs == rhs);
-    }
+    friend constexpr bool operator!=(const Singleton& x, const Singleton& y) { return not(x == y); }
 
     // totally ordered operations
-    friend constexpr bool operator<(const Singleton& lhs, const Singleton& rhs) {
-        return lhs.value < rhs.value;
+    friend constexpr bool operator<(const Singleton& x, const Singleton& y) {
+        return x.value < y.value;
     }
-    friend constexpr bool operator>(const Singleton& lhs, const Singleton& rhs) {
-        return rhs < lhs;
-    }
-    friend constexpr bool operator<=(const Singleton& lhs, const Singleton& rhs) {
-        return not(rhs < lhs);
-    }
-    friend constexpr bool operator>=(const Singleton& lhs, const Singleton& rhs) {
-        return not(lhs < rhs);
-    }
+    friend constexpr bool operator>(const Singleton& x, const Singleton& y) { return y < x; }
+    friend constexpr bool operator<=(const Singleton& x, const Singleton& y) { return not(y < x); }
+    friend constexpr bool operator>=(const Singleton& x, const Singleton& y) { return not(x < y); }
 };
 }
 }

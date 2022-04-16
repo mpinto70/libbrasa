@@ -9,14 +9,10 @@ namespace {
 
 template <size_t N>
 struct Object {
-    template <typename... Ts,
-          std::enable_if_t<sizeof...(Ts) == N, bool> = true>
-    explicit Object(Ts... vals)
-          : values{ vals... } {}
+    template <typename... Ts, std::enable_if_t<sizeof...(Ts) == N, bool> = true>
+    explicit Object(Ts... vals) : values{ vals... } {}
 
-    friend bool operator==(const Object& lhs, const Object& rhs) {
-        return lhs.values == rhs.values;
-    }
+    friend bool operator==(const Object& x, const Object& y) { return x.values == y.values; }
 
     std::array<int, N> values;
 };
@@ -27,15 +23,10 @@ struct Base {
 };
 
 struct Derived final : public Base {
-    Derived(int a, int b)
-          : val_(a * b) {}
+    Derived(int a, int b) : val_(a * b) {}
     ~Derived() noexcept override = default;
-    int f() const override {
-        return val_;
-    }
-    friend bool operator==(const Derived& lhs, const Derived& rhs) {
-        return lhs.val_ == rhs.val_;
-    }
+    int f() const override { return val_; }
+    friend bool operator==(const Derived& x, const Derived& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
@@ -47,8 +38,8 @@ struct POD {
     double d;
 };
 
-bool operator==(const POD& lhs, const POD& rhs) {
-    return lhs.c == rhs.c && lhs.i == rhs.i && lhs.d == rhs.d;
+bool operator==(const POD& x, const POD& y) {
+    return x.c == y.c && x.i == y.i && x.d == y.d;
 }
 
 static void free_insts() {
@@ -72,6 +63,7 @@ static void test_create(ARGS&&... args) {
 
     const T expected{ args... };
 
+    EXPECT_TRUE(Singleton<T>::template is_instance_of_type<T>());
     EXPECT_EQ(instance, expected);
 }
 
@@ -95,6 +87,10 @@ static void test_create_polymorphic(ARGS&&... args) {
     EXPECT_TRUE(Singleton<T>::has_instance());
     EXPECT_FALSE(Singleton<U>::has_instance());
 
+    EXPECT_TRUE(Singleton<T>::template is_instance_of_type<U>());
+    EXPECT_FALSE(Singleton<T>::template is_instance_of_type<POD>());
+    EXPECT_FALSE(Singleton<T>::template is_instance_of_type<int>());
+
     auto& real_instance1 = dynamic_cast<U&>(Singleton<T>::instance());
 
     EXPECT_EQ(real_instance1, expected);
@@ -108,6 +104,9 @@ static void test_create_polymorphic(ARGS&&... args) {
     auto& real_instance2 = dynamic_cast<U&>(Singleton<T>::instance());
 
     EXPECT_EQ(real_instance2, expected);
+    EXPECT_EQ(Singleton<T>::template instance_of_type<U>(), expected);
+    EXPECT_THROW(Singleton<T>::template instance_of_type<int>(), std::logic_error);
+    EXPECT_THROW(Singleton<T>::template instance_of_type<POD>(), std::logic_error);
 }
 
 template <typename T, typename... ARGS>
@@ -150,9 +149,7 @@ static void test_free_instance(ARGS&&... args) {
 
 class SingletonTest : public ::testing::Test {
 private:
-    void TearDown() override {
-        free_insts();
-    }
+    void TearDown() override { free_insts(); }
 };
 
 TEST_F(SingletonTest, create) {

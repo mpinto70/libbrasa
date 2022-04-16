@@ -25,11 +25,12 @@ The class allows for polymorphic singletons also. See
 [`ObjectRepository`](./factory/ObjectRepository.h) is a class that holds instances of objects that
 are identified by a hashable key. The class is parameterized by the base class of all objects `BASE`
 and the type of the key `TYPE_ID`. Every object in the repository has to be of class `BASE` or one
-of its descendants. Objects are added by calling `add`, removed by calling `remove`, and retrived by calling `get`.
+of its descendants. Objects are added by calling `add`, removed by calling `remove`, and retrived by
+calling `get`.
 
 This class **is not thread safe**.
 
-## Object factory
+### Object factory
 
 [`ObjectFactory`](./factory/ObjectFactory.h) is a class that holds creators of objects of differnt
 types that are identified by a hashable key. The class is parameterized by the base class of all

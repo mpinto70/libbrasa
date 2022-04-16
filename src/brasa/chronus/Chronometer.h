@@ -25,11 +25,7 @@ public:
     using TimeT = std::invoke_result_t<NOW_FUNC>; ///< the return of NOW_FUNC is stored in `begin_`
 
     /// Creates the object registering its id and the `NOW_FUNC`
-    Chronometer(NOW_FUNC&& now, uint32_t id)
-          : now_(std::move(now)),
-            id_(id),
-            begin_(now_()) {
-    }
+    Chronometer(NOW_FUNC&& now, uint32_t id) : now_(std::move(now)), id_(id), begin_(now_()) {}
     // no copies, only moves
     Chronometer(const Chronometer&) = delete;
     Chronometer& operator=(const Chronometer&) = delete;
@@ -39,19 +35,13 @@ public:
     [[nodiscard]] uint32_t id() const noexcept { return id_; }
 
     /// Marks the current instant and returns an `ELAPSED` struct
-    [[nodiscard]] ELAPSED mark(uint32_t mark_id) const {
-        return { id_, mark_id, begin_, now_() };
-    }
+    [[nodiscard]] ELAPSED mark(uint32_t mark_id) const { return { id_, mark_id, begin_, now_() }; }
 
     /// Return the tick count since time began
-    [[nodiscard]] uint64_t count() const {
-        return now_() - begin_;
-    }
+    [[nodiscard]] uint64_t count() const { return now_() - begin_; }
 
     /// Restarts the chronometer
-    void reset() noexcept {
-        begin_ = now_();
-    }
+    void reset() noexcept { begin_ = now_(); }
 
 private:
     const NOW_FUNC now_;

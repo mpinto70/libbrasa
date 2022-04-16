@@ -14,14 +14,10 @@ class CircularWriter : public Circular<TYPE_, N_> {
 public:
     using Base = Circular<TYPE_, N_>;
 
-    CircularWriter(uint8_t* buffer, uint64_t key) noexcept
-          : Circular<TYPE_, N_>(buffer, key) {
-    }
+    CircularWriter(uint8_t* buffer, uint64_t key) noexcept : Circular<TYPE_, N_>(buffer, key) {}
 
     /// Writes `data` to buffer
-    void write(const TYPE_& data) const noexcept {
-        Base::do_write(data);
-    }
+    void write(const TYPE_& data) const noexcept { Base::do_write(data); }
 };
 }
 }

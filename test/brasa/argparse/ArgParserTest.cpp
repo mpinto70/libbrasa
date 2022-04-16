@@ -8,7 +8,8 @@
 namespace brasa::argparse {
 namespace {
 template <size_t BUFFER_SIZE, size_t ARGV_SIZE>
-void build(const std::vector<std::string>& options,
+void build(
+      const std::vector<std::string>& options,
       char (&buffer)[BUFFER_SIZE],
       int& argc,
       char* (&argv)[ARGV_SIZE]) {
@@ -30,26 +31,25 @@ void build(const std::vector<std::string>& options,
 }
 
 TEST(ArgParserTest, test_parse) {
-    auto parser = make_parser("program description",
+    auto parser = make_parser(
+          "program description",
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter"),
                 SingleValue<std::string>("PARAMETER2", "another parameter"),
                 SingleValue<std::string>("PARAMETER3", "yet another parameter")),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list the files"),
-                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark the file to be ignored")));
+                ValueParser<SingleValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark the file to be ignored")));
 
     EXPECT_EQ(parser.VALUE_SIZE, 3u);
     EXPECT_EQ(parser.PARSER_SIZE, 2u);
 
     const std::vector<std::string> options = {
-        "command",
-        "parameter1",
-        "-l",
-        "-i",
-        "file1.cpp",
-        "parameter2",
-        "bleh",
+        "command", "parameter1", "-l", "-i", "file1.cpp", "parameter2", "bleh",
     };
     int argc = 0;
     char* argv[50];
@@ -69,13 +69,18 @@ TEST(ArgParserTest, test_parse) {
 
 TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
     const std::string description = "Some program description";
-    const auto parser = make_parser(description,
+    const auto parser = make_parser(
+          description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list files"),
-                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")));
+                ValueParser<SingleValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark a file to be ignored")));
 
     const std::string expected_usage = "Some program description\n"
                                        "\n"
@@ -93,11 +98,16 @@ TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
 
 TEST(ArgParserTest, test_usage_multiple_no_parameters_and_multiple_options) {
     const std::string description = "Some program description";
-    const auto parser = make_parser(description,
+    const auto parser = make_parser(
+          description,
           std::make_tuple(),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list files"),
-                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")));
+                ValueParser<SingleValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark a file to be ignored")));
 
     const std::string expected_usage = "Some program description\n"
                                        "\n"
@@ -112,32 +122,39 @@ TEST(ArgParserTest, test_usage_multiple_no_parameters_and_multiple_options) {
 
 TEST(ArgParserTest, test_usage_multiple_parameters_and_no_options) {
     const std::string description = "Some program description";
-    const auto parser = make_parser(description,
+    const auto parser = make_parser(
+          description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
           std::make_tuple());
 
-    const std::string expected_usage = "Some program description\n"
-                                       "\n"
-                                       "executable PARAMETER1 PARAMETER2\n"
-                                       "\n"
-                                       "Positional parameters:\n"
-                                       "    PARAMETER1              a parameter to process\n"
-                                       "    PARAMETER2              a second parameter to process\n";
+    const std::string expected_usage =
+          "Some program description\n"
+          "\n"
+          "executable PARAMETER1 PARAMETER2\n"
+          "\n"
+          "Positional parameters:\n"
+          "    PARAMETER1              a parameter to process\n"
+          "    PARAMETER2              a second parameter to process\n";
     EXPECT_EQ(parser.usage("executable"), expected_usage);
 }
 
 TEST(ArgParserTest, test_usage_footer) {
     const std::string description = "Some program description";
     const std::string footer = "Some footer";
-    const auto parser = make_parser(description,
+    const auto parser = make_parser(
+          description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<std::string>("PARAMETER2", "a second parameter to process")),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list files"),
-                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")),
+                ValueParser<SingleValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark a file to be ignored")),
           footer);
 
     const std::string expected_usage = "Some program description\n"
@@ -158,15 +175,24 @@ TEST(ArgParserTest, test_usage_footer) {
 
 namespace {
 auto create_parser() {
-    return make_parser("program description",
+    return make_parser(
+          "program description",
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter"),
                 SingleValue<std::string>("PARAMETER2", "another parameter"),
                 SingleValue<int>("PARAMETER3", "yet another parameter")),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list the files"),
-                ValueParser<SingleValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark the file to be ignored"),
-                ValueParser<SingleValue<int>>('n', "number", "number-of-times", "set the number of times")));
+                ValueParser<SingleValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark the file to be ignored"),
+                ValueParser<SingleValue<int>>(
+                      'n',
+                      "number",
+                      "number-of-times",
+                      "set the number of times")));
 }
 
 void check_error_in_parser(const std::vector<std::string>& options, const std::string& error_msg) {
@@ -178,9 +204,12 @@ void check_error_in_parser(const std::vector<std::string>& options, const std::s
     build(options, buffer, argc, argv);
     std::ostringstream out;
     EXPECT_EQ(parser.parse(argc, argv, out), ParseResult::Error);
-    EXPECT_EQ(out.str(), error_msg + "\n"
-                                     "\n"
-                               + parser.usage(options[0]));
+    EXPECT_EQ(
+          out.str(),
+          error_msg
+                + "\n"
+                  "\n"
+                + parser.usage(options[0]));
 }
 }
 
@@ -191,20 +220,19 @@ TEST(ArgParserTest, test_parse_error_insufficient_values) {
         "parameter2",
     };
 
-    check_error_in_parser(options, "ERROR processing command line arguments: missing arguments for PARAMETER3");
+    check_error_in_parser(
+          options,
+          "ERROR processing command line arguments: missing arguments for PARAMETER3");
 }
 
 TEST(ArgParserTest, test_parse_error_too_many_values) {
     const std::vector<std::string> options = {
-        "command",
-        "parameter1",
-        "parameter2",
-        "789",
-        "excess",
-        "value",
+        "command", "parameter1", "parameter2", "789", "excess", "value",
     };
 
-    check_error_in_parser(options, "ERROR processing command line arguments: too many arguments 'excess' 'value'");
+    check_error_in_parser(
+          options,
+          "ERROR processing command line arguments: too many arguments 'excess' 'value'");
 }
 
 TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
@@ -215,7 +243,9 @@ TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
         "text",
     };
 
-    check_error_in_parser(options, "ERROR processing command line arguments: could not convert value 'text' of PARAMETER3");
+    check_error_in_parser(
+          options,
+          "ERROR processing command line arguments: could not convert value 'text' of PARAMETER3");
 }
 
 }

@@ -50,10 +50,7 @@ protected:
     /** Creates the object informing the buffer and the key.
      * The buffer has to be at least `BUFFER_SIZE` in length.
      */
-    Circular(uint8_t* buffer, const uint64_t key)
-          : buffer_(buffer),
-            key_(key),
-            crc_(crc32(key)) {
+    Circular(uint8_t* buffer, const uint64_t key) : buffer_(buffer), key_(key), crc_(crc32(key)) {
         if (not is_initialized()) {
             initialize();
         }

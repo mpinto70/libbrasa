@@ -24,8 +24,7 @@ class CircularMock : public PARENT {
 public:
     using PARENT::BufferDataT;
 
-    CircularMock(uint8_t* buffer, const uint64_t key)
-          : PARENT(buffer, key) {}
+    CircularMock(uint8_t* buffer, const uint64_t key) : PARENT(buffer, key) {}
 };
 
 template <typename CIRCULAR>
@@ -47,7 +46,8 @@ void verify_create_uninitialized(const uint64_t KEY) {
     uint8_t buffer2[CIRCULAR::BUFFER_SIZE];
     ::memset(buffer2, 0x55, sizeof(buffer2));
     auto buffer_data2 = reinterpret_cast<const BufferDataT*>(buffer2);
-    EXPECT_EQ(::memcmp(buffer_data2->buffer, buffer_data->buffer, sizeof(buffer_data2->buffer)), 0) << "key = " << KEY;
+    EXPECT_EQ(::memcmp(buffer_data2->buffer, buffer_data->buffer, sizeof(buffer_data2->buffer)), 0)
+          << "key = " << KEY;
     EXPECT_NE(::memcmp(buffer2, buffer, sizeof(buffer)), 0) << "key = " << KEY;
     const CIRCULAR circular2(buffer2, KEY);
     EXPECT_EQ(::memcmp(buffer2, buffer, sizeof(buffer)), 0) << "key = " << KEY;
