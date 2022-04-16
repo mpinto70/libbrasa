@@ -6,7 +6,11 @@
 #include <string>
 
 namespace {
-void execute_command(const std::string& param1, int param2, bool is_list, const std::vector<std::string>& ignores) {
+void execute_command(
+      const std::string& param1,
+      int param2,
+      bool is_list,
+      const std::vector<std::string>& ignores) {
     using namespace std::literals;
     std::cout << "Executing command with " << param1 << " " << param2
               << (is_list ? " " : " without ") << "listing files ";
@@ -30,13 +34,18 @@ int main(int argc, char* argv[]) {
     using brasa::argparse::SingleValue;
     using brasa::argparse::ValueParser;
     const std::string program_description = "Demo for argparse facility of libbrasa";
-    auto parser = make_parser(program_description,
+    auto parser = make_parser(
+          program_description,
           std::make_tuple(
                 SingleValue<std::string>("PARAMETER1", "a parameter to process"),
                 SingleValue<int>("PARAMETER2", "a second parameter to process")),
           std::make_tuple(
                 BooleanParser('l', "list-files", "list files"),
-                ValueParser<MultiValue<std::string>>('i', "ignore-file", "file-to-ignore", "mark a file to be ignored")));
+                ValueParser<MultiValue<std::string>>(
+                      'i',
+                      "ignore-file",
+                      "file-to-ignore",
+                      "mark a file to be ignored")));
 
     switch (parser.parse(argc, argv, std::cerr)) {
         case ParseResult::Ok: {

@@ -15,27 +15,25 @@ struct Regular {
     int x;
     int y;
 
-    friend bool operator==(const Regular& lhs, const Regular& rhs) {
-        return lhs.x == rhs.x && lhs.y == rhs.y;
-    }
+    friend bool operator==(const Regular& x, const Regular& y) { return x.x == y.x && x.y == y.y; }
 };
 
 struct TotallyOrdered {
     int x;
     int y;
 
-    friend bool operator==(const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
-        return lhs.x == rhs.x && lhs.y == rhs.y;
+    friend bool operator==(const TotallyOrdered& x, const TotallyOrdered& y) {
+        return x.x == y.x && x.y == y.y;
     }
 
-    friend bool operator<(const TotallyOrdered& lhs, const TotallyOrdered& rhs) {
-        if (lhs.x < rhs.x) {
+    friend bool operator<(const TotallyOrdered& x, const TotallyOrdered& y) {
+        if (x.x < y.x) {
             return true;
         }
-        if (lhs.x > rhs.x) {
+        if (x.x > y.x) {
             return false;
         }
-        return lhs.y < rhs.y;
+        return x.y < y.y;
     }
 };
 

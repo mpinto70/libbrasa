@@ -21,7 +21,9 @@ void check_cast(const safe_type& value, const typename safe_type::underlying_typ
 }
 
 template <typename safe_type>
-void check_trivial(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
+void check_trivial(
+      const safe_type& value,
+      const typename safe_type::underlying_type& stored_value) {
     typename safe_type::underlying_type buffer = stored_value;
     // check that safe_type does not add any storage
     auto reinterpreted_value = reinterpret_cast<safe_type*>(&buffer);
@@ -58,9 +60,13 @@ TEST(TypeSafeTest, trivial_is_viable) {
 
 namespace {
 template <typename safe_type>
-void check_trivial_array(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
+void check_trivial_array(
+      const safe_type& value,
+      const typename safe_type::underlying_type& stored_value) {
     auto reinterpreted_value = reinterpret_cast<const safe_type*>(&stored_value);
-    EXPECT_EQ(static_cast<const void*>(reinterpreted_value), static_cast<const void*>(&stored_value));
+    EXPECT_EQ(
+          static_cast<const void*>(reinterpreted_value),
+          static_cast<const void*>(&stored_value));
 
     EXPECT_EQ(sizeof(value), sizeof(stored_value));
     EXPECT_EQ(memcmp(value.value, stored_value, sizeof(stored_value)), 0);
@@ -95,7 +101,9 @@ TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
 ////////// ordered //////////
 namespace {
 template <typename safe_type>
-void check_ordered(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
+void check_ordered(
+      const safe_type& value,
+      const typename safe_type::underlying_type& stored_value) {
     check_trivial<safe_type>(value, stored_value);
 
     const typename safe_type::underlying_type stored_plus_one = stored_value + 1;

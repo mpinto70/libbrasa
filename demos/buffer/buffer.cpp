@@ -46,7 +46,8 @@ void producer(uint8_t* buffer) {
     auto begin = brasa::chronus::micro_now();
 
     // preparing a processing that would take roughly one millisecond each lap
-    brasa::chronus::Waiter waiter = brasa::chronus::make_waiter(brasa::chronus::micro_now, 1000, brasa::chronus::micro_sleep);
+    brasa::chronus::Waiter waiter =
+          brasa::chronus::make_waiter(brasa::chronus::micro_now, 1000, brasa::chronus::micro_sleep);
     for (size_t i = 0; i < NUM_WRITES; ++i) {
         waiter.reset();
         waiter.wait();
@@ -74,7 +75,8 @@ void consumer(uint8_t* buffer) {
     ElapsedTime elapsed;
 
     // consumption has to be faster than production, to avoid dirty reads
-    brasa::chronus::Waiter waiter = brasa::chronus::make_waiter(brasa::chronus::nano_now, 1000, brasa::chronus::nano_sleep);
+    brasa::chronus::Waiter waiter =
+          brasa::chronus::make_waiter(brasa::chronus::nano_now, 1000, brasa::chronus::nano_sleep);
     for (size_t i = 0; i < NUM_WRITES; ++i) {
         discarded = 0;
         waiter.reset();

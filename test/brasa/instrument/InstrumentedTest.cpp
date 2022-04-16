@@ -22,7 +22,9 @@ void Iota(I first, I last, N start = N(0), N step = N(1)) {
 }
 
 TEST(InstrumentedTest, names) {
-    EXPECT_EQ(sizeof(InstrumentedCounter::counter_names), InstrumentedCounter::NUMBER_OPS * sizeof(char*));
+    EXPECT_EQ(
+          sizeof(InstrumentedCounter::counter_names),
+          InstrumentedCounter::NUMBER_OPS * sizeof(char*));
     ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::n);
     ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::destruction);
     ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::default_construction);
@@ -40,7 +42,9 @@ TEST(InstrumentedTest, names) {
     EXPECT_EQ(std::string(names[InstrumentedCounter::destruction]), "dtor");
     EXPECT_EQ(std::string(names[InstrumentedCounter::default_construction]), "default ctor");
     EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_construction]), "conv ctor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_move_construction]), "conv move ctor");
+    EXPECT_EQ(
+          std::string(names[InstrumentedCounter::conversion_move_construction]),
+          "conv move ctor");
     EXPECT_EQ(std::string(names[InstrumentedCounter::copy_construction]), "copy ctor");
     EXPECT_EQ(std::string(names[InstrumentedCounter::move_construction]), "move ctor");
     EXPECT_EQ(std::string(names[InstrumentedCounter::conversion]), "conv");
@@ -67,7 +71,8 @@ void run_sort() {
     EXPECT_NE(0u, InstrumentedCounter::counts[InstrumentedCounter::comparison]) << N;
 
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion_construction]) << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion_move_construction]) << N;
+    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion_move_construction])
+          << N;
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion]) << N;
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::copy_construction]) << N;
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::default_construction]) << N;
@@ -102,9 +107,8 @@ void verify_operations(F f, const std::vector<int>& ops) {
 }
 
 TEST(InstrumentedTest, count_default_construction) {
-    verify_operations([]() {
-        const Instrumented<int> x;
-    },
+    verify_operations(
+          []() { const Instrumented<int> x; },
           {
                 InstrumentedCounter::default_construction,
                 InstrumentedCounter::destruction,
@@ -112,10 +116,11 @@ TEST(InstrumentedTest, count_default_construction) {
 }
 
 TEST(InstrumentedTest, count_conversion_construction) {
-    verify_operations([]() {
-        int i = 13;
-        const Instrumented<int> x(i);
-    },
+    verify_operations(
+          []() {
+              int i = 13;
+              const Instrumented<int> x(i);
+          },
           {
                 InstrumentedCounter::conversion_construction,
                 InstrumentedCounter::destruction,
@@ -123,9 +128,8 @@ TEST(InstrumentedTest, count_conversion_construction) {
 }
 
 TEST(InstrumentedTest, count_conversion_move_construction) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-    },
+    verify_operations(
+          []() { const auto x = Instrumented<int>(129); },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::destruction,
@@ -133,10 +137,11 @@ TEST(InstrumentedTest, count_conversion_move_construction) {
 }
 
 TEST(InstrumentedTest, count_copy_construction) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-        const Instrumented<int> y(x);
-    },
+    verify_operations(
+          []() {
+              const auto x = Instrumented<int>(129);
+              const Instrumented<int> y(x);
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::copy_construction,
@@ -146,10 +151,11 @@ TEST(InstrumentedTest, count_copy_construction) {
 }
 
 TEST(InstrumentedTest, count_move_construction) {
-    verify_operations([]() {
-        Instrumented<int> a(123);
-        Instrumented<int> b(std::move(a));
-    },
+    verify_operations(
+          []() {
+              Instrumented<int> a(123);
+              Instrumented<int> b(std::move(a));
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::move_construction,
@@ -159,10 +165,11 @@ TEST(InstrumentedTest, count_move_construction) {
 }
 
 TEST(InstrumentedTest, count_conversion) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-        static_cast<int>(x);
-    },
+    verify_operations(
+          []() {
+              const auto x = Instrumented<int>(129);
+              static_cast<int>(x);
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::conversion,
@@ -171,11 +178,12 @@ TEST(InstrumentedTest, count_conversion) {
 }
 
 TEST(InstrumentedTest, count_assignment) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-        Instrumented<int> y;
-        y = x;
-    },
+    verify_operations(
+          []() {
+              const auto x = Instrumented<int>(129);
+              Instrumented<int> y;
+              y = x;
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::default_construction,
@@ -186,13 +194,14 @@ TEST(InstrumentedTest, count_assignment) {
 }
 
 TEST(InstrumentedTest, count_equality) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-        Instrumented<int> y;
-        y = x;
-        y == x;
-        y != x;
-    },
+    verify_operations(
+          []() {
+              const auto x = Instrumented<int>(129);
+              Instrumented<int> y;
+              y = x;
+              y == x;
+              y != x;
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::default_construction,
@@ -205,15 +214,16 @@ TEST(InstrumentedTest, count_equality) {
 }
 
 TEST(InstrumentedTest, count_comparison) {
-    verify_operations([]() {
-        const auto x = Instrumented<int>(129);
-        Instrumented<int> y;
-        y = x;
-        y < x;
-        y > x;
-        y <= x;
-        y >= x;
-    },
+    verify_operations(
+          []() {
+              const auto x = Instrumented<int>(129);
+              Instrumented<int> y;
+              y = x;
+              y < x;
+              y > x;
+              y <= x;
+              y >= x;
+          },
           {
                 InstrumentedCounter::conversion_move_construction,
                 InstrumentedCounter::default_construction,

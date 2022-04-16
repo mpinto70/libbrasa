@@ -34,12 +34,8 @@ public:
     using value_type = T;
 
     // conversions
-    explicit constexpr Instrumented(const T& x)
-          : value(x) {
-        ++counts[conversion_construction];
-    }
-    explicit constexpr Instrumented(T&& x)
-          : value(std::move(x)) {
+    explicit constexpr Instrumented(const T& x) : value(x) { ++counts[conversion_construction]; }
+    explicit constexpr Instrumented(T&& x) : value(std::move(x)) {
         ++counts[conversion_move_construction];
     }
     explicit operator T() const {
@@ -48,48 +44,38 @@ public:
     }
 
     // semi-regular operations
-    constexpr Instrumented(const Instrumented& x)
-          : value(x.value) {
-        ++counts[copy_construction];
-    }
-    constexpr Instrumented(Instrumented&& x) noexcept
-          : value(std::move(x.value)) {
+    constexpr Instrumented(const Instrumented& x) : value(x.value) { ++counts[copy_construction]; }
+    constexpr Instrumented(Instrumented&& x) noexcept : value(std::move(x.value)) {
         ++counts[move_construction];
     }
-    constexpr Instrumented() noexcept {
-        ++counts[default_construction];
-    }
-    ~Instrumented() {
-        ++counts[destruction];
-    }
-    Instrumented& operator=(const Instrumented& rhs) {
+    constexpr Instrumented() noexcept { ++counts[default_construction]; }
+    ~Instrumented() { ++counts[destruction]; }
+    Instrumented& operator=(const Instrumented& y) {
         ++counts[assignment];
-        value = rhs.value;
+        value = y.value;
         return *this;
     }
 
     // regular operations
-    friend constexpr bool operator==(const Instrumented& lhs, const Instrumented& rhs) {
+    friend constexpr bool operator==(const Instrumented& x, const Instrumented& y) {
         ++counts[equality];
-        return lhs.value == rhs.value;
+        return x.value == y.value;
     }
-    friend constexpr bool operator!=(const Instrumented& lhs, const Instrumented& rhs) {
-        return not(lhs == rhs);
+    friend constexpr bool operator!=(const Instrumented& x, const Instrumented& y) {
+        return not(x == y);
     }
 
     // totally ordered operations
-    friend constexpr bool operator<(const Instrumented& lhs, const Instrumented& rhs) {
+    friend constexpr bool operator<(const Instrumented& x, const Instrumented& y) {
         ++counts[comparison];
-        return lhs.value < rhs.value;
+        return x.value < y.value;
     }
-    friend constexpr bool operator>(const Instrumented& lhs, const Instrumented& rhs) {
-        return rhs < lhs;
+    friend constexpr bool operator>(const Instrumented& x, const Instrumented& y) { return y < x; }
+    friend constexpr bool operator<=(const Instrumented& x, const Instrumented& y) {
+        return not(y < x);
     }
-    friend constexpr bool operator<=(const Instrumented& lhs, const Instrumented& rhs) {
-        return not(rhs < lhs);
-    }
-    friend constexpr bool operator>=(const Instrumented& lhs, const Instrumented& rhs) {
-        return not(lhs < rhs);
+    friend constexpr bool operator>=(const Instrumented& x, const Instrumented& y) {
+        return not(x < y);
     }
 };
 }

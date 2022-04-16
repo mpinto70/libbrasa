@@ -91,9 +91,9 @@ BASE& ObjectRepository<BASE, TYPE_ID>::get(TYPE_ID id) {
     if (it == objects_.end()) {
         using std::to_string;
         using namespace std::string_literals;
-        throw std::logic_error("brasa::pattern::ObjectRepository::get object not found for "s
-                               + typeid(BASE).name() + " and id "
-                               + to_string(id));
+        throw std::logic_error(
+              "brasa::pattern::ObjectRepository::get object not found for "s + typeid(BASE).name()
+              + " and id " + to_string(id));
     }
     return *it->second;
 }

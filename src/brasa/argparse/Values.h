@@ -9,9 +9,7 @@
 namespace brasa::argparse {
 
 struct InvalidArgument : std::runtime_error {
-    explicit InvalidArgument(const std::string& msg)
-          : std::runtime_error(msg) {
-    }
+    explicit InvalidArgument(const std::string& msg) : std::runtime_error(msg) {}
 };
 
 void assert_can_digest(bool can_digest, const std::string& argument);
@@ -110,7 +108,9 @@ public:
     const T& value(size_t idx) const { return ts_[idx].value(); }
     std::vector<T> values() const {
         std::vector<T> res;
-        std::transform(ts_.begin(), ts_.end(), std::back_inserter(res), [](const auto& t) { return t.value(); });
+        std::transform(ts_.begin(), ts_.end(), std::back_inserter(res), [](const auto& t) {
+            return t.value();
+        });
         return res;
     }
 

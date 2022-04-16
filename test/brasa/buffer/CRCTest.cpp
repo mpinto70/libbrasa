@@ -1,8 +1,9 @@
 #include <brasa/buffer/CRC.h>
 
+#include <gtest/gtest.h>
+
 #include <cstdio>
 #include <cstdlib>
-#include <gtest/gtest.h>
 
 namespace brasa {
 namespace buffer {

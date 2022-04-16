@@ -16,29 +16,43 @@ namespace brasa::argparse {
 namespace detail {
 template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
 typename std::enable_if<I == std::tuple_size_v<TupleT>, void>::type
-      for_each_tuple(TupleT& /*a_tuple*/, Ts&&... /*ts*/) {
-}
+      for_each_tuple(TupleT&, Ts&&...) {}
 
 template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
-      typename std::enable_if < I<std::tuple_size_v<TupleT>, void>::type
-      for_each_tuple(TupleT& a_tuple, Ts&&... ts) {
+      typename std::enable_if
+      < I<std::tuple_size_v<TupleT>, void>::type for_each_tuple(TupleT& a_tuple, Ts&&... ts) {
     FunctorT f;
     f.template operator()<I>(a_tuple, ts...);
     for_each_tuple<FunctorT, I + 1, TupleT>(a_tuple, std::forward<Ts>(ts)...);
 }
 
-template <typename FunctorT, typename ReturnT, typename BinaryOperator = std::plus<ReturnT>, size_t I = 0, typename TupleT, typename... Ts>
+template <
+      typename FunctorT,
+      typename ReturnT,
+      typename BinaryOperator = std::plus<ReturnT>,
+      size_t I = 0,
+      typename TupleT,
+      typename... Ts>
 typename std::enable_if<I == std::tuple_size_v<TupleT>, ReturnT>::type
-      accumulate_tuple(TupleT& /*a_tuple*/, const ReturnT& return_v = ReturnT{}, Ts&&... /*ts*/) {
+      accumulate_tuple(TupleT&, const ReturnT& return_v = ReturnT{}, Ts&&...) {
     return return_v;
 }
 
-template <typename FunctorT, typename ReturnT, typename BinaryOperator = std::plus<ReturnT>, size_t I = 0, typename TupleT, typename... Ts>
+template <
+      typename FunctorT,
+      typename ReturnT,
+      typename BinaryOperator = std::plus<ReturnT>,
+      size_t I = 0,
+      typename TupleT,
+      typename... Ts>
       typename std::enable_if < I<std::tuple_size_v<TupleT>, ReturnT>::type
       accumulate_tuple(TupleT& a_tuple, ReturnT return_v = ReturnT{}, Ts&&... ts) {
     FunctorT f;
     return_v = BinaryOperator{}(return_v, f.template operator()<I>(a_tuple, ts...));
-    return accumulate_tuple<FunctorT, ReturnT, BinaryOperator, I + 1, TupleT>(a_tuple, return_v, std::forward<Ts>(ts)...);
+    return accumulate_tuple<FunctorT, ReturnT, BinaryOperator, I + 1, TupleT>(
+          a_tuple,
+          return_v,
+          std::forward<Ts>(ts)...);
 }
 }
 
@@ -76,7 +90,11 @@ class ArgParser {
 public:
     static constexpr size_t VALUE_SIZE = std::tuple_size_v<ValueTupleT>;
     static constexpr size_t PARSER_SIZE = std::tuple_size_v<ParserTupleT>;
-    ArgParser(std::string description, ValueTupleT value_tuple, ParserTupleT parser_tuple, std::string footer)
+    ArgParser(
+          std::string description,
+          ValueTupleT value_tuple,
+          ParserTupleT parser_tuple,
+          std::string footer)
           : description_(std::move(description)),
             values_(std::move(value_tuple)),
             parsers_(std::move(parser_tuple)),
@@ -88,9 +106,12 @@ public:
 
         detail::for_each_tuple<BuildOptions>(parsers_, long_options, short_options);
 
-        const auto is_help = [](const struct option& op) { return std::strcmp(op.name, "help") == 0; };
+        const auto is_help = [](const struct option& op) {
+            return std::strcmp(op.name, "help") == 0;
+        };
         if (short_options.find('h') != std::string::npos
-              || std::find_if(long_options.begin(), long_options.end(), is_help) != long_options.end()) {
+            || std::find_if(long_options.begin(), long_options.end(), is_help)
+                     != long_options.end()) {
             throw InvalidArgument("Option -h/--help is reserved for ArgParser");
         }
 
@@ -108,7 +129,8 @@ public:
     std::string usage(const std::string& executable) const {
         const auto parameters_usage = detail::accumulate_tuple<BuildUsage, std::string>(values_);
         const auto parsers_usage = detail::accumulate_tuple<BuildUsage, std::string>(parsers_);
-        const auto command_line_parameters = detail::accumulate_tuple<BuildCommandLine, std::string>(values_);
+        const auto command_line_parameters =
+              detail::accumulate_tuple<BuildCommandLine, std::string>(values_);
         std::string res = description_;
         res += "\n\n";
         res += executable;
@@ -135,8 +157,7 @@ public:
             }
             return parse_result;
         } catch (const InvalidArgument& error) {
-            err << ERROR_MSG_ << error.what() << "\n\n"
-                << usage(argv[0]);
+            err << ERROR_MSG_ << error.what() << "\n\n" << usage(argv[0]);
             return ParseResult::Error;
         }
     }
@@ -155,7 +176,8 @@ private:
 private: // functions
     ParseResult do_parse(int argc, char* const argv[], std::ostream& err) {
         int c;
-        while ((c = getopt_long(argc, argv, short_options_.c_str(), long_options_.data(), nullptr)) != -1) {
+        while ((c = getopt_long(argc, argv, short_options_.c_str(), long_options_.data(), nullptr))
+               != -1) {
             switch (c) {
                 case 'h':
                     return ParseResult::Help;
@@ -171,9 +193,18 @@ private: // functions
 
         int index = optind;
         const size_t first_value_index = index;
-        if (not detail::accumulate_tuple<ParseValues, bool, std::logical_and<bool>>(values_, true, index, argc, argv)) {
+        if (not detail::accumulate_tuple<ParseValues, bool, std::logical_and<bool>>(
+                  values_,
+                  true,
+                  index,
+                  argc,
+                  argv)) {
             const size_t num_values_processed = index - first_value_index;
-            const auto missing_arguments = detail::accumulate_tuple<BuildMissingParameters, std::string>(values_, "", num_values_processed);
+            const auto missing_arguments =
+                  detail::accumulate_tuple<BuildMissingParameters, std::string>(
+                        values_,
+                        "",
+                        num_values_processed);
             err << ERROR_MSG_ << "missing arguments for" << missing_arguments << "\n\n";
             return ParseResult::Error;
         }
@@ -269,17 +300,27 @@ private: // functions
 
     struct BuildOptions {
         template <size_t I>
-        void operator()(const ParserTupleT& parsers, std::vector<struct option>& long_options, std::string& short_options) {
+        void operator()(
+              const ParserTupleT& parsers,
+              std::vector<struct option>& long_options,
+              std::string& short_options) {
             auto& parser = std::get<I>(parsers);
             const std::string& long_option = parser.long_option();
             const char short_option = parser.short_option();
             const auto require_argument = parser.IS_BOOLEAN ? no_argument : required_argument;
-            const struct option opt = { long_option.c_str(), require_argument, nullptr, short_option };
-            const auto is_present = [&long_option](const struct option& op) { return long_option == op.name; };
+            const struct option opt = { long_option.c_str(),
+                                        require_argument,
+                                        nullptr,
+                                        short_option };
+            const auto is_present = [&long_option](const struct option& op) {
+                return long_option == op.name;
+            };
 
             if (short_options.find(short_option) != std::string::npos
-                  || std::find_if(long_options.begin(), long_options.end(), is_present) != long_options.end()) {
-                throw InvalidArgument("Duplicated option: -" + std::string(1, short_option) + "/--" + long_option);
+                || std::find_if(long_options.begin(), long_options.end(), is_present)
+                         != long_options.end()) {
+                throw InvalidArgument(
+                      "Duplicated option: -" + std::string(1, short_option) + "/--" + long_option);
             }
 
             long_options.push_back(opt);
@@ -303,10 +344,15 @@ private: // functions
 };
 
 template <typename ValueTupleT, typename ParserTupleT>
-ArgParser<ValueTupleT, ParserTupleT> make_parser(std::string description,
+ArgParser<ValueTupleT, ParserTupleT> make_parser(
+      std::string description,
       ValueTupleT value_tuple,
       ParserTupleT parser_tuple,
       std::string footer = "") {
-    return ArgParser<ValueTupleT, ParserTupleT>(std::move(description), std::move(value_tuple), std::move(parser_tuple), std::move(footer));
+    return ArgParser<ValueTupleT, ParserTupleT>(
+          std::move(description),
+          std::move(value_tuple),
+          std::move(parser_tuple),
+          std::move(footer));
 }
 }

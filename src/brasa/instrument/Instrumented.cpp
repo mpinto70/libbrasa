@@ -6,17 +6,8 @@ namespace brasa {
 namespace instrument {
 size_t InstrumentedCounter::counts[];
 const char* InstrumentedCounter::counter_names[InstrumentedCounter::NUMBER_OPS] = {
-    "n",
-    "dtor",
-    "default ctor",
-    "conv ctor",
-    "conv move ctor",
-    "copy ctor",
-    "move ctor",
-    "conv",
-    "assign",
-    "equal",
-    "compare",
+    "n",         "dtor", "default ctor", "conv ctor", "conv move ctor", "copy ctor",
+    "move ctor", "conv", "assign",       "equal",     "compare",
 };
 
 void InstrumentedCounter::initialize(size_t m) {

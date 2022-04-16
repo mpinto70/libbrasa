@@ -8,12 +8,8 @@ namespace chronus {
 namespace {
 class NowFunctor {
 public:
-    NowFunctor(uint64_t initial)
-          : initial_(initial) {
-    }
-    uint64_t operator()() const {
-        return initial_++;
-    }
+    NowFunctor(uint64_t initial) : initial_(initial) {}
+    uint64_t operator()() const { return initial_++; }
 
 private:
     mutable uint64_t initial_;

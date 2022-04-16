@@ -11,30 +11,20 @@ struct Base {
 };
 
 struct Derived1 final : public Base {
-    Derived1(int a, int b)
-          : val_(a * b) {}
+    Derived1(int a, int b) : val_(a * b) {}
     ~Derived1() noexcept override = default;
-    int f() const override {
-        return val_;
-    }
-    friend bool operator==(const Derived1& lhs, const Derived1& rhs) {
-        return lhs.val_ == rhs.val_;
-    }
+    int f() const override { return val_; }
+    friend bool operator==(const Derived1& x, const Derived1& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
 };
 
 struct Derived2 final : public Base {
-    Derived2(int a, int b)
-          : val_(a * b) {}
+    Derived2(int a, int b) : val_(a * b) {}
     ~Derived2() noexcept override = default;
-    int f() const override {
-        return val_;
-    }
-    friend bool operator==(const Derived2& lhs, const Derived2& rhs) {
-        return lhs.val_ == rhs.val_;
-    }
+    int f() const override { return val_; }
+    friend bool operator==(const Derived2& x, const Derived2& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
@@ -50,8 +40,7 @@ std::string to_string(Types t) {
 }
 }
 
-class ObjectRepositoryTest : public ::testing::Test {
-};
+class ObjectRepositoryTest : public ::testing::Test {};
 
 TEST_F(ObjectRepositoryTest, create_with_unique_ptr) {
     ObjectRepository<Base, Types> repo;

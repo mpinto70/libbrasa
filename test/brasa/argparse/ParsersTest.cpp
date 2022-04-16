@@ -13,21 +13,37 @@ TEST(BooleanParserTest, test_creation) {
 }
 
 TEST(ValueParserTest, test_name) {
-    const ValueParser<SingleValue<std::string>> arg1('i', "ignore-file", "file-to-ignore", "some description");
-    const ValueParser<SingleValue<std::string>> arg2('o', "option", "option-to-apply", "some description");
+    const ValueParser<SingleValue<std::string>> arg1(
+          'i',
+          "ignore-file",
+          "file-to-ignore",
+          "some description");
+    const ValueParser<SingleValue<std::string>> arg2(
+          'o',
+          "option",
+          "option-to-apply",
+          "some description");
     EXPECT_EQ(arg1.name(), "file-to-ignore");
     EXPECT_EQ(arg2.name(), "option-to-apply");
 }
 
 TEST(ValueParserTest, test_creation_single_string) {
-    ValueParser<SingleValue<std::string>> arg('i', "ignore-file", "file-to-ignore", "some description");
+    ValueParser<SingleValue<std::string>> arg(
+          'i',
+          "ignore-file",
+          "file-to-ignore",
+          "some description");
     EXPECT_EQ(arg.digester().value(), "");
     arg.digest("something");
     EXPECT_EQ(arg.digester().value(), "something");
 }
 
 TEST(ValueParserTest, test_creation_multiple_string) {
-    ValueParser<MultiValue<std::string>> arg('i', "ignore-file", "file-to-ignore", "some description");
+    ValueParser<MultiValue<std::string>> arg(
+          'i',
+          "ignore-file",
+          "file-to-ignore",
+          "some description");
 
     arg.digest("something");
     EXPECT_EQ(arg.digester().value(0), "something");
