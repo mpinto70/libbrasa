@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -66,11 +68,13 @@ public:
 
 private:
     std::unordered_map<TYPE_ID, std::unique_ptr<BASE>> objects_;
+    mutable std::shared_mutex mutex_;
 };
 
 template <typename BASE, typename TYPE_ID>
 template <typename U>
 bool ObjectRepository<BASE, TYPE_ID>::add(TYPE_ID id, std::unique_ptr<U> u) {
+    std::unique_lock lock(mutex_);
     return objects_.insert({ id, std::move(u) }).second;
 }
 
@@ -82,11 +86,13 @@ bool ObjectRepository<BASE, TYPE_ID>::add(TYPE_ID id, ARGS&&... args) {
 
 template <typename BASE, typename TYPE_ID>
 bool ObjectRepository<BASE, TYPE_ID>::remove(TYPE_ID id) {
+    std::unique_lock lock(mutex_);
     return objects_.erase(id) > 0;
 }
 
 template <typename BASE, typename TYPE_ID>
 BASE& ObjectRepository<BASE, TYPE_ID>::get(TYPE_ID id) {
+    std::shared_lock lock(mutex_);
     auto it = objects_.find(id);
     if (it == objects_.end()) {
         using std::to_string;
@@ -100,6 +106,7 @@ BASE& ObjectRepository<BASE, TYPE_ID>::get(TYPE_ID id) {
 
 template <typename BASE, typename TYPE_ID>
 bool ObjectRepository<BASE, TYPE_ID>::has(TYPE_ID id) const {
+    std::shared_lock lock(mutex_);
     return objects_.find(id) != objects_.end();
 }
 

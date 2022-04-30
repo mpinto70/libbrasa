@@ -2,6 +2,8 @@
 
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -38,7 +40,7 @@ public:
      * @return the object
      * @throw std::logic_error if no object exists for identifier \b id
      */
-    std::unique_ptr<BASE> get(TYPE_ID id);
+    std::unique_ptr<BASE> get(TYPE_ID id) const;
     /**
      * Return if object identified by \b id exists.
      *
@@ -49,20 +51,24 @@ public:
 
 private:
     std::unordered_map<TYPE_ID, creator_t> creators_;
+    mutable std::shared_mutex mutex_;
 };
 
 template <typename BASE, typename TYPE_ID>
 bool ObjectFactory<BASE, TYPE_ID>::add(TYPE_ID id, creator_t creator) {
+    std::unique_lock lock(mutex_);
     return creators_.insert({ id, std::move(creator) }).second;
 }
 
 template <typename BASE, typename TYPE_ID>
 bool ObjectFactory<BASE, TYPE_ID>::remove(TYPE_ID id) {
+    std::unique_lock lock(mutex_);
     return creators_.erase(id) > 0;
 }
 
 template <typename BASE, typename TYPE_ID>
-std::unique_ptr<BASE> ObjectFactory<BASE, TYPE_ID>::get(TYPE_ID id) {
+std::unique_ptr<BASE> ObjectFactory<BASE, TYPE_ID>::get(TYPE_ID id) const {
+    std::shared_lock lock(mutex_);
     auto it = creators_.find(id);
     if (it == creators_.end()) {
         using std::to_string;
@@ -76,6 +82,7 @@ std::unique_ptr<BASE> ObjectFactory<BASE, TYPE_ID>::get(TYPE_ID id) {
 
 template <typename BASE, typename TYPE_ID>
 bool ObjectFactory<BASE, TYPE_ID>::has(TYPE_ID id) const {
+    std::shared_lock lock(mutex_);
     return creators_.find(id) != creators_.end();
 }
 
