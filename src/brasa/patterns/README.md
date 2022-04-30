@@ -5,8 +5,8 @@ In tihs directory are implementations of some design patterns.
 | class                                              |   is thread safe   |
 | :------------------------------------------------- | :----------------: |
 | [`Singleton`](./singleton/Singleton.h)             | :heavy_check_mark: |
-| [`ObjectRepository`](./factory/ObjectRepository.h) |        :x:         |
-| [`ObjectFactory`](./factory/ObjectFactory.h)       |        :x:         |
+| [`ObjectRepository`](./factory/ObjectRepository.h) | :heavy_check_mark: |
+| [`ObjectFactory`](./factory/ObjectFactory.h)       | :heavy_check_mark: |
 
 ## Singleton
 
@@ -28,7 +28,7 @@ and the type of the key `TYPE_ID`. Every object in the repository has to be of c
 of its descendants. Objects are added by calling `add`, removed by calling `remove`, and retrived by
 calling `get`.
 
-This class **is not thread safe**.
+This class **is thread safe**.
 
 ### Object factory
 
@@ -38,4 +38,4 @@ objects created `BASE` and the type of the key `TYPE_ID`. Every creator in the f
 unique pointer to an object of type `BASE` or one of its descendants. Creators are added by calling
 `add` and removed by calling `remove`. In order to receive a new object, `get` has to be called.
 
-This class **is not thread safe**.
+This class **is thread safe**.
