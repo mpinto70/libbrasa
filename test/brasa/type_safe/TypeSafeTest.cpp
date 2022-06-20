@@ -234,6 +234,23 @@ TEST(TypeSafeTest, scalar_is_viable) {
 
     check_scalar(value, underlying);
 }
+
+TEST(TypeSafeTest, increment_decrement) {
+    using SCALAR = scalar<int64_t, struct SCALAR_>;
+
+    SCALAR value{ 127 };
+    const auto pre_increment = ++value;
+    const auto pos_increment = value++;
+    EXPECT_EQ(value.value, 129);
+    EXPECT_EQ(pre_increment.value, 128);
+    EXPECT_EQ(pos_increment.value, 128);
+
+    const auto pre_decrement = --value;
+    const auto pos_decrement = value--;
+    EXPECT_EQ(value.value, 127);
+    EXPECT_EQ(pre_decrement.value, 128);
+    EXPECT_EQ(pos_decrement.value, 128);
+}
 }
 }
 

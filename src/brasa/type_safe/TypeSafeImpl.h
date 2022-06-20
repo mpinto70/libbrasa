@@ -33,6 +33,28 @@ struct base_type<T, Tag, impl::Category::Scalar> {
     using underlying_type = T;
     T value;
 
+    base_type& operator++() noexcept(noexcept(++value)) {
+        ++value;
+        return *this;
+    }
+
+    base_type operator++(int) noexcept(noexcept(value++)) {
+        auto tmp = *this;
+        value++;
+        return tmp;
+    }
+
+    base_type& operator--() noexcept(noexcept(--value)) {
+        --value;
+        return *this;
+    }
+
+    base_type operator--(int) noexcept(noexcept(value--)) {
+        auto tmp = *this;
+        value--;
+        return tmp;
+    }
+
     base_type& operator+=(const base_type& y) noexcept(noexcept(value += y.value)) {
         value += y.value;
         return *this;
