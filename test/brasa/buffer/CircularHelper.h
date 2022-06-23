@@ -8,7 +8,7 @@ struct SimpleData {
     char character;
 } __attribute__((packed));
 
-inline bool operator==(const SimpleData& x, const SimpleData& y) {
+constexpr bool operator==(const SimpleData& x, const SimpleData& y) {
     return x.character == y.character && x.value == y.value;
 }
 }

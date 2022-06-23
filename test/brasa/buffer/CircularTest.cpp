@@ -29,6 +29,8 @@ public:
 
 template <typename CIRCULAR>
 void verify_create_uninitialized(const uint64_t KEY) {
+    SCOPED_TRACE("key = " + std::to_string(KEY));
+
     uint8_t buffer[CIRCULAR::BUFFER_SIZE];
     ::memset(buffer, 0x55, sizeof(buffer));
 
@@ -36,21 +38,20 @@ void verify_create_uninitialized(const uint64_t KEY) {
     auto buffer_data = reinterpret_cast<const BufferDataT*>(buffer);
 
     const CircularMock<CIRCULAR> circular(buffer, KEY);
-    EXPECT_EQ(buffer_data->read_head.offset, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->read_head.lap, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.offset, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.lap, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->key, KEY) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->crc, crc32(KEY)) << "key = " << KEY;
+    EXPECT_EQ(buffer_data->read_head.offset, 0u);
+    EXPECT_EQ(buffer_data->read_head.lap, 0u);
+    EXPECT_EQ(buffer_data->write_head.offset, 0u);
+    EXPECT_EQ(buffer_data->write_head.lap, 0u);
+    EXPECT_EQ(buffer_data->key, KEY);
+    EXPECT_EQ(buffer_data->crc, crc32(KEY));
 
     uint8_t buffer2[CIRCULAR::BUFFER_SIZE];
     ::memset(buffer2, 0x55, sizeof(buffer2));
     auto buffer_data2 = reinterpret_cast<const BufferDataT*>(buffer2);
-    EXPECT_EQ(::memcmp(buffer_data2->buffer, buffer_data->buffer, sizeof(buffer_data2->buffer)), 0)
-          << "key = " << KEY;
-    EXPECT_NE(::memcmp(buffer2, buffer, sizeof(buffer)), 0) << "key = " << KEY;
+    EXPECT_EQ(::memcmp(buffer_data2->buffer, buffer_data->buffer, sizeof(buffer_data2->buffer)), 0);
+    EXPECT_NE(::memcmp(buffer2, buffer, sizeof(buffer)), 0);
     const CIRCULAR circular2(buffer2, KEY);
-    EXPECT_EQ(::memcmp(buffer2, buffer, sizeof(buffer)), 0) << "key = " << KEY;
+    EXPECT_EQ(::memcmp(buffer2, buffer, sizeof(buffer)), 0);
 }
 }
 
@@ -67,15 +68,17 @@ void verify_create_initialized(const uint64_t KEY) {
     using TYPE = typename CIRCULAR::TYPE;
     using BufferDataT = typename CircularMock<CIRCULAR>::BufferDataT;
 
+    SCOPED_TRACE("key = " + std::to_string(KEY));
+
     uint8_t buffer[CIRCULAR::BUFFER_SIZE];
     ::memset(buffer, 0x55, sizeof(buffer));
 
     CIRCULAR circular(buffer, KEY);
     auto buffer_data = reinterpret_cast<BufferDataT*>(buffer);
-    EXPECT_EQ(buffer_data->read_head.offset, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->read_head.lap, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.offset, 0u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.lap, 0u) << "key = " << KEY;
+    EXPECT_EQ(buffer_data->read_head.offset, 0u);
+    EXPECT_EQ(buffer_data->read_head.lap, 0u);
+    EXPECT_EQ(buffer_data->write_head.offset, 0u);
+    EXPECT_EQ(buffer_data->write_head.lap, 0u);
 
     buffer_data->read_head.offset = sizeof(TYPE);
     buffer_data->write_head.offset = 2 * sizeof(TYPE);
@@ -84,17 +87,17 @@ void verify_create_initialized(const uint64_t KEY) {
 
     // if the buffer is already initialized, the creation of a circular buffer does not alter
     // underlying memory
-    EXPECT_EQ(buffer_data->read_head.offset, sizeof(TYPE)) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->read_head.lap, 11u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.offset, 2 * sizeof(TYPE)) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.lap, 17u) << "key = " << KEY;
+    EXPECT_EQ(buffer_data->read_head.offset, sizeof(TYPE));
+    EXPECT_EQ(buffer_data->read_head.lap, 11u);
+    EXPECT_EQ(buffer_data->write_head.offset, 2 * sizeof(TYPE));
+    EXPECT_EQ(buffer_data->write_head.lap, 17u);
 
     CIRCULAR circular2(buffer, KEY);
 
-    EXPECT_EQ(buffer_data->read_head.offset, sizeof(TYPE)) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->read_head.lap, 11u) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.offset, 2 * sizeof(TYPE)) << "key = " << KEY;
-    EXPECT_EQ(buffer_data->write_head.lap, 17u) << "key = " << KEY;
+    EXPECT_EQ(buffer_data->read_head.offset, sizeof(TYPE));
+    EXPECT_EQ(buffer_data->read_head.lap, 11u);
+    EXPECT_EQ(buffer_data->write_head.offset, 2 * sizeof(TYPE));
+    EXPECT_EQ(buffer_data->write_head.lap, 17u);
 }
 }
 
@@ -169,9 +172,11 @@ TEST(CircularTest, write) {
 
 namespace {
 template <typename TYPE, uint32_t N>
-void verify_laps(uint64_t key) {
+void verify_laps(const uint64_t key) {
     using CircularBuffer = Circular<TYPE, N>;
     using BufferDataT = typename CircularMock<CircularBuffer>::BufferDataT;
+
+    SCOPED_TRACE("For key " + std::to_string(key));
 
     uint8_t buffer1[CircularBuffer::BUFFER_SIZE];
     uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
@@ -189,23 +194,23 @@ void verify_laps(uint64_t key) {
     for (uint32_t i = 0; i < 3 * N; ++i) {
         const uint32_t off_idx = i % N;
         ::memset(&t1, i, sizeof(t1));
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
         writer.write(t1);
-        EXPECT_NE(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
+        EXPECT_NE(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
 
         h.offset = ((i + 1) % N) * sizeof(t1);
         h.lap = (i + 1) / N;
         ::memcpy(&buffer_data2->buffer[off_idx * sizeof(t1)], &t1, sizeof(t1));
         ::memcpy(&buffer_data2->write_head, &h, sizeof(h));
 
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
 
-        EXPECT_TRUE(reader.read(t2)) << i << '/' << key;
-        EXPECT_EQ(t1, t2) << i << '/' << key;
+        EXPECT_TRUE(reader.read(t2)) << i;
+        EXPECT_EQ(t1, t2) << i;
 
         ::memcpy(&buffer_data2->read_head, &h, sizeof(h));
 
-        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i << '/' << key;
+        EXPECT_EQ(::memcmp(buffer1, buffer2, sizeof(buffer1)), 0) << i;
     }
 }
 }
@@ -219,6 +224,8 @@ namespace {
 template <typename TYPE, uint32_t N>
 void verify_many_laps_one_read(uint64_t key) {
     using CircularBuffer = Circular<TYPE, N>;
+
+    SCOPED_TRACE("For key " + std::to_string(key));
 
     uint8_t buffer[CircularBuffer::BUFFER_SIZE];
 
@@ -237,8 +244,8 @@ void verify_many_laps_one_read(uint64_t key) {
     for (uint32_t i = 0; i < N; ++i) {
         TYPE t2;
         ::memset(&t2, i + MAX - N, sizeof(t2));
-        EXPECT_TRUE(reader.read(t1)) << i << '/' << key;
-        EXPECT_EQ(t1, t2) << i << '/' << key;
+        EXPECT_TRUE(reader.read(t1)) << i;
+        EXPECT_EQ(t1, t2) << i;
     }
 }
 }
