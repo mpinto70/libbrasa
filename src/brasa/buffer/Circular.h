@@ -19,11 +19,11 @@ static_assert(std::is_trivial_v<Head>, "TYPE must be POD");
 
 template <typename TYPE_, uint32_t N_>
 struct BufferData {
-    uint8_t buffer[N_ * sizeof(TYPE_)];
-    Head write_head;
-    Head read_head;
-    uint64_t key;
-    uint32_t crc;
+    uint8_t buffer[N_ * sizeof(TYPE_)]; ///< the data
+    Head write_head;                    ///< position and lap of the next write
+    Head read_head;                     ///< position and lap of the next read
+    uint64_t key;                       ///< a unique key
+    uint32_t crc;                       ///< CRC of the key
 };
 
 /** Circular buffer base class. It should be extended by Writer and Reader.
@@ -36,8 +36,8 @@ protected: // to allow testing and prevent use outside of the classes
     using BufferDataT = BufferData<TYPE_, N_>;
 
 public:
-    static_assert(std::is_trivial_v<TYPE_>, "TYPE must be POD");
-    static_assert(std::is_trivial_v<BufferDataT>, "BufferT must be POD");
+    static_assert(std::is_nothrow_move_assignable_v<TYPE_>);
+    static_assert(std::is_nothrow_move_constructible_v<TYPE_>);
     using TYPE = TYPE_;
     constexpr static uint32_t N = N_;
     constexpr static uint32_t BUFFER_SIZE = sizeof(BufferDataT);
@@ -45,6 +45,8 @@ public:
     // no copies no moves
     Circular(const Circular& other) = delete;
     Circular& operator=(const Circular& other) = delete;
+    Circular(Circular&& other) = delete;
+    Circular& operator=(Circular&& other) = delete;
 
 protected:
     /** Creates the object informing the buffer and the key.
@@ -55,6 +57,8 @@ protected:
             initialize();
         }
     }
+
+    ~Circular() noexcept = default;
 
     /// Writes `data` to the buffer
     void do_write(const TYPE& data) const noexcept {
@@ -91,8 +95,6 @@ protected:
         return true;
     }
 
-    ~Circular() noexcept = default;
-
 private:
     uint8_t* buffer_;
     const uint64_t key_;
@@ -100,20 +102,12 @@ private:
     constexpr static uint32_t OFFSET_END_OF_DATA = sizeof(BufferDataT::buffer);
 
     [[nodiscard]] bool is_valid(const Head& head) const noexcept {
-        if (head.offset % sizeof(TYPE) != 0) {
-            return false;
-        }
-        return head.offset < OFFSET_END_OF_DATA;
+        return (head.offset % sizeof(TYPE) == 0) && head.offset < OFFSET_END_OF_DATA;
     }
 
     [[nodiscard]] bool is_valid(const Head& read_head, const Head& write_head) const noexcept {
-        if (not is_valid(read_head) || not is_valid(write_head)) {
-            return false;
-        }
-        if (read_head.lap > write_head.lap) {
-            return false;
-        }
-        return read_head.lap != write_head.lap || read_head.offset <= write_head.offset;
+        return is_valid(read_head) && is_valid(write_head) && read_head.lap <= write_head.lap
+               && (read_head.lap != write_head.lap || read_head.offset <= write_head.offset);
     }
 
     [[nodiscard]] bool is_initialized() const noexcept {
