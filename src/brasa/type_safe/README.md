@@ -8,11 +8,11 @@ Stepanov and Paul McJones](http://elementsofprogramming.com/).
 
 There are three different categories (see `enum class Category`) of types:
 
-|           | assignable         | comparison (`==`, `!=`) | ordering (`<`, `>`, `<=`, `>=`) | arithmetic operations (`+`, `-`, `*`, `/`)<sup>*</sup> |
-| :-------- | :----------------: | :---------------------: | :-----------------------------: | :----------------------------------------------------: |
-| `Trivial` | :heavy_check_mark: | :heavy_check_mark:      |                                 |                                                        |
-| `Ordered` | :heavy_check_mark: | :heavy_check_mark:      | :heavy_check_mark:              |                                                        |
-| `Scalar`  | :heavy_check_mark: | :heavy_check_mark:      | :heavy_check_mark:              | :heavy_check_mark:                                     |
+|           |     assignable     | comparison (`==`, `!=`) | ordering (`<`, `>`, `<=`, `>=`) | arithmetic operations (`+`, `-`, `*`, `/`, `++`, `--`)<sup>*</sup> |
+| :-------- | :----------------: | :---------------------: | :-----------------------------: | :----------------------------------------------------------------: |
+| `Trivial` | :heavy_check_mark: |   :heavy_check_mark:    |                                 |                                                                    |
+| `Ordered` | :heavy_check_mark: |   :heavy_check_mark:    |       :heavy_check_mark:        |                                                                    |
+| `Scalar`  | :heavy_check_mark: |   :heavy_check_mark:    |       :heavy_check_mark:        |                         :heavy_check_mark:                         |
 
 <sup>*</sup> `*` and `/` operates on native types only.
 
