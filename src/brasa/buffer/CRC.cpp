@@ -1,8 +1,8 @@
 #include <brasa/buffer/CRC.h>
 
-namespace brasa {
-namespace buffer {
+namespace brasa::buffer::impl {
 
+namespace {
 // clang-format off
 // see https://rosettacode.org/wiki/CRC-32
 constexpr uint32_t CRC_TABLE[] = {
@@ -50,7 +50,7 @@ static_assert(sizeof(CRC_TABLE) == 256 * sizeof(uint32_t), "CRC_TABLE needs to h
 // clang-format on
 
 /// calculates the CRC-32 of the buffer
-uint32_t brasa::buffer::crc32(const uint8_t* buf, size_t len) noexcept {
+uint32_t brasa::buffer::impl::crc32(const uint8_t* buf, size_t len) noexcept {
     uint32_t crc = 0;
     while (len >= 8) {
         DO8(buf);
@@ -65,7 +65,7 @@ uint32_t brasa::buffer::crc32(const uint8_t* buf, size_t len) noexcept {
 }
 
 /// calculates the CRC-32 of the number passed
-uint32_t brasa::buffer::crc32(uint64_t value) noexcept {
+uint32_t brasa::buffer::impl::crc32(uint64_t value) noexcept {
     uint32_t crc = 0;
     crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
     value >>= 8;
