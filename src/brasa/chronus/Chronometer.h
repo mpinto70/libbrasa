@@ -14,9 +14,9 @@ struct Elapsed {
     uint64_t end;       ///< instant timing
 };
 
-/** A class to mark serve as a chronometer
+/** A class to serve as a chronometer
  * NOW_FUNC is a function or functor that returns a suitable representation of current instant in time
- * ELAPSED is a structure in which the two first members are compatible with uint32_t and the third 
+ * ELAPSED is a structure in which the two first members are compatible with uint32_t and the third
  *      and fourth members compatible with the return type of `NOW_FUNC`.
  */
 template <typename NOW_FUNC, typename ELAPSED>
