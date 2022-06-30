@@ -49,7 +49,9 @@ public:
     /** Return if the instance is of type U or its descendants. */
     template <typename U>
     static bool is_instance_of_type() noexcept;
-    /** Return the instance cast to type U or throw an exception if not possible to cast. */
+    /** Return the instance cast to type U
+     * @throw std::logic_error if not possible to cast.
+     */
     template <typename U>
     static U& instance_of_type();
 
@@ -78,15 +80,7 @@ std::shared_mutex Singleton<T>::mutex_;
 template <typename T>
 template <typename... ARGS>
 T& Singleton<T>::create_instance(ARGS&&... args) {
-    std::unique_lock lock(mutex_);
-    if (t_ != nullptr) {
-        using namespace std::string_literals;
-        throw std::logic_error(
-              "brasa::pattern::Singleton::create_instance already created for "s
-              + typeid(T).name());
-    }
-    t_ = std::make_unique<T>(std::forward<ARGS>(args)...);
-    return *t_;
+    return create_instance<T, ARGS...>(std::forward<ARGS>(args)...);
 }
 
 template <typename T>

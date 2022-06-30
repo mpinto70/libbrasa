@@ -24,8 +24,8 @@ struct ElapsedTime {
 constexpr uint64_t BUFFER_KEY = 0xf1ab'25e3'3562'abde; // some arbitrary unique key
 
 constexpr size_t ELEMENTS = 1500;
-constexpr size_t BUFFER_SIZE = brasa::buffer::Circular<ElapsedTime, ELEMENTS>::BUFFER_SIZE;
-using BufferDataT = brasa::buffer::BufferData<ElapsedTime, ELEMENTS>;
+constexpr size_t BUFFER_SIZE = brasa::buffer::CircularWriter<ElapsedTime, ELEMENTS>::BUFFER_SIZE;
+
 // 2 laps and ten more elements
 constexpr size_t NUM_WRITES = 2 * ELEMENTS + 10;
 

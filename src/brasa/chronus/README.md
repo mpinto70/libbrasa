@@ -1,6 +1,6 @@
 # Chronus package
 
-This is the package of timing and waiting facilities. 
+This is the package of timing and waiting facilities.
 
 ## Chronometer utilities
 
@@ -9,11 +9,14 @@ determined by the function (or functor) passed during construction:
 
 * to create a chronometer with nanosecond resolution (`brasa::chronus::nano_now`
   has nanosecond resolution):
+
 ```cpp
     const auto nano_chron = brasa::chronus::make_chronometer(brasa::chronus::nano_now, 1); // 1 is the chronometer identifier
 ```
+
 * to create a chronometer with millisecond resolution (`brasa::chronus::milli_now`
   has millisecond resolution):
+
 ```cpp
     const auto milli_chron = brasa::chronus::make_chronometer(brasa::chronus::milli_now, 2); // 2 is the chronometer identifier
 ```
@@ -43,7 +46,7 @@ const auto t1 = chron.count();
 ## Waiting utilities
 
 Sometimes you need some computations to hold off for a while to avoid
-overloading the systems, or because its results will be timed. In those cases,
+overloading the system, or because its results will be timed. In those cases,
 you should use `Waiter` class. To create a `Waiter` object, you have to inform
 the function that represents counts units of time (now function), the amount of
 units of time you want to wait, and the sleep function that will be used to
@@ -55,6 +58,7 @@ milliseconds, instead of creating a waiter of 15 milliseconds, create a waiter
 of 15'000 microseconds.
 
 To create a `Waiter` object to wait for 150 milliseconds:
+
 ```cpp
 auto waiter = make_waiter(brasa::chronus::milli_now, 150, brasa::chronus::milli_sleep);
 // run the fast process
@@ -62,13 +66,14 @@ waiter.wait(); // assure that current thread will wait until 150ms have passed
 ```
 
 ## Technical aspects
+
 ### `Chronometer` component
 
 There are two main classes (`Elapsed` and `Chronometer`) and one helper function
 (`make_chronometer`) in this component.
 
 The `Elapsed` class serves to register elapsed times from a chronometer. The
-information registered are: 
+information registered are:
 
 * `chrono_id`: chronometer identifier passed to `Chronometer` construction.
 * `mark_id`: identifier for a specific instant in time when `Chronometer::mark`
@@ -157,7 +162,7 @@ specified amount of time. They are a wrapper around
 The `Waiter` class is parameterized by the function or functor that returns the
 current instant in time (`NOW_FUNC`) and the sleep function (`SLEEP_FUNC`) that
 will sleep for one tenth of the wait time. The `Waiter` component is responsible
-to guarantee that a certain amount of time has elapsed before continuing. 
+to guarantee that a certain amount of time has elapsed before continuing.
 
 The helper function `make_waiter` creates a `Waiter` without the need to specify
 the types of now and sleep functions (because it is deduced from the arguments).

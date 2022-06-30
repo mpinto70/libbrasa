@@ -5,8 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-namespace brasa {
-namespace buffer {
+namespace brasa::buffer::impl {
 
 TEST(CRCTest, crc32) {
     srand(time(nullptr));
@@ -15,6 +14,5 @@ TEST(CRCTest, crc32) {
         auto buffer = reinterpret_cast<const uint8_t*>(&val);
         EXPECT_EQ(crc32(val), crc32(buffer, sizeof(val)));
     }
-}
 }
 }
