@@ -6,20 +6,9 @@
 
 namespace brasa {
 namespace type_safe {
-////////// trivial //////////
+// ---------- trivial ----------
 
 namespace {
-template <typename safe_type>
-void check_cast(const safe_type& value, const typename safe_type::underlying_type& stored_value) {
-    EXPECT_EQ(value, type_cast<safe_type>(stored_value));
-    EXPECT_EQ(value_cast(value), stored_value);
-
-    safe_type variable = value;
-    EXPECT_EQ(variable, value);
-    value_cast(variable) = stored_value + 3;
-    EXPECT_NE(variable, value);
-}
-
 template <typename safe_type>
 void check_trivial(
       const safe_type& value,
@@ -48,6 +37,8 @@ void check_trivial(
 
     static_assert(safe_type{ 5 } == safe_type{ 5 });
     static_assert(safe_type{ 4 } != safe_type{ 5 });
+
+    EXPECT_EQ(value, safe_type::to_safe(stored_value));
 }
 }
 
@@ -98,7 +89,7 @@ TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
     static_assert(value_eq != value_ne);
 }
 
-////////// ordered //////////
+// ---------- ordered ----------
 namespace {
 template <typename safe_type>
 void check_ordered(
@@ -162,21 +153,17 @@ TEST(TypeSafeTest, ordered_string_is_viable) {
     ORDERED str_3 = str_1;
     EXPECT_STREQ(str_3.value, cstr_1);
     EXPECT_STRNE(str_3.value, cstr_2);
-    EXPECT_STREQ(value_cast(str_3), cstr_1);
-    EXPECT_STRNE(value_cast(str_3), cstr_2);
     EXPECT_EQ(str_1, str_3);
     EXPECT_NE(str_2, str_3);
 
     str_3 = str_2;
     EXPECT_STRNE(str_3.value, cstr_1);
     EXPECT_STREQ(str_3.value, cstr_2);
-    EXPECT_STRNE(value_cast(str_3), cstr_1);
-    EXPECT_STREQ(value_cast(str_3), cstr_2);
     EXPECT_NE(str_1, str_3);
     EXPECT_EQ(str_2, str_3);
 }
 
-////////// scalar //////////
+// ---------- scalar ----------
 namespace {
 template <typename safe_type>
 void check_scalar(const safe_type& value, const typename safe_type::underlying_type& stored_value) {

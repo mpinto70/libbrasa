@@ -19,16 +19,5 @@ template <typename T, typename Tag>
 using ordered = base_type<T, Tag, impl::Category::Ordered>;
 template <typename T, typename Tag>
 using scalar = base_type<T, Tag, impl::Category::Scalar>;
-
-/// cast from underlying to wrapped type
-template <typename TYPE>
-constexpr TYPE type_cast(typename TYPE::underlying_type value) noexcept {
-    return TYPE{ value };
-}
-
-template <typename TYPE>
-constexpr const typename TYPE::underlying_type& value_cast(const TYPE& t) noexcept {
-    return t.value;
-}
 }
 }

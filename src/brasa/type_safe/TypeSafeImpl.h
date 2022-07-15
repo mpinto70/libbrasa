@@ -25,6 +25,7 @@ template <typename T, typename Tag, impl::Category category>
 struct base_type {
     using underlying_type = T;
     T value;
+    static constexpr base_type to_safe(underlying_type v) { return base_type{ v }; }
 };
 
 /// A wrapper that adds the ability to make arithmetic operations
@@ -32,6 +33,7 @@ template <typename T, typename Tag>
 struct base_type<T, Tag, impl::Category::Scalar> {
     using underlying_type = T;
     T value;
+    static constexpr base_type to_safe(underlying_type v) { return base_type{ v }; }
 
     base_type& operator++() noexcept(noexcept(++value)) {
         ++value;
