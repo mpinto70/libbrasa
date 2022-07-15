@@ -25,6 +25,10 @@ template <typename T, typename Tag, impl::Category category>
 struct base_type {
     using underlying_type = T;
     T value;
+    // This function is useful when a value to use to initialize the safe type needs a static_cast,
+    // because TYPE{value} wouldn´t compile. In these cases, you would have to write
+    // TYPE{static_cast<underlying_type>(value)}. This funcion make it a little less verbose:
+    // TYPE.to_safe(value)
     static constexpr base_type to_safe(underlying_type v) { return base_type{ v }; }
 };
 
