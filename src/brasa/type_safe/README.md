@@ -144,15 +144,15 @@ assert(destination->name == expected_name);
 assert(destination->time.value == source.time);
 ```
 
-### `base_type` class
+### `safe_type` class
 
-`base_type` is the only class in this package. It is the wrapper around native
+`safe_type` is the only class in this package. It is the wrapper around native
 types. It is parameterized by the underlying type (`T`), a tag type (`Tag`) and
 the `Category`. The **tag type** is present to prevent the interpretation of a
 type as another one at function parameters and operations (see [this
 page](https://github.com/rollbear/strong_type) for details).
 
-`base_type` can be used to represent values in categories `Trivial` and
+`safe_type` can be used to represent values in categories `Trivial` and
 `Ordered`. For types of category `Scalar` there is an overload that adds
 operators: `+=` and `-=` (for other `Scalar` types of same `Tag`), and `*=` and
 `/=` (for values of underlying type).
