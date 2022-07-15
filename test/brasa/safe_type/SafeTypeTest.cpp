@@ -1,12 +1,12 @@
-#include <brasa/type_safe/TypeSafe.h>
+#include <brasa/safe_type/SafeType.h>
 
 #include <gtest/gtest.h>
 
 #include <cassert>
 
 namespace brasa {
-namespace type_safe {
-// ---------- trivial ----------
+namespace safe_type {
+// ---------- Trivial ----------
 
 namespace {
 template <typename SAFE_TYPE>
@@ -42,8 +42,8 @@ void check_trivial(
 }
 }
 
-TEST(TypeSafeTest, trivial_is_viable) {
-    using TRIVIAL = trivial<uint16_t, struct TRIVIAL_>;
+TEST(SafeTypeTest, trivial_is_viable) {
+    using TRIVIAL = Trivial<uint16_t, struct TRIVIAL_>;
     TRIVIAL value{ 18 };
     uint16_t underlying = 18;
     check_trivial(value, underlying);
@@ -77,8 +77,8 @@ void check_trivial_array(
 }
 }
 
-TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
-    using TRIVIAL = trivial<char[5], struct TRIVIAL_>;
+TEST(SafeTypeTest, trivial_is_viable_for_arrays) {
+    using TRIVIAL = Trivial<char[5], struct TRIVIAL_>;
     TRIVIAL value = { { 'A', 'B', 'C', 'D', 'E' } };
     const char underlying[] = { 'A', 'B', 'C', 'D', 'E' };
     check_trivial_array(value, underlying);
@@ -89,7 +89,7 @@ TEST(TypeSafeTest, trivial_is_viable_for_arrays) {
     static_assert(value_eq != value_ne);
 }
 
-// ---------- ordered ----------
+// ---------- Ordered ----------
 namespace {
 template <typename SAFE_TYPE>
 void check_ordered(
@@ -115,8 +115,8 @@ void check_ordered(
 }
 }
 
-TEST(TypeSafeTest, ordered_is_viable) {
-    using ORDERED = ordered<uint16_t, struct ORDERED_>;
+TEST(SafeTypeTest, ordered_is_viable) {
+    using ORDERED = Ordered<uint16_t, struct ORDERED_>;
 
     ORDERED value{ 127 };
     uint16_t underlying = 127;
@@ -124,9 +124,9 @@ TEST(TypeSafeTest, ordered_is_viable) {
     check_ordered(value, underlying);
 }
 
-TEST(TypeSafeTest, ordered_string_is_viable) {
+TEST(SafeTypeTest, ordered_string_is_viable) {
     constexpr size_t N = 5;
-    using ORDERED = ordered<char[N], struct ORDERED_>;
+    using ORDERED = Ordered<char[N], struct ORDERED_>;
 
     constexpr const char cstr_1[N] = "1234";
     constexpr ORDERED str_1{ "1234" };
@@ -163,15 +163,15 @@ TEST(TypeSafeTest, ordered_string_is_viable) {
     EXPECT_EQ(str_2, str_3);
 }
 
-// ---------- scalar ----------
+// ---------- Scalar ----------
 namespace {
 template <typename SAFE_TYPE>
 void check_scalar(const SAFE_TYPE& value, const typename SAFE_TYPE::underlying_type& stored_value) {
     check_ordered<SAFE_TYPE>(value, stored_value);
 
-    const typename SAFE_TYPE::underlying_type scalar = 5;
+    const typename SAFE_TYPE::underlying_type Scalar = 5;
     typename SAFE_TYPE::underlying_type expected = 5 * value.value;
-    EXPECT_EQ(value * scalar, SAFE_TYPE{ expected });
+    EXPECT_EQ(value * Scalar, SAFE_TYPE{ expected });
 
     SAFE_TYPE other = value;
     expected = stored_value + 3;
@@ -213,8 +213,8 @@ void check_scalar(const SAFE_TYPE& value, const typename SAFE_TYPE::underlying_t
 }
 }
 
-TEST(TypeSafeTest, scalar_is_viable) {
-    using SCALAR = scalar<int64_t, struct SCALAR_>;
+TEST(SafeTypeTest, scalar_is_viable) {
+    using SCALAR = Scalar<int64_t, struct SCALAR_>;
 
     SCALAR value{ 127 };
     int64_t underlying = 127;
@@ -222,8 +222,8 @@ TEST(TypeSafeTest, scalar_is_viable) {
     check_scalar(value, underlying);
 }
 
-TEST(TypeSafeTest, increment_decrement) {
-    using SCALAR = scalar<int64_t, struct SCALAR_>;
+TEST(SafeTypeTest, increment_decrement) {
+    using SCALAR = Scalar<int64_t, struct SCALAR_>;
 
     SCALAR value{ 127 };
     const auto pre_increment = ++value;
@@ -241,16 +241,16 @@ TEST(TypeSafeTest, increment_decrement) {
 }
 }
 
-TEST(TypeSafeUsageTest, type_punning_works) {
+TEST(SafeTypeUsageTest, type_punning_works) {
     struct Source {
         uint32_t price;
         char name[5];
         uint64_t time;
     } __attribute__((packed));
 
-    using Price = brasa::type_safe::scalar<uint32_t, struct Price_>;
-    using Name = brasa::type_safe::trivial<char[5], struct Name_>;
-    using Time = brasa::type_safe::ordered<uint64_t, struct Time_>;
+    using Price = brasa::safe_type::Scalar<uint32_t, struct Price_>;
+    using Name = brasa::safe_type::Trivial<char[5], struct Name_>;
+    using Time = brasa::safe_type::Ordered<uint64_t, struct Time_>;
     struct Destination {
         Price price;
         Name name;

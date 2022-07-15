@@ -1,4 +1,4 @@
-# Type Safe package
+# Safe Type package
 
 This package contains facilities to wrap POD types in safe structures with
 limited operations, to prevent wrong assignments and passing the wrong
@@ -45,9 +45,9 @@ uint32_t price = unsafe_sell(quantity, product_id); // not what you wanted
 On the other hand, if you use the type safe utilities, your code would look like:
 
 ```cpp
-using ProductId = brasa::type_safe::ordered<uint32_t, struct ProductId_>;
-using Price = brasa::type_safe::scalar<uint32_t, struct Price_>;
-using Quantity = brasa::type_safe::scalar<uint32_t, struct Quantity_>;
+using ProductId = brasa::safe_type::ordered<uint32_t, struct ProductId_>;
+using Price = brasa::safe_type::scalar<uint32_t, struct Price_>;
+using Quantity = brasa::safe_type::scalar<uint32_t, struct Quantity_>;
 
 Price safe_sell(ProductId product_id, Quantity quantity);
 ```
@@ -76,9 +76,9 @@ wrappers don't add space to the underlying type, so they can be used in
 `struct`s below have the same memory representation:
 
 ```cpp
-using ProductId = brasa::type_safe::ordered<uint32_t, struct ProductId_>;
-using Name = brasa::type_safe::trivial<char[10], struct Name_>;
-using Price = brasa::type_safe::scalar<uint32_t, struct Price_>;
+using ProductId = brasa::safe_type::Ordered<uint32_t, struct ProductId_>;
+using Name = brasa::safe_type::Trivial<char[10], struct Name_>;
+using Price = brasa::safe_type::Scalar<uint32_t, struct Price_>;
 
 struct unsafe_struct {
     uint32_t product_id;
@@ -102,9 +102,9 @@ static_assert(offsetof(unsafe_struct, price) == offsetof(safe_struct, price));
 
 The important types defined in this package are:
 
-* `trivial`: a type of category `Category::Trivial`
-* `ordered`: a type of category `Category::Ordered`
-* `scalar`: a type of category `Category::Scalar`
+* `Trivial`: a type of category `Category::Trivial`
+* `Ordered`: a type of category `Category::Ordered`
+* `Scalar`: a type of category `Category::Scalar`
 
 Below is an example of two different `struct`s used for serialization and
 de-serialization. The struct with native types is written to a buffer, that
@@ -117,9 +117,9 @@ struct WithNativeTypes {
     char name[5];
     uint64_t time;
 } __attribute__((packed));
-using Price = brasa::type_safe::scalar<uint32_t, struct Price_>;
-using Name = brasa::type_safe::trivial<char[5], struct Name_>;
-using Time = brasa::type_safe::ordered<uint64_t, struct Time_>;
+using Price = brasa::safe_type::Scalar<uint32_t, struct Price_>;
+using Name = brasa::safe_type::Trivial<char[5], struct Name_>;
+using Time = brasa::safe_type::Ordered<uint64_t, struct Time_>;
 struct WithWrappedTypes {
     Price price;
     Name name;
@@ -144,15 +144,15 @@ assert(destination->name == expected_name);
 assert(destination->time.value == source.time);
 ```
 
-### `safe_type` class
+### `SafeType` class
 
-`safe_type` is the only class in this package. It is the wrapper around native
+`SafeType` is the only class in this package. It is the wrapper around native
 types. It is parameterized by the underlying type (`T`), a tag type (`Tag`) and
 the `Category`. The **tag type** is present to prevent the interpretation of a
 type as another one at function parameters and operations (see [this
 page](https://github.com/rollbear/strong_type) for details).
 
-`safe_type` can be used to represent values in categories `Trivial` and
+`SafeType` can be used to represent values in categories `Trivial` and
 `Ordered`. For types of category `Scalar` there is an overload that adds
 operators: `+=` and `-=` (for other `Scalar` types of same `Tag`), and `*=` and
 `/=` (for values of underlying type).
