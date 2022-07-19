@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <cassert>
+#include <limits>
 
 namespace brasa {
 namespace safe_type {
@@ -277,4 +278,19 @@ TEST(SafeTypeUsageTest, type_punning_works) {
     assert(memcmp(destination->name.value, source.name, sizeof(source.name)) == 0);
     assert(destination->name == expected_name);
     assert(destination->time.value == source.time);
+}
+
+namespace {
+using QttyProperties = brasa::safe_type::Scalar<uint16_t, struct QttyProperties_>;
+constexpr QttyProperties operator"" _qtpp(unsigned long long qtty) {
+    return QttyProperties{ static_cast<uint16_t>(qtty) };
+}
+
+TEST(SafeTypeUsageTest, suffixes_work) {
+    constexpr QttyProperties a{ 12 };
+    constexpr auto b = 12_qtpp;
+    EXPECT_EQ(a, b);
+    static_assert(a == b);
+}
+
 }
