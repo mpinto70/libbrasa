@@ -14,5 +14,5 @@ void InstrumentedCounter::initialize(size_t m) {
     std::fill(counts, counts + sizeof(counts) / sizeof(counts[0]), 0);
     counts[n] = m;
 }
-}
-}
+} // namespace instrument
+} // namespace brasa

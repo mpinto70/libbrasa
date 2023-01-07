@@ -14,7 +14,7 @@ public:
 private:
     mutable uint64_t initial_;
 };
-}
+} // namespace
 
 TEST(ChronometerTest, create) {
     const auto chron1 = make_chronometer(nano_now, 1);
@@ -99,5 +99,5 @@ TEST(ChronometerTest, reset) {
     EXPECT_EQ(t2.begin, 102u);
     EXPECT_EQ(t2.end, 103u);
 }
-}
-}
+} // namespace chronus
+} // namespace brasa

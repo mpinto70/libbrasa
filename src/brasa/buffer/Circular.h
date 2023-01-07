@@ -134,4 +134,4 @@ private:
         }
     }
 };
-}
+} // namespace brasa::buffer::impl

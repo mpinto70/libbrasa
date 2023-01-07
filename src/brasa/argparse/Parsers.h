@@ -94,4 +94,4 @@ public:
                 not_empty) {}
 };
 
-}
+} // namespace brasa::argparse

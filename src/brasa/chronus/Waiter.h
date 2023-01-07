@@ -53,5 +53,5 @@ Waiter<NOW_FUNC, SLEEPER_FUNC>
           units_of_time,
           std::forward<SLEEPER_FUNC>(sleeper));
 }
-}
-}
+} // namespace chronus
+} // namespace brasa

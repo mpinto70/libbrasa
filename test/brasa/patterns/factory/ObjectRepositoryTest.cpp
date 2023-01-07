@@ -38,7 +38,7 @@ enum class Types {
 std::string to_string(Types t) {
     return std::to_string(static_cast<int>(t));
 }
-}
+} // namespace
 
 class ObjectRepositoryTest : public ::testing::Test {};
 
@@ -98,4 +98,4 @@ TEST_F(ObjectRepositoryTest, remove_has) {
     EXPECT_FALSE(repo.has(Types::type2));
 }
 
-}
+} // namespace brasa::pattern::test

@@ -14,7 +14,7 @@ enum class Category {
     Ordered, ///< ordering (<, >, <= and >=)
     Scalar,  ///< arithmetic (+, -, * and /)
 };
-}
+} // namespace impl
 
 /** A wrapper to make POD types different types.
  * `T`: is the underlying type
@@ -194,5 +194,5 @@ constexpr
     const T tmp = x.value / y;
     return SafeType<T, Tag, category>{ tmp };
 }
-}
-}
+} // namespace safe_type
+} // namespace brasa

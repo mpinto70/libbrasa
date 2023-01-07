@@ -15,4 +15,4 @@ TEST(CRCTest, crc32) {
         EXPECT_EQ(crc32(val), crc32(buffer, sizeof(val)));
     }
 }
-}
+} // namespace brasa::buffer::impl

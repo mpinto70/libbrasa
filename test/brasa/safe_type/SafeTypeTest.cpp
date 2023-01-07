@@ -41,7 +41,7 @@ void check_trivial(
 
     EXPECT_EQ(value, SAFE_TYPE::to_safe(stored_value));
 }
-}
+} // namespace
 
 TEST(SafeTypeTest, trivial_is_viable) {
     using TRIVIAL = Trivial<uint16_t, struct TRIVIAL_>;
@@ -76,7 +76,7 @@ void check_trivial_array(
 
     EXPECT_EQ(sizeof(test_struct), sizeof(typename SAFE_TYPE::underlying_type) + 1);
 }
-}
+} // namespace
 
 TEST(SafeTypeTest, trivial_is_viable_for_arrays) {
     using TRIVIAL = Trivial<char[5], struct TRIVIAL_>;
@@ -114,7 +114,7 @@ void check_ordered(
     static_assert(SAFE_TYPE{ 5 } >= SAFE_TYPE{ 5 });
     static_assert(SAFE_TYPE{ 4 } <= SAFE_TYPE{ 4 });
 }
-}
+} // namespace
 
 TEST(SafeTypeTest, ordered_is_viable) {
     using ORDERED = Ordered<uint16_t, struct ORDERED_>;
@@ -212,7 +212,7 @@ void check_scalar(const SAFE_TYPE& value, const typename SAFE_TYPE::underlying_t
     static_assert(6 * SAFE_TYPE{ 15 } == SAFE_TYPE{ 90 });
     static_assert(SAFE_TYPE{ 27 } / 4 == SAFE_TYPE{ 6 });
 }
-}
+} // namespace
 
 TEST(SafeTypeTest, scalar_is_viable) {
     using SCALAR = Scalar<int64_t, struct SCALAR_>;
@@ -239,8 +239,8 @@ TEST(SafeTypeTest, increment_decrement) {
     EXPECT_EQ(pre_decrement.value, 128);
     EXPECT_EQ(pos_decrement.value, 128);
 }
-}
-}
+} // namespace safe_type
+} // namespace brasa
 
 TEST(SafeTypeUsageTest, type_punning_works) {
     struct Source {
@@ -293,4 +293,4 @@ TEST(SafeTypeUsageTest, suffixes_work) {
     static_assert(a == b);
 }
 
-}
+} // namespace

@@ -21,4 +21,4 @@ public:
     /// Writes `value` to `data`
     void write(const TYPE_& value) noexcept { Base::do_write(value); }
 };
-}
+} // namespace brasa::buffer

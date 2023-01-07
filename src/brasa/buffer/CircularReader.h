@@ -21,4 +21,4 @@ public:
     /// Reads `value` from `data` and returns true. If there is no element in `data`, returns false.
     bool read(TYPE_& value) noexcept { return Base::do_read(value); }
 };
-}
+} // namespace brasa::buffer

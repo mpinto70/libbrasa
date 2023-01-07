@@ -142,10 +142,10 @@ static void test_free_instance(ARGS&&... args) {
     Singleton<T>::free_instance();
     EXPECT_FALSE(Singleton<T>::has_instance());
 
-    //multiple frees are OK
+    // multiple frees are OK
     EXPECT_NO_THROW(Singleton<T>::free_instance());
 }
-}
+} // namespace
 
 class SingletonTest : public ::testing::Test {
 private:
@@ -221,4 +221,4 @@ TEST_F(SingletonTest, free_instance) {
     test_free_instance<Object<4>>(1, 2, 3, 4);
     test_free_instance<POD>(POD{ 'a', 1, 42.7 });
 }
-}
+} // namespace brasa::pattern::test

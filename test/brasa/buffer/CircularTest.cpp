@@ -59,7 +59,7 @@ void verify_create_uninitialized(const uint64_t KEY) {
     const CIRCULAR circular2(buffer2, KEY);
     EXPECT_EQ(*buffer_data2, *buffer_data);
 }
-}
+} // namespace
 
 TEST(CircularTest, create_uninitialized) {
     verify_create_uninitialized<CircularReader<data, 27>>(12345);
@@ -104,7 +104,7 @@ void verify_create_initialized(const uint64_t KEY) {
     EXPECT_EQ(buffer_data->write_head.index, 2);
     EXPECT_EQ(buffer_data->write_head.lap, 17u);
 }
-}
+} // namespace
 
 TEST(CircularTest, create_initialized) {
     verify_create_initialized<CircularReader<data, 47>>(12345);
@@ -225,7 +225,7 @@ void verify_laps(const uint64_t key) {
     }
     EXPECT_EQ(h.lap, 3);
 }
-}
+} // namespace
 
 TEST(CircularTest, laps) {
     verify_laps<data, 29>(12345678);
@@ -260,7 +260,7 @@ void verify_many_laps_one_read(uint64_t key) {
         EXPECT_EQ(t1, t2) << i;
     }
 }
-}
+} // namespace
 
 TEST(CircularTest, manyLapsOneRead) {
     verify_many_laps_one_read<data, 278>(12);
@@ -268,4 +268,4 @@ TEST(CircularTest, manyLapsOneRead) {
     verify_many_laps_one_read<int, 278>(14);
     verify_many_laps_one_read<int, 27>(15);
 }
-}
+} // namespace brasa::buffer::impl
