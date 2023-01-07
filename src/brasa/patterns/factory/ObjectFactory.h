@@ -86,4 +86,4 @@ bool ObjectFactory<BASE, TYPE_ID>::has(TYPE_ID id) const {
     return creators_.find(id) != creators_.end();
 }
 
-}
+} // namespace brasa::pattern

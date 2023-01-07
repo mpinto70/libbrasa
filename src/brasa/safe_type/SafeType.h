@@ -19,5 +19,5 @@ template <typename T, typename Tag>
 using Ordered = SafeType<T, Tag, impl::Category::Ordered>;
 template <typename T, typename Tag>
 using Scalar = SafeType<T, Tag, impl::Category::Scalar>;
-}
-}
+} // namespace safe_type
+} // namespace brasa

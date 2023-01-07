@@ -27,7 +27,7 @@ void verifyWait(NOW_FUNC now_func, SLEEPER_FUNC sleeper_func, const uint32_t wai
         EXPECT_GE(diff, wait_size) << "iteration " << i;
     }
 }
-}
+} // namespace
 
 TEST(WaitTest, Nano) {
     verifyWait(nano_now, nano_sleep, 1 * NSECS_PER_MSEC);
@@ -40,5 +40,5 @@ TEST(WaitTest, Micro) {
 TEST(WaitTest, Milli) {
     verifyWait(milli_now, milli_sleep, 1);
 }
-}
-}
+} // namespace chronus
+} // namespace brasa

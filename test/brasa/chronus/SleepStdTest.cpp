@@ -20,7 +20,7 @@ void veriffySleep(SLEEP_FUNC func, const uint32_t MULT_NSEC, const uint32_t slee
         EXPECT_GT(diff, sleep_size * MULT_NSEC) << "iteration " << i;
     }
 }
-}
+} // namespace
 
 TEST(SleepTest, usleep) {
     veriffySleep(::usleep, NSECS_PER_USEC, 100);
@@ -41,5 +41,5 @@ TEST(SleepTest, milli_sleep) {
     veriffySleep(milli_sleep, NSECS_PER_MSEC, 1);
     veriffySleep(milli_sleep, NSECS_PER_MSEC, 2);
 }
-}
-}
+} // namespace chronus
+} // namespace brasa

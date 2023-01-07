@@ -60,4 +60,4 @@ TEST(ValueParserTest, test_creation_single_int) {
     EXPECT_EQ(arg.digester().value(), 7);
 }
 
-}
+} // namespace brasa::argparse

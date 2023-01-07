@@ -25,12 +25,12 @@ void verifyUniformity(NOW_FUNC func) {
     uint64_t diff = t2 - t1;
     EXPECT_GT(diff, 50 * NSECS_PER_MSEC);
 }
-}
+} // namespace
 
 TEST(NowTest, nano_now) {
     verifyNow(nano_now);
     verifyUniformity(nano_now);
 }
 
-}
-}
+} // namespace chronus
+} // namespace brasa

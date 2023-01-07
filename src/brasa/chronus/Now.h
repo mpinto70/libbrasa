@@ -30,5 +30,5 @@ inline uint64_t milli_now() {
     return std_now<std::chrono::milliseconds>();
 }
 
-}
-}
+} // namespace chronus
+} // namespace brasa

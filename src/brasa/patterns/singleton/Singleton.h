@@ -66,7 +66,8 @@ private:
     static std::unique_ptr<T> t_;    ///< the instance
     static std::shared_mutex mutex_; ///< the mutex to protect concurrent access
 
-    /** Return a pointer of type U if the instance if of type U or its descendants or nullptr otherwise. */
+    /** Return a pointer of type U if the instance if of type U or its descendants
+     * or nullptr otherwise. */
     template <typename U>
     static U* get_pointer() noexcept;
 };
@@ -170,4 +171,4 @@ U* Singleton<T>::get_pointer() noexcept {
     }
 }
 
-}
+} // namespace brasa::pattern

@@ -11,4 +11,4 @@ BooleanParser::BooleanParser(char short_option, std::string long_option, std::st
       : BaseParser(short_option, std::move(long_option), std::move(description)),
         active_(false) {}
 
-}
+} // namespace brasa::argparse

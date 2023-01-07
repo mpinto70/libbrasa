@@ -110,4 +110,4 @@ bool ObjectRepository<BASE, TYPE_ID>::has(TYPE_ID id) const {
     return objects_.find(id) != objects_.end();
 }
 
-}
+} // namespace brasa::pattern

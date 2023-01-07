@@ -43,7 +43,7 @@ Singleton<T> create(const T& t) {
     a.value = t;
     return a;
 }
-}
+} // namespace
 
 TEST(SingletonTest, static_invariants) {
     EXPECT_EQ(sizeof(int), sizeof(Singleton<int>));
@@ -78,7 +78,7 @@ void verify_creation_assignment(const T& v0, const T& v1) {
     c = a;
     EXPECT_EQ(memcmp(&c.value, &a.value, sizeof(T)), 0) << msg;
 }
-}
+} // namespace
 
 TEST(SingletonTest, default_creation_assignment) {
     verify_creation_assignment<int>(3, 5);
@@ -105,7 +105,7 @@ void verify_equality(const T& v0, const T& v1) {
 
     EXPECT_TRUE(a != b) << msg;
 }
-}
+} // namespace
 
 TEST(SingletonTest, equality) {
     verify_equality<int>(3, 5);
@@ -144,7 +144,7 @@ void verify_ordering(const T& v0, const T& v1, const T& v2) {
     EXPECT_TRUE(c <= C) << msg;
     EXPECT_TRUE(c >= C) << msg;
 }
-}
+} // namespace
 
 TEST(SingletonTest, total_ordering) {
     verify_ordering<int>(3, 5, 7);
@@ -162,7 +162,7 @@ void verify_conversions(const T& v) {
     const T w = static_cast<T>(x);
     EXPECT_EQ(memcmp(&w, &v, sizeof(T)), 0) << msg;
 }
-}
+} // namespace
 
 TEST(SingletonTest, conversions) {
     verify_conversions<int>(3);
@@ -170,5 +170,5 @@ TEST(SingletonTest, conversions) {
     verify_conversions<Regular>({ 12, 47 });
     verify_conversions<TotallyOrdered>({ 12, 47 });
 }
-}
-}
+} // namespace instrument
+} // namespace brasa

@@ -93,4 +93,4 @@ TEST(SingleValueTest, test_int_invalid_conversion) {
     EXPECT_EQ(str.value(), 0);
 }
 
-}
+} // namespace brasa::argparse

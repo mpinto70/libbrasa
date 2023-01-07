@@ -24,7 +24,7 @@ void execute_command(
     }
     std::cout << "\n";
 }
-}
+} // namespace
 
 int main(int argc, char* argv[]) {
     using brasa::argparse::BooleanParser;

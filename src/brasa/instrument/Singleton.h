@@ -1,6 +1,7 @@
 #pragma once
-// based in work from Alex Stepanov https://www.youtube.com/watch?v=aIHAEYyoTUc&list=PLHxtyCq_WDLXryyw91lahwdtpZsmo4BGD
-// this is not a Singleton pattern.
+// based in work from Alex Stepanov
+// https://www.youtube.com/watch?v=aIHAEYyoTUc&list=PLHxtyCq_WDLXryyw91lahwdtpZsmo4BGD this is not a
+// Singleton pattern.
 
 #include <utility>
 
@@ -42,5 +43,5 @@ public:
     friend constexpr bool operator<=(const Singleton& x, const Singleton& y) { return not(y < x); }
     friend constexpr bool operator>=(const Singleton& x, const Singleton& y) { return not(x < y); }
 };
-}
-}
+} // namespace instrument
+} // namespace brasa

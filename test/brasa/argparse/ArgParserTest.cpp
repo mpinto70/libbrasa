@@ -28,7 +28,7 @@ void build(
     }
     optind = 0;
 }
-}
+} // namespace
 
 TEST(ArgParserTest, test_parse) {
     auto parser = make_parser(
@@ -211,7 +211,7 @@ void check_error_in_parser(const std::vector<std::string>& options, const std::s
                   "\n"
                 + parser.usage(options[0]));
 }
-}
+} // namespace
 
 TEST(ArgParserTest, test_parse_error_insufficient_values) {
     const std::vector<std::string> options = {
@@ -248,4 +248,4 @@ TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
           "ERROR processing command line arguments: could not convert value 'text' of PARAMETER3");
 }
 
-}
+} // namespace brasa::argparse

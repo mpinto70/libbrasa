@@ -19,7 +19,7 @@ void Iota(I first, I last, N start = N(0), N step = N(1)) {
         ++first;
     }
 }
-}
+} // namespace
 
 TEST(InstrumentedTest, names) {
     EXPECT_EQ(
@@ -78,7 +78,7 @@ void run_sort() {
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::default_construction]) << N;
     EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::equality]) << N;
 }
-}
+} // namespace
 
 TEST(InstrumentedTest, sort) {
     run_sort<int, 16>();
@@ -104,7 +104,7 @@ void verify_operations(F f, const std::vector<int>& ops) {
         }
     }
 }
-}
+} // namespace
 
 TEST(InstrumentedTest, count_default_construction) {
     verify_operations(
@@ -236,5 +236,5 @@ TEST(InstrumentedTest, count_comparison) {
                 InstrumentedCounter::destruction,
           });
 }
-}
-}
+} // namespace instrument
+} // namespace brasa

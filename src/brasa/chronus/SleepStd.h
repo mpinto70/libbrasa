@@ -27,5 +27,5 @@ inline void micro_sleep(const uint32_t sleep_length) {
 inline void milli_sleep(const uint32_t sleep_length) {
     return std_sleep<std::chrono::milliseconds>(sleep_length);
 }
-}
-}
+} // namespace chronus
+} // namespace brasa

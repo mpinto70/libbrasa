@@ -66,5 +66,5 @@ inline std::ostream& operator<<(std::ostream& out, const BufferData<TYPE, N>& x)
     }
     return out;
 }
-}
-}
+} // namespace impl
+} // namespace brasa::buffer
