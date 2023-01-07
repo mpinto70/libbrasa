@@ -47,7 +47,7 @@ PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyReturnTypeOnItsOwnLine: 60
 SpaceAfterCStyleCast: true
 SpacesBeforeTrailingComments: 1
-Standard:        Cpp11
+Standard:        c++20
 TabWidth:        4
 ...
 
