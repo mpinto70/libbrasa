@@ -68,6 +68,16 @@ elif [[ "$1" = "install" ]]; then
     _do_build
     cd ${SCRIPT_DIR}/build || _check "cd to build"
     make DESTDIR="${SCRIPT_DIR}/install" install
+elif [[ "$1" = "dependency" ]]; then
+    dependency ${SCRIPT_DIR} ${SCRIPT_DIR}/src  \
+        -o "-I ${SCRIPT_DIR}/src -std=c++20"    \
+        -c ${SCRIPT_DIR}/src/                   \
+        -A                                      \
+        > depend.dot
+    _check "dependency"
+    dot -Tsvg -o depend.svg depend.dot
+    _check "dot dependency"
+
 else
-    echo "Usage: `basename $0` [test|ctest|clean|demo|check|install]"
+    echo "Usage: `basename $0` [test|ctest|clean|demo|check|install|dependency]"
 fi
