@@ -40,13 +40,25 @@ ContinuationIndentWidth: 6
 Cpp11BracedListStyle: false
 DeriveLineEnding: false
 DerivePointerAlignment: false
-IncludeBlocks:   Preserve
+IncludeBlocks:   Regroup
+IncludeCategories:
+  - Regex:           '^<\.\./'
+    Priority:        120
+  - Regex:           '^<brasa/'
+    Priority:        150
+  - Regex:           '^(<[^/.]*>)' # stdlib
+    Priority:        1000
+  - Regex:           '^(<)'
+    Priority:        900
+  - Regex:           '.*'
+    Priority:        200
 IndentWidth:     4
 IndentWrappedFunctionNames: true
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyReturnTypeOnItsOwnLine: 60
 SpaceAfterCStyleCast: true
 SpacesBeforeTrailingComments: 1
+SortIncludes:    true
 Standard:        c++20
 TabWidth:        4
 ...
