@@ -1,5 +1,7 @@
 set(thread_srcs
     RcuTest.cpp
+    RcuReaderTest.cpp
+    RcuWriterTest.cpp
 )
 
 set(thread_libs
