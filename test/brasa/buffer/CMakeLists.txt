@@ -1,6 +1,7 @@
 set(buffer_srcs
-    CRCTest.cpp
     CircularTest.cpp
+    CopyTest.cpp
+    CRCTest.cpp
 )
 
 set(buffer_libs
