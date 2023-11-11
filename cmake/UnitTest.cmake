@@ -7,7 +7,7 @@ enable_testing()
 FetchContent_Declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        release-1.11.0
+        GIT_TAG        v1.14.0
 )
 
 FetchContent_GetProperties(googletest)
@@ -83,3 +83,41 @@ function(add_mock_lib mck_lib_name sources_var)
         mck
     )
 endfunction(add_mock_lib)
+
+################################################################################
+# Google Benchmark Setup - BEGIN ###############################################
+################################################################################
+find_package(benchmark REQUIRED)
+
+################################################################################
+# Google Benchmark Setup - END #################################################
+################################################################################
+
+function(add_benchmark_test test_name sources_var libs_var)
+    set(benchmark_test_name benchmark_${test_name})
+
+    # add brasa_ prefix to all libs
+    set(prefixed_libs "")
+    foreach(f ${${libs_var}})
+        list(APPEND prefixed_libs "brasa_${f}")
+    endforeach(f)
+
+    add_executable(
+        ${benchmark_test_name}
+        ${${sources_var}}
+    )
+
+    set_target_properties(
+        ${benchmark_test_name}
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test/bin
+    )
+
+    target_link_libraries(
+        ${benchmark_test_name}
+        PRIVATE ${prefixed_libs}
+        PRIVATE benchmark::benchmark
+        PRIVATE benchmark::benchmark_main
+    )
+endfunction(add_benchmark_test)
+
