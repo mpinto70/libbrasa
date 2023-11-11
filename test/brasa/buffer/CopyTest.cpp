@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <numeric>
 #include <random>
 #include <source_location>
@@ -28,7 +29,8 @@ protected:
             buffer_size_(std::get<2>(GetParam())),
             pad_(create_random(pad_size_, '0', '9')),
             src_(create_random(buffer_size_, 'a', 'z')),
-            dest0_(create_random(buffer_size_, 'A', 'Z')) {}
+            dest0_(create_random(buffer_size_, 'A', 'Z')),
+            max_offset_(std::min<size_t>(7, buffer_size_)) {}
 
     std::string memory() const noexcept { return pad_ + dest0_ + pad_; }
 
@@ -42,6 +44,7 @@ protected:
     const std::string pad_;
     const std::string src_;
     const std::string dest0_;
+    const size_t max_offset_;
 };
 
 void CopyTest::expect_eq_pad(const std::string& dest, const std::source_location& loc) const {
@@ -63,7 +66,7 @@ TEST_P(CopyTest, copy_full_buffer) {
 
 TEST_P(CopyTest, copy_unaligned_src_begin) {
     const auto dest0 = memory();
-    for (size_t offset = 1; offset < 8; ++offset) {
+    for (size_t offset = 1; offset < max_offset_; ++offset) {
         auto dest = dest0;
         auto expected = dest0;
         const auto size = buffer_size_ - offset;
@@ -79,7 +82,7 @@ TEST_P(CopyTest, copy_unaligned_src_begin) {
 
 TEST_P(CopyTest, copy_unaligned_dest_begin) {
     const auto dest0 = memory();
-    for (size_t offset = 1; offset < 8; ++offset) {
+    for (size_t offset = 1; offset < max_offset_; ++offset) {
         auto dest = dest0;
         auto expected = dest0;
         const auto size = buffer_size_ - offset;
@@ -95,8 +98,11 @@ TEST_P(CopyTest, copy_unaligned_dest_begin) {
 
 TEST_P(CopyTest, copy_unaligned_both_begin) {
     const auto dest0 = memory();
-    for (size_t offset_dest = 1; offset_dest < 8; ++offset_dest) {
-        for (size_t offset_src = 1; offset_src < 8; ++offset_src) {
+    for (size_t offset_dest = 1; offset_dest < max_offset_; ++offset_dest) {
+        for (size_t offset_src = 1; offset_src < max_offset_; ++offset_src) {
+            if (offset_dest + offset_src >= buffer_size_) {
+                continue;
+            }
             auto dest = dest0;
             auto expected = dest0;
             SCOPED_TRACE(
@@ -120,15 +126,17 @@ INSTANTIATE_TEST_SUITE_P(
       Correctness,
       CopyTest,
       testing::Combine(
-            testing::Values(copy_by_byte, copy_by_qword),
-            testing::Values(16, 32),  // pad size
-            testing::Values(64, 96)), // buffer size
+            testing::Values(copy_by_byte, copy_by_qword, copy_by_qword_dest_aligned),
+            testing::Values(16, 32),     // pad size
+            testing::Values(7, 64, 96)), // buffer size
       [](const auto& info) {
           std::string func = "Not processed fix it";
           if (std::get<0>(info.param) == copy_by_byte) {
               func = "copy_by_byte_";
           } else if (std::get<0>(info.param) == copy_by_qword) {
               func = "copy_by_qword_";
+          } else if (std::get<0>(info.param) == copy_by_qword_dest_aligned) {
+              func = "copy_by_qword_dest_aligned_";
           }
           return func + "PadSize_" + std::to_string(std::get<1>(info.param)) + "_BufferSize_"
                  + std::to_string(std::get<2>(info.param));
