@@ -111,18 +111,6 @@ TEST_P(CopyTest, copy_unaligned_both_begin) {
                   src_.begin() + offset_src + size,
                   expected.begin() + pad_size_ + offset_dest);
             EXPECT_EQ(dest, expected);
-
-            // check the copied part
-            EXPECT_EQ(
-                  dest.substr(pad_size_ + offset_dest, buffer_size_ - size),
-                  src_.substr(offset_src, buffer_size_ - size));
-            // check the part that should be left untouched
-            EXPECT_EQ(
-                  dest.substr(0, pad_size_ + offset_dest),
-                  dest0.substr(0, pad_size_ + offset_dest));
-            EXPECT_EQ(
-                  dest.substr(pad_size_ + offset_dest + size),
-                  dest0.substr(pad_size_ + offset_dest + size));
             expect_eq_pad(dest);
         }
     }
@@ -132,13 +120,15 @@ INSTANTIATE_TEST_SUITE_P(
       Correctness,
       CopyTest,
       testing::Combine(
-            testing::Values(copy_by_byte), // copy function
-            testing::Values(16, 32),       // pad size
-            testing::Values(64, 96)),      // buffer size
+            testing::Values(copy_by_byte, copy_by_qword),
+            testing::Values(16, 32),  // pad size
+            testing::Values(64, 96)), // buffer size
       [](const auto& info) {
-          std::string func;
+          std::string func = "Not processed fix it";
           if (std::get<0>(info.param) == copy_by_byte) {
               func = "copy_by_byte_";
+          } else if (std::get<0>(info.param) == copy_by_qword) {
+              func = "copy_by_qword_";
           }
           return func + "PadSize_" + std::to_string(std::get<1>(info.param)) + "_BufferSize_"
                  + std::to_string(std::get<2>(info.param));
