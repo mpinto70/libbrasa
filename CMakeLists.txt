@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.13)
+cmake_minimum_required (VERSION 3.14)
 project (libbrasa VERSION 0.11.0 LANGUAGES CXX)
 
 # add support for CTest

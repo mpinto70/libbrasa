@@ -45,7 +45,16 @@ elif [[ "$1" = "test" ]]; then
     _do_build
     shift
     echo "Testing... "
-    for test in "${SCRIPT_DIR}"/build/test/bin/*
+    for test in "${SCRIPT_DIR}"/build/test/bin/unit_*
+    do
+        $test "$@"
+        _check "$test"
+    done
+elif [[ "$1" = "benchmark" ]]; then
+    _do_build
+    shift
+    echo "Testing... "
+    for test in "${SCRIPT_DIR}"/build/test/bin/benchmark_*
     do
         $test "$@"
         _check "$test"
@@ -79,5 +88,5 @@ elif [[ "$1" = "dependency" ]]; then
     _check "dot dependency"
 
 else
-    echo "Usage: `basename $0` [test|ctest|clean|demo|check|install|dependency]"
+    echo "Usage: `basename $0` [test|ctest|benchmark|clean|demo|check|install|dependency]"
 fi
