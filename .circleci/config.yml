@@ -14,3 +14,6 @@ jobs:
       - run:
           name: Test system
           command: ./runbuild test
+      - run:
+          name: Benchmarks
+          command: ./runbuild benchmark
