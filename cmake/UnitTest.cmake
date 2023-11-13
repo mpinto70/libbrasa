@@ -87,7 +87,15 @@ endfunction(add_mock_lib)
 ################################################################################
 # Google Benchmark Setup - BEGIN ###############################################
 ################################################################################
-find_package(benchmark REQUIRED)
+FetchContent_Declare(
+        googlebenchmark
+        GIT_REPOSITORY https://github.com/google/benchmark.git
+        GIT_TAG v1.8.3
+)
+
+FetchContent_MakeAvailable(
+        googlebenchmark
+)
 
 ################################################################################
 # Google Benchmark Setup - END #################################################
