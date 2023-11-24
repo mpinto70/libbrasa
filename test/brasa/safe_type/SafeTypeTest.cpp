@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <cassert>
+#include <functional>
 #include <limits>
 
 namespace brasa {
@@ -239,6 +240,184 @@ TEST(SafeTypeTest, increment_decrement) {
     EXPECT_EQ(pre_decrement.value, 128);
     EXPECT_EQ(pos_decrement.value, 128);
 }
+
+namespace {
+
+template <class T>
+struct sink {
+    typedef void type;
+};
+template <class T>
+using sink_t = typename sink<T>::type;
+
+template <typename T, typename R, typename = void>
+struct sum_allowed : std::false_type {};
+template <typename T, typename R>
+struct sum_allowed<T, R, sink_t<decltype(std::declval<T>() + std::declval<R>())>> : std::true_type {
+};
+template <typename T, typename R, typename = void>
+struct sub_allowed : std::false_type {};
+template <typename T, typename R>
+struct sub_allowed<T, R, sink_t<decltype(std::declval<T>() - std::declval<R>())>> : std::true_type {
+};
+
+template <bool res, typename T, typename R = T>
+constexpr void CheckCompilesSumSub() {
+    static_assert(sum_allowed<T, R>::value == res);
+    static_assert(sub_allowed<T, R>::value == res);
+}
+
+template <typename T, typename R, typename = void>
+struct mul_allowed : std::false_type {};
+template <typename T, typename R>
+struct mul_allowed<T, R, sink_t<decltype(std::declval<T>() * std::declval<R>())>> : std::true_type {
+};
+
+template <bool res, typename T, typename R = T>
+constexpr void CheckCompilesMul() {
+    static_assert(mul_allowed<T, R>::value == res);
+}
+
+template <typename T, typename R, typename = void>
+struct div_allowed : std::false_type {};
+template <typename T, typename R>
+struct div_allowed<T, R, sink_t<decltype(std::declval<T>() / std::declval<R>())>> : std::true_type {
+};
+
+template <bool res, typename T, typename R = T>
+constexpr void CheckCompilesDiv() {
+    static_assert(div_allowed<T, R>::value == res);
+}
+
+template <typename T, typename R, typename = void>
+struct less_allowed : std::false_type {};
+template <typename T, typename R>
+struct less_allowed<T, R, sink_t<decltype(std::declval<T>() < std::declval<R>())>>
+      : std::true_type {};
+template <typename T, typename R, typename = void>
+struct greater_allowed : std::false_type {};
+template <typename T, typename R>
+struct greater_allowed<T, R, sink_t<decltype(std::declval<T>() > std::declval<R>())>>
+      : std::true_type {};
+template <typename T, typename R, typename = void>
+struct less_equal_allowed : std::false_type {};
+template <typename T, typename R>
+struct less_equal_allowed<T, R, sink_t<decltype(std::declval<T>() <= std::declval<R>())>>
+      : std::true_type {};
+template <typename T, typename R, typename = void>
+struct greater_equal_allowed : std::false_type {};
+template <typename T, typename R>
+struct greater_equal_allowed<T, R, sink_t<decltype(std::declval<T>() >= std::declval<R>())>>
+      : std::true_type {};
+
+template <bool res, typename T, typename R = T>
+constexpr void CheckCompilesOrdering() {
+    static_assert(less_allowed<T, R>::value == res);
+    static_assert(greater_allowed<T, R>::value == res);
+    static_assert(less_equal_allowed<T, R>::value == res);
+    static_assert(greater_equal_allowed<T, R>::value == res);
+}
+
+template <typename T, typename R, typename = void>
+struct eq_allowed : std::false_type {};
+template <typename T, typename R>
+struct eq_allowed<T, R, sink_t<decltype(std::declval<T>() == std::declval<R>())>> : std::true_type {
+};
+template <typename T, typename R, typename = void>
+struct neq_allowed : std::false_type {};
+template <typename T, typename R>
+struct neq_allowed<T, R, sink_t<decltype(std::declval<T>() != std::declval<R>())>>
+      : std::true_type {};
+
+template <bool res, typename T, typename R = T>
+constexpr void CheckCompilesIdentity() {
+    static_assert(eq_allowed<T, R>::value == res);
+    static_assert(neq_allowed<T, R>::value == res);
+}
+
+TEST(SafeTypeTest, Compilation) {
+    using TRIVIAL1 = Trivial<int64_t, struct TRIVIAL1_>;
+    using TRIVIAL2 = Trivial<TRIVIAL1::underlying_type, struct TRIVIAL2_>;
+    using ORDERED1 = Ordered<int64_t, struct ORDERED1_>;
+    using ORDERED2 = Ordered<ORDERED1::underlying_type, struct ORDERED2_>;
+    using SCALAR1 = Scalar<int64_t, struct SCALAR1_>;
+    using SCALAR2 = Scalar<SCALAR1::underlying_type, struct SCALAR2_>;
+
+    // arithmetic operations
+
+    CheckCompilesSumSub<true, int>();
+    CheckCompilesSumSub<false, TRIVIAL1>();
+    CheckCompilesSumSub<false, ORDERED1>();
+    CheckCompilesSumSub<true, SCALAR1>();
+
+    CheckCompilesSumSub<true, int, int>();
+    CheckCompilesSumSub<true, int, long>();
+    CheckCompilesSumSub<true, long, int>();
+    CheckCompilesSumSub<false, SCALAR1, SCALAR1::underlying_type>(); // this is the one to avoid
+    CheckCompilesSumSub<false, SCALAR1, SCALAR2>();                  // different types
+
+    // scaling
+
+    CheckCompilesMul<true, int>();
+    CheckCompilesMul<false, TRIVIAL1>();
+    CheckCompilesMul<false, ORDERED1>();
+    CheckCompilesMul<false, SCALAR1>();
+
+    CheckCompilesMul<true, int, long>();
+    CheckCompilesMul<false, TRIVIAL1, TRIVIAL1::underlying_type>();
+    CheckCompilesMul<false, TRIVIAL1::underlying_type, TRIVIAL1>();
+    CheckCompilesMul<false, ORDERED1, ORDERED1::underlying_type>();
+    CheckCompilesMul<false, ORDERED1::underlying_type, ORDERED1>();
+    CheckCompilesMul<true, SCALAR1, SCALAR1::underlying_type>();
+    CheckCompilesMul<true, SCALAR1::underlying_type, SCALAR1>();
+
+    CheckCompilesDiv<true, int>();
+    CheckCompilesDiv<false, TRIVIAL1>();
+    CheckCompilesDiv<false, ORDERED1>();
+    CheckCompilesDiv<false, SCALAR1>();
+
+    CheckCompilesDiv<true, int, long>();
+    CheckCompilesDiv<false, TRIVIAL1, TRIVIAL1::underlying_type>();
+    CheckCompilesDiv<false, TRIVIAL1::underlying_type, TRIVIAL1>();
+    CheckCompilesDiv<false, ORDERED1, ORDERED1::underlying_type>();
+    CheckCompilesDiv<false, ORDERED1::underlying_type, ORDERED1>();
+    CheckCompilesDiv<true, SCALAR1, SCALAR1::underlying_type>();
+    CheckCompilesDiv<false, SCALAR1::underlying_type, SCALAR1>();
+
+    // ordering
+
+    CheckCompilesOrdering<true, int>();
+    CheckCompilesOrdering<false, TRIVIAL1>();
+    CheckCompilesOrdering<true, ORDERED1>();
+    CheckCompilesOrdering<true, SCALAR1>();
+
+    CheckCompilesOrdering<true, int, int>();
+    CheckCompilesOrdering<true, int, long>();
+    CheckCompilesOrdering<true, long, int>();
+    CheckCompilesOrdering<false, ORDERED1, ORDERED1::underlying_type>(); // this is the one to avoid
+    CheckCompilesOrdering<false, ORDERED1, ORDERED2>();                  // different types
+    CheckCompilesOrdering<false, SCALAR1, SCALAR1::underlying_type>();   // this is the one to avoid
+    CheckCompilesOrdering<false, SCALAR1, SCALAR2>();                    // different types
+
+    // identity
+
+    CheckCompilesIdentity<true, int>();
+    CheckCompilesIdentity<true, TRIVIAL1>();
+    CheckCompilesIdentity<true, ORDERED1>();
+    CheckCompilesIdentity<true, SCALAR1>();
+
+    CheckCompilesIdentity<true, int, int>();
+    CheckCompilesIdentity<true, int, long>();
+    CheckCompilesIdentity<true, long, int>();
+    CheckCompilesIdentity<false, TRIVIAL1, TRIVIAL1::underlying_type>(); // this is the one to avoid
+    CheckCompilesIdentity<false, TRIVIAL1, TRIVIAL2>();                  // different types
+    CheckCompilesIdentity<false, ORDERED1, ORDERED1::underlying_type>(); // this is the one to avoid
+    CheckCompilesIdentity<false, ORDERED1, ORDERED2>();                  // different types
+    CheckCompilesIdentity<false, SCALAR1, SCALAR1::underlying_type>();   // this is the one to avoid
+    CheckCompilesIdentity<false, SCALAR1, SCALAR2>();                    // different types
+}
+} // namespace
+
 } // namespace safe_type
 } // namespace brasa
 
