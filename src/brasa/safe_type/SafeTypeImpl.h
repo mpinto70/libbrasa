@@ -109,54 +109,62 @@ constexpr bool operator==(
 
 /// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr bool
-      operator<(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(noexcept(
-            x.value
-            < y.value)) requires(category == impl::Category::Ordered || category == impl::Category::Scalar) {
+constexpr bool operator<(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+    requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
+{
     return x.value < y.value;
 }
 
 /// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr bool
-      operator>(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(noexcept(
-            x.value
-            < y.value)) requires(category == impl::Category::Ordered || category == impl::Category::Scalar) {
+constexpr bool operator>(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+    requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
+{
     return y < x;
 }
 
 /// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr bool
-      operator<=(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(noexcept(
-            x.value
-            < y.value)) requires(category == impl::Category::Ordered || category == impl::Category::Scalar) {
+constexpr bool operator<=(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+    requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
+{
     return not(y < x);
 }
 
 /// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr bool
-      operator>=(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(noexcept(
-            x.value
-            < y.value)) requires(category == impl::Category::Ordered || category == impl::Category::Scalar) {
+constexpr bool operator>=(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+    requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
+{
     return not(x < y);
 }
 
 /// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr SafeType<T, Tag, category>
-      operator+(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(
-            noexcept(x.value + y.value)) requires(category == impl::Category::Scalar) {
+constexpr SafeType<T, Tag, category> operator+(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value + y.value))
+    requires(category == impl::Category::Scalar)
+{
     const T tmp = x.value + y.value;
     return SafeType<T, Tag, category>{ tmp };
 }
 
 /// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
-constexpr SafeType<T, Tag, category>
-      operator-(const SafeType<T, Tag, category>& x, const SafeType<T, Tag, category>& y) noexcept(
-            noexcept(x.value - y.value)) requires(category == impl::Category::Scalar) {
+constexpr SafeType<T, Tag, category> operator-(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value - y.value))
+    requires(category == impl::Category::Scalar)
+{
     const T tmp = x.value - y.value;
     return SafeType<T, Tag, category>{ tmp };
 }
@@ -165,8 +173,9 @@ constexpr SafeType<T, Tag, category>
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       const SafeType<T, Tag, category>& x,
-      typename SafeType<T, Tag, category>::underlying_type
-            y) noexcept(noexcept(x.value* y)) requires(category == impl::Category::Scalar) {
+      typename SafeType<T, Tag, category>::underlying_type y) noexcept(noexcept(x.value* y))
+    requires(category == impl::Category::Scalar)
+{
     const T tmp = x.value * y;
     return SafeType<T, Tag, category>{ tmp };
 }
@@ -175,8 +184,9 @@ constexpr SafeType<T, Tag, category> operator*(
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       typename SafeType<T, Tag, category>::underlying_type x,
-      const SafeType<T, Tag, category>&
-            y) noexcept(noexcept(x* y.value)) requires(category == impl::Category::Scalar) {
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x* y.value))
+    requires(category == impl::Category::Scalar)
+{
     const T tmp = x * y.value;
     return SafeType<T, Tag, category>{ tmp };
 }
@@ -185,8 +195,9 @@ constexpr SafeType<T, Tag, category> operator*(
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator/(
       const SafeType<T, Tag, category>& x,
-      typename SafeType<T, Tag, category>::underlying_type
-            y) noexcept(noexcept(x.value / y)) requires(category == impl::Category::Scalar) {
+      typename SafeType<T, Tag, category>::underlying_type y) noexcept(noexcept(x.value / y))
+    requires(category == impl::Category::Scalar)
+{
     const T tmp = x.value / y;
     return SafeType<T, Tag, category>{ tmp };
 }
