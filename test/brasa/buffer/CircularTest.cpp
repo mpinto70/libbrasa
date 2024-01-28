@@ -200,7 +200,7 @@ void verify_laps(const uint64_t key) {
     CircularWriter<TYPE, N> writer(buffer1, key);
     CircularReader<TYPE, N> reader(buffer1, key);
 
-    TYPE t1, t2;
+    TYPE t1{}, t2{};
     Head h;
     for (uint32_t i = 0; i < 3 * N; ++i) {
         const uint32_t off_idx = i % N;

@@ -5,8 +5,7 @@
 #include <cstring>
 #include <type_traits>
 
-namespace brasa {
-namespace safe_type {
+namespace brasa::safe_type {
 namespace impl {
 /// Categories of wrapped values
 enum class Category {
@@ -65,21 +64,27 @@ struct SafeType<T, Tag, impl::Category::Scalar> {
         value += y.value;
         return *this;
     }
+
     SafeType& operator-=(const SafeType& y) noexcept(noexcept(value -= y.value)) {
         value -= y.value;
         return *this;
     }
+
     SafeType& operator*=(const T& y) noexcept(noexcept(value *= y)) {
         value *= y;
         return *this;
     }
+
     SafeType& operator/=(const T& y) noexcept(noexcept(value /= y)) {
         value /= y;
         return *this;
     }
 };
 
-/// comparison: enabled to all categories
+// ==================================================
+// IDENTITY: enabled to all categories
+// ==================================================
+
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator==(
       const SafeType<T, Tag, category>& x,
@@ -87,27 +92,28 @@ constexpr bool operator==(
     return x.value == y.value;
 }
 
-/// comparison: enabled to all categories
-template <typename T, typename Tag, impl::Category category>
-constexpr bool operator!=(
-      const SafeType<T, Tag, category>& x,
-      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value == y.value)) {
-    return not(x == y);
-}
-
-/// comparison: enabled to all categories (specialization for arrays)
 template <typename T, typename Tag, impl::Category category, size_t N>
 constexpr bool operator==(
       const SafeType<T[N], Tag, category>& x,
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] == y.value[0])) {
     for (size_t i = 0; i < N; ++i) {
-        if (x.value[i] != y.value[i])
+        if (not(x.value[i] == y.value[i]))
             return false;
     }
     return true;
 }
 
-/// sorting: enabled to categories `Ordered` and `Scalar`
+template <typename T, typename Tag, impl::Category category>
+constexpr bool operator!=(
+      const SafeType<T, Tag, category>& x,
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x == y)) {
+    return not(x == y);
+}
+
+// ==================================================
+// SORTING: enabled to categories `Ordered` and `Scalar`
+// ==================================================
+
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator<(
       const SafeType<T, Tag, category>& x,
@@ -117,37 +123,53 @@ constexpr bool operator<(
     return x.value < y.value;
 }
 
-/// sorting: enabled to categories `Ordered` and `Scalar`
+template <typename T, typename Tag, impl::Category category, size_t N>
+constexpr bool operator<(
+      const SafeType<T[N], Tag, category>& x,
+      const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] < y.value[0]))
+    requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
+{
+    for (size_t i = 0; i < N; ++i) {
+        if (y.value[i] < x.value[i]) {
+            return false;
+        } else if (x.value[i] < y.value[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator>(
       const SafeType<T, Tag, category>& x,
-      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x < y))
     requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
 {
     return y < x;
 }
 
-/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator<=(
       const SafeType<T, Tag, category>& x,
-      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x < y))
     requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
 {
     return not(y < x);
 }
 
-/// sorting: enabled to categories `Ordered` and `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr bool operator>=(
       const SafeType<T, Tag, category>& x,
-      const SafeType<T, Tag, category>& y) noexcept(noexcept(x.value < y.value))
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x < y))
     requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
 {
     return not(x < y);
 }
 
-/// arithmetic: enabled to category `Scalar`
+// ==================================================
+// ARITHMETIC: enabled to category `Scalar`
+// ==================================================
+
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator+(
       const SafeType<T, Tag, category>& x,
@@ -158,7 +180,6 @@ constexpr SafeType<T, Tag, category> operator+(
     return SafeType<T, Tag, category>{ tmp };
 }
 
-/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator-(
       const SafeType<T, Tag, category>& x,
@@ -169,7 +190,6 @@ constexpr SafeType<T, Tag, category> operator-(
     return SafeType<T, Tag, category>{ tmp };
 }
 
-/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       const SafeType<T, Tag, category>& x,
@@ -180,7 +200,6 @@ constexpr SafeType<T, Tag, category> operator*(
     return SafeType<T, Tag, category>{ tmp };
 }
 
-/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       typename SafeType<T, Tag, category>::underlying_type x,
@@ -191,7 +210,6 @@ constexpr SafeType<T, Tag, category> operator*(
     return SafeType<T, Tag, category>{ tmp };
 }
 
-/// arithmetic: enabled to category `Scalar`
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator/(
       const SafeType<T, Tag, category>& x,
@@ -201,5 +219,5 @@ constexpr SafeType<T, Tag, category> operator/(
     const T tmp = x.value / y;
     return SafeType<T, Tag, category>{ tmp };
 }
-} // namespace safe_type
-} // namespace brasa
+
+} // namespace brasa::safe_type

@@ -150,7 +150,9 @@ TEST(SafeTypeTest, ordered_string_is_viable) {
     EXPECT_NE(str_1, str_2);
     EXPECT_NE(str_2, str_1);
     EXPECT_LT(str_1, str_2);
+    EXPECT_LE(str_1, str_2);
     EXPECT_GT(str_2, str_1);
+    EXPECT_GE(str_2, str_1);
 
     ORDERED str_3 = str_1;
     EXPECT_STREQ(str_3.value, cstr_1);

@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <random>
 #include <vector>
 
 namespace brasa {
@@ -58,7 +59,8 @@ template <typename T, size_t N>
 void run_sort() {
     std::vector<Instrumented<int>> vec(N);
     Iota(vec.begin(), vec.end(), 0);
-    std::random_shuffle(vec.begin(), vec.end());
+    std::mt19937 gen{ std::random_device{}() };
+    std::ranges::shuffle(vec, gen);
 
     InstrumentedCounter::initialize(N);
 
