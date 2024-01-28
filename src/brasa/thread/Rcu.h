@@ -3,6 +3,7 @@
 #include <brasa/thread/RcuReader.h>
 #include <brasa/thread/RcuWriter.h>
 
+#include <algorithm>
 #include <atomic>
 #include <list>
 #include <mutex>
