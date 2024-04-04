@@ -1,5 +1,11 @@
 # Safe Type package
 
+- [Safe Type package](#safe-type-package)
+  - [Strong typing](#strong-typing)
+  - [Use in `struct`s](#use-in-structs)
+  - [Technical details](#technical-details)
+    - [`SafeType` class](#safetype-class)
+
 This package contains facilities to wrap POD types in safe structures with
 limited operations, to prevent wrong assignments and passing the wrong
 arguments. This code is inspired in [this
@@ -8,13 +14,13 @@ Stepanov and Paul McJones](http://elementsofprogramming.com/).
 
 There are three different categories (see `enum class Category`) of types:
 
-|           |     assignable     | comparison (`==`, `!=`) | ordering (`<`, `>`, `<=`, `>=`) | arithmetic operations (`+`, `-`, `*`, `/`, `++`, `--`)<sup>*</sup> |
-| :-------- | :----------------: | :---------------------: | :-----------------------------: | :----------------------------------------------------------------: |
-| `Trivial` | :heavy_check_mark: |   :heavy_check_mark:    |                                 |                                                                    |
-| `Ordered` | :heavy_check_mark: |   :heavy_check_mark:    |       :heavy_check_mark:        |                                                                    |
-| `Scalar`  | :heavy_check_mark: |   :heavy_check_mark:    |       :heavy_check_mark:        |                         :heavy_check_mark:                         |
+|           |     assignable     | comparison (`==`, `!=`) | ordering (`<`, `>`, `<=`, `>=`) | arithmetic operations (`+`, `-`, `*`, `/`, `++`, `--`)[^1] |
+| :-------- | :----------------: | :---------------------: | :-----------------------------: | :--------------------------------------------------------: |
+| `Trivial` | :white_check_mark: |   :white_check_mark:    |                                 |                                                            |
+| `Ordered` | :white_check_mark: |   :white_check_mark:    |       :white_check_mark:        |                                                            |
+| `Scalar`  | :white_check_mark: |   :white_check_mark:    |       :white_check_mark:        |                     :white_check_mark:                     |
 
-<sup>*</sup> `*` and `/` operates on native types only.
+[^1]: `*` and `/` operates on native types only.
 
 ## Strong typing
 
@@ -42,7 +48,8 @@ Note that it would also be possible to call it as
 uint32_t price = unsafe_sell(quantity, product_id); // not what you wanted
 ```
 
-On the other hand, if you use the type safe utilities, your code would look like:
+On the other hand, if you use the safe type utilities, your code would look
+like:
 
 ```cpp
 using ProductId = brasa::safe_type::ordered<uint32_t, struct ProductId_>;
@@ -102,9 +109,9 @@ static_assert(offsetof(unsafe_struct, price) == offsetof(safe_struct, price));
 
 The important types defined in this package are:
 
-* `Trivial`: a type of category `Category::Trivial`
-* `Ordered`: a type of category `Category::Ordered`
-* `Scalar`: a type of category `Category::Scalar`
+- `Trivial`: a type of category `Category::Trivial`
+- `Ordered`: a type of category `Category::Ordered`
+- `Scalar`: a type of category `Category::Scalar`
 
 Below is an example of two different `struct`s used for serialization and
 de-serialization. The struct with native types is written to a buffer, that

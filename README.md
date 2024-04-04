@@ -1,5 +1,11 @@
 # libbrasa
 
+- [libbrasa](#libbrasa)
+  - [Import `libbrasa` as a cmake lib](#import-libbrasa-as-a-cmake-lib)
+  - [Package documentation](#package-documentation)
+
+## Import `libbrasa` as a cmake lib
+
 Library of utilities that I recurrently need and have to recode.
 
 If you want to install `libbrasa` as an external project in your project you
@@ -44,8 +50,8 @@ add_dependencies(brasa_argparse libbrasa)
 
 ## Package documentation
 
-* [Argument parser](./src/brasa/argparse/README.md)
-* [Circular buffer](./src/brasa/buffer/README.md)
-* [Design patterns](./src/brasa/patterns/README.md)
-* [Safe type utilities](./src/brasa/safe_type/README.md)
-* [Timing and waiting utilities](./src/brasa/chronus/README.md)
+- [Argument parser](./src/brasa/argparse/README.md)
+- [Circular buffer](./src/brasa/buffer/README.md)
+- [Design patterns](./src/brasa/patterns/README.md)
+- [Safe type utilities](./src/brasa/safe_type/README.md)
+- [Timing and waiting utilities](./src/brasa/chronus/README.md)
