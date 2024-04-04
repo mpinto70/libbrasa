@@ -6,8 +6,7 @@
 #include <cstdint>
 #include <ctime>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 
 template <typename NOW_FUNC, typename SLEEPER_FUNC>
 class Waiter {
@@ -53,5 +52,4 @@ Waiter<NOW_FUNC, SLEEPER_FUNC>
           units_of_time,
           std::forward<SLEEPER_FUNC>(sleeper));
 }
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

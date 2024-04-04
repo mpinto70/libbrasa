@@ -5,8 +5,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace brasa {
-namespace instrument {
+namespace brasa::instrument {
 
 struct InstrumentedCounter {
     enum operations {
@@ -79,5 +78,4 @@ public:
         return not(x < y);
     }
 };
-} // namespace instrument
-} // namespace brasa
+} // namespace brasa::instrument

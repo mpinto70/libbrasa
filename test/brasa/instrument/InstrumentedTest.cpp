@@ -7,8 +7,7 @@
 #include <random>
 #include <vector>
 
-namespace brasa {
-namespace instrument {
+namespace brasa::instrument {
 
 namespace {
 template <typename I, typename N>
@@ -238,5 +237,4 @@ TEST(InstrumentedTest, count_comparison) {
                 InstrumentedCounter::destruction,
           });
 }
-} // namespace instrument
-} // namespace brasa
+} // namespace brasa::instrument

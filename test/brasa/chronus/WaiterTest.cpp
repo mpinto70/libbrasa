@@ -6,8 +6,7 @@
 
 #include <ctime>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 namespace {
 template <typename NOW_FUNC, typename SLEEPER_FUNC>
 void verifyWait(NOW_FUNC now_func, SLEEPER_FUNC sleeper_func, const uint32_t wait_size) {
@@ -40,5 +39,4 @@ TEST(WaitTest, Micro) {
 TEST(WaitTest, Milli) {
     verifyWait(milli_now, milli_sleep, 1);
 }
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

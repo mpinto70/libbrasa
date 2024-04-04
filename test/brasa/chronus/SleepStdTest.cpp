@@ -7,8 +7,7 @@
 
 #include <ctime>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 namespace {
 template <typename SLEEP_FUNC>
 void veriffySleep(SLEEP_FUNC func, const uint32_t MULT_NSEC, const uint32_t sleep_size) {
@@ -41,5 +40,4 @@ TEST(SleepTest, milli_sleep) {
     veriffySleep(milli_sleep, NSECS_PER_MSEC, 1);
     veriffySleep(milli_sleep, NSECS_PER_MSEC, 2);
 }
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

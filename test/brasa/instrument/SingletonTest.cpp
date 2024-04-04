@@ -2,8 +2,7 @@
 
 #include <gtest/gtest.h>
 
-namespace brasa {
-namespace instrument {
+namespace brasa::instrument {
 
 namespace {
 struct SemiRegular {
@@ -170,5 +169,4 @@ TEST(SingletonTest, conversions) {
     verify_conversions<Regular>({ 12, 47 });
     verify_conversions<TotallyOrdered>({ 12, 47 });
 }
-} // namespace instrument
-} // namespace brasa
+} // namespace brasa::instrument

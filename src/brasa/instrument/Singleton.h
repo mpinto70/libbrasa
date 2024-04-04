@@ -5,8 +5,7 @@
 
 #include <utility>
 
-namespace brasa {
-namespace instrument {
+namespace brasa::instrument {
 
 template <typename T>
 class Singleton {
@@ -43,5 +42,4 @@ public:
     friend constexpr bool operator<=(const Singleton& x, const Singleton& y) { return not(y < x); }
     friend constexpr bool operator>=(const Singleton& x, const Singleton& y) { return not(x < y); }
 };
-} // namespace instrument
-} // namespace brasa
+} // namespace brasa::instrument
