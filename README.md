@@ -44,8 +44,8 @@ add_dependencies(brasa_argparse libbrasa)
 
 ## Package documentation
 
-* [Argument parser](./src/brasa/argparse)
-* [Circular buffer](./src/brasa/buffer)
-* [Timing and waiting utilities](./src/brasa/chronus)
-* [Type safe utilities](./src/brasa/type_safe)
-* [Design patterns](./src/brasa/patterns)
+* [Argument parser](./src/brasa/argparse/README.md)
+* [Circular buffer](./src/brasa/buffer/README.md)
+* [Design patterns](./src/brasa/patterns/README.md)
+* [Safe type utilities](./src/brasa/safe_type/README.md)
+* [Timing and waiting utilities](./src/brasa/chronus/README.md)
