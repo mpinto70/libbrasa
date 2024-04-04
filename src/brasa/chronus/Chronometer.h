@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 
 /** A struct to register the instants in time from `Chronometer` objects. */
 struct Elapsed {
@@ -54,5 +53,4 @@ template <typename ELAPSED = Elapsed, typename NOW_FUNC>
 Chronometer<NOW_FUNC, ELAPSED> make_chronometer(NOW_FUNC&& func, uint32_t id) {
     return Chronometer<NOW_FUNC, ELAPSED>(std::forward<NOW_FUNC>(func), id);
 }
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

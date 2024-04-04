@@ -3,8 +3,7 @@
 
 #include <gtest/gtest.h>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 namespace {
 class NowFunctor {
 public:
@@ -38,7 +37,9 @@ TEST(ChronometerTest, mark) {
 }
 
 TEST(ChronometerTest, count_nano) {
-    const struct timespec tim { 0, 500 };
+    const struct timespec tim {
+        0, 500
+    };
 
     const auto chron = make_chronometer(nano_now, 1234);
     nanosleep(&tim, nullptr);
@@ -48,7 +49,9 @@ TEST(ChronometerTest, count_nano) {
 }
 
 TEST(ChronometerTest, count_micro) {
-    const struct timespec tim { 0, 5000 };
+    const struct timespec tim {
+        0, 5000
+    };
 
     const auto chron = make_chronometer(micro_now, 1234);
     nanosleep(&tim, nullptr);
@@ -58,7 +61,9 @@ TEST(ChronometerTest, count_micro) {
 }
 
 TEST(ChronometerTest, count_milli) {
-    const struct timespec tim { 0, 5000000 };
+    const struct timespec tim {
+        0, 5000000
+    };
 
     const auto chron = make_chronometer(milli_now, 1234);
     nanosleep(&tim, nullptr);
@@ -99,5 +104,4 @@ TEST(ChronometerTest, reset) {
     EXPECT_EQ(t2.begin, 102u);
     EXPECT_EQ(t2.end, 103u);
 }
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

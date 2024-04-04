@@ -7,8 +7,7 @@
 #include <cstring>
 #include <type_traits>
 
-namespace brasa {
-namespace safe_type {
+namespace brasa::safe_type {
 // Important definitions. You should use one of the below types
 // Trivial: [ == and != ]
 // Ordered: trivial + [ < > <= >= ]
@@ -19,5 +18,4 @@ template <typename T, typename Tag>
 using Ordered = SafeType<T, Tag, impl::Category::Ordered>;
 template <typename T, typename Tag>
 using Scalar = SafeType<T, Tag, impl::Category::Scalar>;
-} // namespace safe_type
-} // namespace brasa
+} // namespace brasa::safe_type

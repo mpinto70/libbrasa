@@ -6,8 +6,7 @@
 #include <functional>
 #include <limits>
 
-namespace brasa {
-namespace safe_type {
+namespace brasa::safe_type {
 // ---------- Trivial ----------
 
 namespace {
@@ -420,8 +419,7 @@ TEST(SafeTypeTest, Compilation) {
 }
 } // namespace
 
-} // namespace safe_type
-} // namespace brasa
+} // namespace brasa::safe_type
 
 TEST(SafeTypeUsageTest, type_punning_works) {
     struct Source {

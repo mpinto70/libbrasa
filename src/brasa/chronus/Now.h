@@ -5,8 +5,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 
 template <typename DURATION_TYPE>
 inline uint64_t std_now() {
@@ -30,5 +29,4 @@ inline uint64_t milli_now() {
     return std_now<std::chrono::milliseconds>();
 }
 
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus

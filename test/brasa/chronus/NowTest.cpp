@@ -4,8 +4,7 @@
 
 #include <ctime>
 
-namespace brasa {
-namespace chronus {
+namespace brasa::chronus {
 namespace {
 template <typename NOW_FUNC>
 void verifyNow(NOW_FUNC func) {
@@ -32,5 +31,4 @@ TEST(NowTest, nano_now) {
     verifyUniformity(nano_now);
 }
 
-} // namespace chronus
-} // namespace brasa
+} // namespace brasa::chronus
