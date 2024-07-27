@@ -83,7 +83,7 @@ void run_sort() {
 
 TEST(InstrumentedTest, sort) {
     run_sort<int, 16>();
-    run_sort<int, 1000000>();
+    run_sort<int, 1'000'000>();
 }
 
 namespace {

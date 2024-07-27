@@ -63,10 +63,10 @@ void verify_create_uninitialized(const uint64_t KEY) {
 } // namespace
 
 TEST(CircularTest, create_uninitialized) {
-    verify_create_uninitialized<CircularReader<data, 27>>(12345);
-    verify_create_uninitialized<CircularReader<int, 158>>(22222);
-    verify_create_uninitialized<CircularWriter<data, 27>>(11111);
-    verify_create_uninitialized<CircularWriter<int, 158>>(33333);
+    verify_create_uninitialized<CircularReader<data, 27>>(12'345);
+    verify_create_uninitialized<CircularReader<int, 158>>(22'222);
+    verify_create_uninitialized<CircularWriter<data, 27>>(11'111);
+    verify_create_uninitialized<CircularWriter<int, 158>>(33'333);
 }
 
 namespace {
@@ -108,10 +108,10 @@ void verify_create_initialized(const uint64_t KEY) {
 } // namespace
 
 TEST(CircularTest, create_initialized) {
-    verify_create_initialized<CircularReader<data, 47>>(12345);
-    verify_create_initialized<CircularReader<int, 357>>(22222);
-    verify_create_initialized<CircularWriter<data, 59>>(11111);
-    verify_create_initialized<CircularWriter<int, 293>>(33333);
+    verify_create_initialized<CircularReader<data, 47>>(12'345);
+    verify_create_initialized<CircularReader<int, 357>>(22'222);
+    verify_create_initialized<CircularWriter<data, 59>>(11'111);
+    verify_create_initialized<CircularWriter<int, 293>>(33'333);
 }
 
 TEST(CircularTest, read_fail) {
@@ -120,7 +120,7 @@ TEST(CircularTest, read_fail) {
 
     uint8_t buffer[CircularBuffer::BUFFER_SIZE];
     uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
-    const uint64_t KEY = 0x1234567890abcdefUL;
+    const uint64_t KEY = 0x1234'5678'90ab'cdefUL;
     initialize_buffer<data, 15>(buffer, KEY);
     initialize_buffer<data, 15>(buffer2, KEY);
     auto buffer_data = reinterpret_cast<BufferDataT*>(buffer);
@@ -143,7 +143,7 @@ TEST(CircularTest, write) {
     uint8_t buffer[CircularBuffer::BUFFER_SIZE];
     uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
 
-    constexpr uint64_t KEY = 0x1234567890abcdefUL;
+    constexpr uint64_t KEY = 0x1234'5678'90ab'cdefUL;
 
     initialize_buffer<data, 15>(buffer, KEY);
     initialize_buffer<data, 15>(buffer2, KEY);
@@ -229,8 +229,8 @@ void verify_laps(const uint64_t key) {
 } // namespace
 
 TEST(CircularTest, laps) {
-    verify_laps<data, 29>(12345678);
-    verify_laps<int, 17>(87654321);
+    verify_laps<data, 29>(12'345'678);
+    verify_laps<int, 17>(87'654'321);
 }
 
 namespace {

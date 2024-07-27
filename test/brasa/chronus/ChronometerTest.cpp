@@ -62,7 +62,7 @@ TEST(ChronometerTest, count_micro) {
 
 TEST(ChronometerTest, count_milli) {
     const struct timespec tim {
-        0, 5000000
+        0, 5'000'000
     };
 
     const auto chron = make_chronometer(milli_now, 1234);

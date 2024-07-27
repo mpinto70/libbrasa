@@ -15,8 +15,9 @@ namespace brasa::argparse {
 
 namespace detail {
 template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
-typename std::enable_if<I == std::tuple_size_v<TupleT>, void>::type
-      for_each_tuple(TupleT&, Ts&&...) {}
+typename std::enable_if<I == std::tuple_size_v<TupleT>, void>::type for_each_tuple(
+      TupleT&,
+      Ts&&...) {}
 
 template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
       typename std::enable_if
@@ -188,10 +189,11 @@ private: // functions
                 case '?':
                     return ParseResult::Error;
                 default:
-                    if (optarg == nullptr)
+                    if (optarg == nullptr) {
                         detail::for_each_tuple<ParseOption>(parsers_, c, "");
-                    else
+                    } else {
                         detail::for_each_tuple<ParseOption>(parsers_, c, optarg);
+                    }
             }
         }
 
@@ -230,10 +232,11 @@ private: // functions
         void operator()(TupleT& parsers, char short_option, const std::string& parameter) {
             auto& parser = std::get<I>(parsers);
             if (short_option == parser.short_option()) {
-                if constexpr (parser.IS_BOOLEAN)
+                if constexpr (parser.IS_BOOLEAN) {
                     parser.digest();
-                else
+                } else {
                     parser.digest(parameter);
+                }
             }
         }
     };
@@ -274,8 +277,9 @@ private: // functions
             const char short_option = parser.short_option();
 
             std::string preamble = "-" + std::string(1, short_option) + ", --" + long_option;
-            if constexpr (not parser.IS_BOOLEAN)
+            if constexpr (not parser.IS_BOOLEAN) {
                 preamble += "  <" + parser.name() + ">";
+            }
 
             usage += build_usage_line(preamble, parser.description());
 
@@ -329,8 +333,9 @@ private: // functions
 
             long_options.push_back(opt);
             short_options += short_option;
-            if (not parser.IS_BOOLEAN)
+            if (not parser.IS_BOOLEAN) {
                 short_options += ':';
+            }
         }
     };
 

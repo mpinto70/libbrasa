@@ -80,12 +80,18 @@ void check_trivial_array(
 
 TEST(SafeTypeTest, trivial_is_viable_for_arrays) {
     using TRIVIAL = Trivial<char[5], struct TRIVIAL_>;
-    TRIVIAL value = { { 'A', 'B', 'C', 'D', 'E' } };
+    TRIVIAL value = {
+        { 'A', 'B', 'C', 'D', 'E' }
+    };
     const char underlying[] = { 'A', 'B', 'C', 'D', 'E' };
     check_trivial_array(value, underlying);
 
-    constexpr TRIVIAL value_eq = { { 'A', 'B', 'C', 'D', 'E' } };
-    constexpr TRIVIAL value_ne = { { 'a', 'B', 'C', 'D', 'E' } };
+    constexpr TRIVIAL value_eq = {
+        { 'A', 'B', 'C', 'D', 'E' }
+    };
+    constexpr TRIVIAL value_ne = {
+        { 'a', 'B', 'C', 'D', 'E' }
+    };
     static_assert(value_eq == value_eq);
     static_assert(value_eq != value_ne);
 }
@@ -444,15 +450,21 @@ TEST(SafeTypeUsageTest, type_punning_works) {
 
     char buffer[sizeof(Source)] = {};
 
-    const Source source = { 0x11223344, { 'A', 'B', 'C', 'D', 'E' }, 0x8877665544332211 };
+    const Source source = {
+        0x1122'3344,
+        { 'A', 'B', 'C', 'D', 'E' },
+        0x8877'6655'4433'2211
+    };
     memcpy(buffer, &source, sizeof(source));
-    Name expected_name = { { 'A', 'B', 'C', 'D', 'E' } };
+    Name expected_name = {
+        { 'A', 'B', 'C', 'D', 'E' }
+    };
 
     auto destination = reinterpret_cast<const Destination*>(buffer);
     EXPECT_EQ(destination->price.value, source.price);
     EXPECT_EQ(memcmp(destination->name.value, source.name, sizeof(source.name)), 0);
     EXPECT_EQ(destination->name, expected_name);
-    EXPECT_EQ(destination->time, Time{ 0x8877665544332211 });
+    EXPECT_EQ(destination->time, Time{ 0x8877'6655'4433'2211 });
     assert(destination->price.value == source.price);
     assert(memcmp(destination->name.value, source.name, sizeof(source.name)) == 0);
     assert(destination->name == expected_name);

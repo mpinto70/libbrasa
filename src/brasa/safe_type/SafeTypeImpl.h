@@ -97,8 +97,9 @@ constexpr bool operator==(
       const SafeType<T[N], Tag, category>& x,
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] == y.value[0])) {
     for (size_t i = 0; i < N; ++i) {
-        if (not(x.value[i] == y.value[i]))
+        if (not(x.value[i] == y.value[i])) {
             return false;
+        }
     }
     return true;
 }
@@ -193,7 +194,7 @@ constexpr SafeType<T, Tag, category> operator-(
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       const SafeType<T, Tag, category>& x,
-      typename SafeType<T, Tag, category>::underlying_type y) noexcept(noexcept(x.value* y))
+      typename SafeType<T, Tag, category>::underlying_type y) noexcept(noexcept(x.value * y))
     requires(category == impl::Category::Scalar)
 {
     const T tmp = x.value * y;
@@ -203,7 +204,7 @@ constexpr SafeType<T, Tag, category> operator*(
 template <typename T, typename Tag, impl::Category category>
 constexpr SafeType<T, Tag, category> operator*(
       typename SafeType<T, Tag, category>::underlying_type x,
-      const SafeType<T, Tag, category>& y) noexcept(noexcept(x* y.value))
+      const SafeType<T, Tag, category>& y) noexcept(noexcept(x * y.value))
     requires(category == impl::Category::Scalar)
 {
     const T tmp = x * y.value;

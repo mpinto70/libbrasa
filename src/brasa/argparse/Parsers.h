@@ -87,11 +87,11 @@ public:
           std::string name,
           std::string description)
           : BaseParameterParser<decltype(&not_empty), DIGESTER>(
-                short_option,
-                std::move(long_option),
-                std::move(name),
-                std::move(description),
-                not_empty) {}
+                  short_option,
+                  std::move(long_option),
+                  std::move(name),
+                  std::move(description),
+                  not_empty) {}
 };
 
 } // namespace brasa::argparse

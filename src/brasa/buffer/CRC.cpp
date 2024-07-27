@@ -61,7 +61,7 @@ uint32_t brasa::buffer::impl::crc32(const uint8_t* buf, size_t len) noexcept {
             DO1(buf);
         } while (--len);
     }
-    return crc ^ 0xffffffff;
+    return crc ^ 0xffff'ffff;
 }
 
 /// calculates the CRC-32 of the number passed
@@ -82,5 +82,5 @@ uint32_t brasa::buffer::impl::crc32(uint64_t value) noexcept {
     crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
     value >>= 8;
     crc = CRC_TABLE[(crc ^ (value & 0xff)) & 0xff] ^ (crc >> 8);
-    return crc ^ 0xffffffff;
+    return crc ^ 0xffff'ffff;
 }
