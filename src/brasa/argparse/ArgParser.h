@@ -5,6 +5,7 @@
 #include <getopt.h>
 
 #include <cstring>
+#include <format>
 #include <functional>
 #include <iostream>
 #include <string>
@@ -14,19 +15,34 @@
 namespace brasa::argparse {
 
 namespace detail {
+/** Perform operation `FunctorT` to each element to `a_tuple` recursively.
+ * @tparam FunctorT the functor to be applied to each element of the tuple
+ * @tparam I the index of the element to be processed
+ * @tparam TupleT the type tuple to be processed
+ * @tparam Ts the types of the arguments to be passed to `FunctorT`
+ * @param a_tuple the tuple to be processed
+ * @param ts the arguments to be passed to `FunctorT`
+ */
 template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
-typename std::enable_if<I == std::tuple_size_v<TupleT>, void>::type for_each_tuple(
-      TupleT&,
-      Ts&&...) {}
-
-template <typename FunctorT, size_t I = 0, typename TupleT, typename... Ts>
-      typename std::enable_if
-      < I<std::tuple_size_v<TupleT>, void>::type for_each_tuple(TupleT& a_tuple, Ts&&... ts) {
-    FunctorT f;
-    f.template operator()<I>(a_tuple, ts...);
-    for_each_tuple<FunctorT, I + 1, TupleT>(a_tuple, std::forward<Ts>(ts)...);
+void for_each_tuple(TupleT& a_tuple, Ts&&... ts) {
+    if constexpr (I < std::tuple_size_v<TupleT>) {
+        FunctorT f;
+        f.template operator()<I>(a_tuple, ts...);
+        for_each_tuple<FunctorT, I + 1, TupleT>(a_tuple, std::forward<Ts>(ts)...);
+    }
 }
 
+/** Cumulatively apply binary function `FunctorT` to each element of `a_tuple`.
+ * @tparam FunctorT the function to be applied to each element of the tuple
+ * @tparam ReturnT the type of the return value of `FunctorT`
+ * @tparam BinaryOperator the binary operator to accumulate the returned values of `FunctorT`
+ * @tparam I the index of the element to be processed
+ * @tparam TupleT the type tuple to be processed
+ * @tparam Ts the types of the arguments to be passed to `FunctorT`
+ * @param a_tuple the tuple to be processed
+ * @param return_v the initial value of the accumulator
+ * @param ts the arguments to be passed to `FunctorT`
+ */
 template <
       typename FunctorT,
       typename ReturnT,
@@ -34,26 +50,17 @@ template <
       size_t I = 0,
       typename TupleT,
       typename... Ts>
-typename std::enable_if<I == std::tuple_size_v<TupleT>, ReturnT>::type
-      accumulate_tuple(TupleT&, const ReturnT& return_v = ReturnT{}, Ts&&...) {
-    return return_v;
-}
-
-template <
-      typename FunctorT,
-      typename ReturnT,
-      typename BinaryOperator = std::plus<ReturnT>,
-      size_t I = 0,
-      typename TupleT,
-      typename... Ts>
-      typename std::enable_if < I<std::tuple_size_v<TupleT>, ReturnT>::type
-      accumulate_tuple(TupleT& a_tuple, ReturnT return_v = ReturnT{}, Ts&&... ts) {
-    FunctorT f;
-    return_v = BinaryOperator{}(return_v, f.template operator()<I>(a_tuple, ts...));
-    return accumulate_tuple<FunctorT, ReturnT, BinaryOperator, I + 1, TupleT>(
-          a_tuple,
-          return_v,
-          std::forward<Ts>(ts)...);
+ReturnT accumulate_tuple(TupleT& a_tuple, ReturnT return_v = ReturnT{}, Ts&&... ts) {
+    if constexpr (I < std::tuple_size_v<TupleT>) {
+        FunctorT f;
+        return_v = BinaryOperator{}(return_v, f.template operator()<I>(a_tuple, ts...));
+        return accumulate_tuple<FunctorT, ReturnT, BinaryOperator, I + 1, TupleT>(
+              a_tuple,
+              return_v,
+              std::forward<Ts>(ts)...);
+    } else {
+        return return_v;
+    }
 }
 } // namespace detail
 
@@ -307,7 +314,8 @@ private: // functions
     };
 
     struct BuildOptions {
-        /** Fills the `long_options` and `short_options` from `parsers[I]`
+        /** Fills the `long_options` and `short_options` from `parsers[I]`. These are filled
+         * to be used with `getopt_long`.
          * @param parsers the tuple of parsers to be processed
          * @param long_options the vector of long options to be filled
          * @param short_options the string of short options to be filled
@@ -333,7 +341,7 @@ private: // functions
                 || std::find_if(long_options.begin(), long_options.end(), is_present)
                          != long_options.end()) {
                 throw InvalidArgument(
-                      "Duplicated option: -" + std::string(1, short_option) + "/--" + long_option);
+                      std::format("Duplicated option: -{}/--{}", short_option, long_option));
             }
 
             long_options.push_back(opt);
