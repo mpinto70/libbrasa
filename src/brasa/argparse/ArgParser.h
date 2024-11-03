@@ -67,7 +67,7 @@ enum class ParseResult {
  * @tparam ValueTupleT a tuple of objects to process mandatory arguments
  * @tparam ParserTupleT a tuple of objects to process optional arguments
  *
- * Each element of ValueTupleT should have functions:
+ * Each element of `ValueTupleT` should have functions:
  * - `void digest(const std::string& argument)` to digest the argument and store the relevant value
  * - `<type> value() const` to return the value parsed (and possibly converted)
  * - `bool can_digest() const` that return if it is still possible to digest an argument. This
@@ -77,7 +77,7 @@ enum class ParseResult {
  * - `std::string description() const` to return the description of the parameter to be used in
  *      documenting usage
  *
- * Each element of ParseTupleT should either be a BooleanParser or have:
+ * Each element of `ParseTupleT` should either be a `BooleanParser` or have:
  * - `void digest(const std::string& argument)` to digest the argument and store the relevant value
  * - `<type> value() const` to return the value parsed (and possibly converted)
  * - `bool is_present() const` that return if the argument was present in command line
@@ -87,8 +87,8 @@ enum class ParseResult {
  * - `char short_option() const` to return the short option (it has to be unique and cannot be `h`)
  * - `const std::string& long_option() const` to return the long option (it has to be unique and
  * cannot be `help` and also has to be persistent so it can be pointed to by the command line
- * parser) Also, ParseTupleT elements that are not BooleanParser should define `constexpr static
- * bool IS_BOOLEAN = false;`
+ * parser). Also, `ParseTupleT` elements that are not `BooleanParser` should define `constexpr
+ * static bool IS_BOOLEAN = false;`
  */
 template <typename ValueTupleT, typename ParserTupleT>
 class ArgParser {
@@ -307,6 +307,11 @@ private: // functions
     };
 
     struct BuildOptions {
+        /** Fills the `long_options` and `short_options` from `parsers[I]`
+         * @param parsers the tuple of parsers to be processed
+         * @param long_options the vector of long options to be filled
+         * @param short_options the string of short options to be filled
+         */
         template <size_t I>
         void operator()(
               const ParserTupleT& parsers,
