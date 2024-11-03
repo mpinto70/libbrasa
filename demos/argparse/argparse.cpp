@@ -11,7 +11,6 @@ void execute_command(
       int param2,
       bool is_list,
       const std::vector<std::string>& ignores) {
-    using namespace std::literals;
     std::cout << "Executing command with " << param1 << " " << param2
               << (is_list ? " " : " without ") << "listing files ";
     if (ignores.empty()) {
