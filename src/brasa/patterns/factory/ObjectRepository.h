@@ -14,7 +14,7 @@ namespace brasa::pattern {
  * This class is not thread safe.
  */
 template <typename BASE, typename TYPE_ID>
-class ObjectRepository {
+class ObjectRepository final {
 public:
     // Non-copyable and movable
     ObjectRepository() noexcept = default;

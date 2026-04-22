@@ -1,6 +1,7 @@
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
+#include <algorithm>
 #include <cstring>
 
 namespace brasa::safe_type {
@@ -19,7 +20,7 @@ enum class Category {
  * `Category`: is used to enable/disable operations
  */
 template <typename T, typename Tag, impl::Category category>
-struct SafeType {
+struct SafeType final {
     using underlying_type = T;
     T value;
     // This function is useful when a value to use to initialize the safe type needs a static_cast,
@@ -31,7 +32,7 @@ struct SafeType {
 
 /// A wrapper that adds the ability to make arithmetic operations
 template <typename T, typename Tag>
-struct SafeType<T, Tag, impl::Category::Scalar> {
+struct SafeType<T, Tag, impl::Category::Scalar> final {
     using underlying_type = T;
     T value;
     static constexpr SafeType to_safe(underlying_type v) { return SafeType{ v }; }
@@ -94,12 +95,7 @@ template <typename T, typename Tag, impl::Category category, size_t N>
 constexpr bool operator==(
       const SafeType<T[N], Tag, category>& x,
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] == y.value[0])) {
-    for (size_t i = 0; i < N; ++i) {
-        if (not(x.value[i] == y.value[i])) {
-            return false;
-        }
-    }
-    return true;
+    return std::equal(x.value, x.value + N, y.value);
 }
 
 template <typename T, typename Tag, impl::Category category>
@@ -128,14 +124,7 @@ constexpr bool operator<(
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] < y.value[0]))
     requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
 {
-    for (size_t i = 0; i < N; ++i) {
-        if (y.value[i] < x.value[i]) {
-            return false;
-        } else if (x.value[i] < y.value[i]) {
-            return true;
-        }
-    }
-    return false;
+    return std::lexicographical_compare(x.value, x.value + N, y.value, y.value + N);
 }
 
 template <typename T, typename Tag, impl::Category category>

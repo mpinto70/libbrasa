@@ -11,14 +11,14 @@
 namespace brasa::buffer::impl {
 
 /// Read and write head marker
-struct Head {
+struct Head final {
     uint32_t index; ///< index into data
     uint32_t lap;   ///< lap number in the data
 };
 static_assert(std::is_trivial_v<Head>, "Head must remain a POD");
 
 template <typename TYPE_, uint32_t N_>
-struct BufferData {
+struct BufferData final {
     TYPE_ data[N_];  ///< the data
     Head write_head; ///< position and lap of the next write
     Head read_head;  ///< position and lap of the next read

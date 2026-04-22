@@ -43,22 +43,22 @@ static_assert(sizeof(CRC_TABLE) == 256 * sizeof(uint32_t), "CRC_TABLE needs to h
 }
 }
 
-#define DO1(buf) crc = CRC_TABLE[((int)crc ^ (*buf++)) & 0xff] ^ (crc >> 8);
-#define DO2(buf)  DO1(buf); DO1(buf);
-#define DO4(buf)  DO2(buf); DO2(buf);
-#define DO8(buf)  DO4(buf); DO4(buf);
+#define DO1(_buf, _crc) _crc = CRC_TABLE[((int)_crc ^ (*_buf++)) & 0xff] ^ (_crc >> 8);
+#define DO2(_buf, _crc)  DO1(_buf, _crc); DO1(_buf, _crc);
+#define DO4(_buf, _crc)  DO2(_buf, _crc); DO2(_buf, _crc);
+#define DO8(_buf, _crc)  DO4(_buf, _crc); DO4(_buf, _crc);
 // clang-format on
 
 /// calculates the CRC-32 of the buffer
 uint32_t brasa::buffer::impl::crc32(const uint8_t* buf, size_t len) noexcept {
     uint32_t crc = 0;
     while (len >= 8) {
-        DO8(buf);
+        DO8(buf, crc);
         len -= 8;
     }
     if (len) {
         do {
-            DO1(buf);
+            DO1(buf, crc);
         } while (--len);
     }
     return crc ^ 0xffff'ffff;
