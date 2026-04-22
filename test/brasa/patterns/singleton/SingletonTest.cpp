@@ -26,7 +26,7 @@ struct Derived final : public Base {
     Derived(int a, int b) : val_(a * b) {}
     ~Derived() noexcept override = default;
     int f() const override { return val_; }
-    friend bool operator==(const Derived& x, const Derived& y) { return x.val_ == y.val_; }
+    [[maybe_unused]]friend bool operator==(const Derived& x, const Derived& y) { return x.val_ == y.val_; }
 
 private:
     int val_;
@@ -38,7 +38,7 @@ struct POD {
     double d;
 };
 
-bool operator==(const POD& x, const POD& y) {
+[[maybe_unused]]bool operator==(const POD& x, const POD& y) {
     return x.c == y.c && x.i == y.i && x.d == y.d;
 }
 

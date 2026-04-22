@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <numeric>
 #include <random>
 #include <vector>
 
@@ -169,7 +168,7 @@ TEST(InstrumentedTest, count_conversion) {
     verify_operations(
           []() {
               const auto x = Instrumented<int>(129);
-              static_cast<int>(x);
+              (void) static_cast<int>(x);
           },
           {
                 InstrumentedCounter::conversion_move_construction,
@@ -200,8 +199,8 @@ TEST(InstrumentedTest, count_equality) {
               const auto x = Instrumented<int>(129);
               Instrumented<int> y;
               y = x;
-              y == x;
-              y != x;
+              (void) (y == x);
+              (void) (y != x);
           },
           {
                 InstrumentedCounter::conversion_move_construction,
@@ -220,10 +219,10 @@ TEST(InstrumentedTest, count_comparison) {
               const auto x = Instrumented<int>(129);
               Instrumented<int> y;
               y = x;
-              y < x;
-              y > x;
-              y <= x;
-              y >= x;
+              (void) (y < x);
+              (void) (y > x);
+              (void) (y <= x);
+              (void) (y >= x);
           },
           {
                 InstrumentedCounter::conversion_move_construction,

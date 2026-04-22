@@ -1,9 +1,5 @@
 #pragma once
 
-#include <atomic>
-#include <list>
-#include <mutex>
-
 namespace brasa::thread {
 
 /** Class responsible to hold the \b read/write reference to the copy of the current value.

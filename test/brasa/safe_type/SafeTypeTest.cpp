@@ -3,8 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <cassert>
-#include <functional>
-#include <limits>
 
 namespace brasa::safe_type {
 // ---------- Trivial ----------
@@ -26,7 +24,8 @@ void check_trivial(
 
     typename SAFE_TYPE::underlying_type different_value = stored_value + 1;
     EXPECT_NE(value, SAFE_TYPE{ different_value });
-    EXPECT_TRUE(std::is_trivial<SAFE_TYPE>::value);
+    EXPECT_TRUE(std::is_trivially_copyable_v<SAFE_TYPE>);
+    EXPECT_TRUE(std::is_trivially_constructible_v<SAFE_TYPE>);
     // is packable
     struct test_struct {
         uint8_t value2;
@@ -473,7 +472,7 @@ TEST(SafeTypeUsageTest, type_punning_works) {
 
 namespace {
 using QttyProperties = brasa::safe_type::Scalar<uint16_t, struct QttyProperties_>;
-constexpr QttyProperties operator"" _qtpp(unsigned long long qtty) {
+constexpr QttyProperties operator""_qtpp(unsigned long long qtty) {
     return QttyProperties{ static_cast<uint16_t>(qtty) };
 }
 

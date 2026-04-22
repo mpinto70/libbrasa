@@ -1,9 +1,7 @@
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
-#include <array>
 #include <cstring>
-#include <type_traits>
 
 namespace brasa::safe_type {
 namespace impl {
@@ -25,8 +23,8 @@ struct SafeType {
     using underlying_type = T;
     T value;
     // This function is useful when a value to use to initialize the safe type needs a static_cast,
-    // because TYPE{value} wouldn´t compile. In these cases, you would have to write
-    // TYPE{static_cast<underlying_type>(value)}. This funcion make it a little less verbose:
+    // because TYPE{value} wouldn't compile. In these cases, you would have to write
+    // TYPE{static_cast<underlying_type>(value)}. This function make it a little less verbose:
     // TYPE.to_safe(value)
     static constexpr SafeType to_safe(underlying_type v) { return SafeType{ v }; }
 };

@@ -49,7 +49,7 @@ TEST(ArgParserTest, test_parse) {
     EXPECT_EQ(parser.PARSER_SIZE, 2u);
 
     const std::vector<std::string> options = {
-        "command", "parameter1", "-l", "-i", "file1.cpp", "parameter2", "bleh",
+        "command", "parameter1", "-l", "-i", "file1.cpp", "parameter2", "blah",
     };
     int argc = 0;
     char* argv[50];
@@ -64,7 +64,7 @@ TEST(ArgParserTest, test_parse) {
     EXPECT_EQ(std::get<1>(parser.parsers()).digester().value(), "file1.cpp");
     EXPECT_EQ(std::get<0>(parser.values()).value(), "parameter1");
     EXPECT_EQ(std::get<1>(parser.values()).value(), "parameter2");
-    EXPECT_EQ(std::get<2>(parser.values()).value(), "bleh");
+    EXPECT_EQ(std::get<2>(parser.values()).value(), "blah");
 }
 
 TEST(ArgParserTest, test_usage_multiple_parameters_and_multiple_options) {
@@ -235,7 +235,7 @@ TEST(ArgParserTest, test_parse_error_too_many_values) {
           "ERROR processing command line arguments: too many arguments 'excess' 'value'");
 }
 
-TEST(ArgParserTest, test_parse_error_incorrect_vlue_type) {
+TEST(ArgParserTest, test_parse_error_incorrect_value_type) {
     const std::vector<std::string> options = {
         "command",
         "parameter1",

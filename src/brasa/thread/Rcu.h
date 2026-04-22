@@ -4,7 +4,6 @@
 #include <brasa/thread/RcuWriter.h>
 
 #include <algorithm>
-#include <atomic>
 #include <list>
 #include <mutex>
 
@@ -62,7 +61,7 @@ private:
     /** Function that is called when the `RcuWriter` object is destroyed.
      * It also performs the cleanup of the nodes that are not being used anymore.
      * Note that this cleanup has to lock `current_mutex_` once to set `current_` to point to the
-     * new value and repeatedly while atempting to remove unused values.
+     * new value and repeatedly while attempting to remove unused values.
      */
     void update() noexcept;
     friend class RcuWriter<T, Rcu<T>>; ///< It is a friend so it can call `update()`.

@@ -3,9 +3,7 @@
 
 #include <brasa/safe_type/SafeTypeImpl.h>
 
-#include <array>
 #include <cstring>
-#include <type_traits>
 
 namespace brasa::safe_type {
 // Important definitions. You should use one of the below types
