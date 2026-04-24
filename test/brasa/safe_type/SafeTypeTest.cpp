@@ -1,8 +1,12 @@
 #include <brasa/safe_type/SafeType.h>
+#include <brasa/safe_type/SafeTypeHash.h>
 
 #include <gtest/gtest.h>
 
 #include <cassert>
+#include <cstdint>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace brasa::safe_type {
 // ---------- Trivial ----------
@@ -24,8 +28,6 @@ void check_trivial(
 
     typename SAFE_TYPE::underlying_type different_value = stored_value + 1;
     EXPECT_NE(value, SAFE_TYPE{ different_value });
-    EXPECT_TRUE(std::is_trivially_copyable_v<SAFE_TYPE>);
-    EXPECT_TRUE(std::is_trivially_constructible_v<SAFE_TYPE>);
     // is packable
     struct test_struct {
         uint8_t value2;
@@ -421,6 +423,55 @@ TEST(SafeTypeTest, Compilation) {
     CheckCompilesIdentity<false, ORDERED1, ORDERED2>();                  // different types
     CheckCompilesIdentity<false, SCALAR1, SCALAR1::underlying_type>();   // this is the one to avoid
     CheckCompilesIdentity<false, SCALAR1, SCALAR2>();                    // different types
+}
+
+TEST(SafeTypeTest, Hash) {
+    using TRIVIAL1 = Trivial<int64_t, struct TRIVIAL1_>;
+    using TRIVIAL2 = Trivial<TRIVIAL1::underlying_type, struct TRIVIAL2_>;
+    using ORDERED1 = Ordered<int64_t, struct ORDERED1_>;
+    using ORDERED2 = Ordered<ORDERED1::underlying_type, struct ORDERED2_>;
+    using SCALAR1 = Scalar<int64_t, struct SCALAR1_>;
+    using SCALAR2 = Scalar<SCALAR1::underlying_type, struct SCALAR2_>;
+
+    const std::hash<TRIVIAL1> hash_trivial_1;
+    const std::hash<ORDERED1> hash_ordered_1;
+    const std::hash<SCALAR1> hash_scalar_1;
+    const std::hash<TRIVIAL2> hash_trivial_2;
+    const std::hash<ORDERED2> hash_ordered_2;
+    const std::hash<SCALAR2> hash_scalar_2;
+
+    constexpr int64_t stored_value = 0x8765'4321'0FED'CBA9;
+
+    constexpr TRIVIAL1 trivial_value_1{ stored_value };
+    constexpr ORDERED1 ordered_value_1{ stored_value };
+    constexpr SCALAR1 scalar_value_1{ stored_value };
+    constexpr TRIVIAL2 trivial_value_2{ stored_value };
+    constexpr ORDERED2 ordered_value_2{ stored_value };
+    constexpr SCALAR2 scalar_value_2{ stored_value };
+
+    const auto hash = std::hash<int64_t>{}(stored_value);
+
+    EXPECT_EQ(hash_trivial_1(trivial_value_1), hash);
+    EXPECT_EQ(hash_ordered_1(ordered_value_1), hash);
+    EXPECT_EQ(hash_scalar_1(scalar_value_1), hash);
+    EXPECT_EQ(hash_trivial_2(trivial_value_2), hash);
+    EXPECT_EQ(hash_ordered_2(ordered_value_2), hash);
+    EXPECT_EQ(hash_scalar_2(scalar_value_2), hash);
+}
+
+TEST(SafeTypeTest, UnorderedContainer) {
+    using TRIVIAL = Trivial<int64_t, struct TRIVIAL_>;
+
+    std::unordered_set<TRIVIAL> set;
+    set.insert(TRIVIAL{ 42 });
+    EXPECT_TRUE(set.contains(TRIVIAL{ 42 }));
+    EXPECT_FALSE(set.contains(TRIVIAL{ 43 }));
+
+    std::unordered_map<TRIVIAL, int> map;
+    map[TRIVIAL{ 42 }] = 100;
+    EXPECT_TRUE(map.contains(TRIVIAL{ 42 }));
+    EXPECT_FALSE(map.contains(TRIVIAL{ 43 }));
+    EXPECT_EQ(map[TRIVIAL{ 42 }], 100);
 }
 } // namespace
 

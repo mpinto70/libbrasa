@@ -15,7 +15,7 @@ namespace brasa::pattern {
  * This class is not thread safe.
  */
 template <typename BASE, typename TYPE_ID>
-class ObjectFactory {
+class ObjectFactory final {
 public:
     using creator_t = std::function<std::unique_ptr<BASE>()>;
     // Non-copyable and movable

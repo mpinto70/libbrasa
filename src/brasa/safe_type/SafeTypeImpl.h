@@ -1,82 +1,135 @@
+/**
+ * Core implementation of the safe-type wrappers exposed by `SafeType.h`.
+ *
+ * The templates in this header preserve the exact layout of the wrapped type while
+ * using a tag type and an operation category to prevent accidental mixing of logically
+ * different values that share the same representation.
+ */
+
 // inspired by https://github.com/rollbear/strong_type
 #pragma once
 
+#include <algorithm>
 #include <cstring>
 
 namespace brasa::safe_type {
 namespace impl {
-/// Categories of wrapped values
+/// Operation sets available for a wrapped value.
 enum class Category {
-    Trivial, ///< only identity (== and !=)
-    Ordered, ///< ordering (<, >, <= and >=)
-    Scalar,  ///< arithmetic (+, -, * and /)
+    Trivial, ///< Enables only identity comparison (`==` and `!=`).
+    Ordered, ///< Adds ordering (`<`, `>`, `<=` and `>=`) to `Trivial`.
+    Scalar,  ///< Adds arithmetic (`+`, `-`, `*`, `/`, `++`, `--`) to `Ordered`.
 };
 } // namespace impl
 
-/** A wrapper to make POD types different types.
- * `T`: is the underlying type
- * `Tag`: is a type to make the wrapper unique
- * `Category`: is used to enable/disable operations
+/**
+ * Strongly typed wrapper around a trivially copyable underlying value.
+ *
+ * `SafeType` keeps the same storage layout as `T`, but becomes a distinct C++ type by
+ * pairing the value with a tag type. Two wrappers with the same underlying type but
+ * different tags are therefore not interchangeable.
+ *
+ * This primary template implements the categories that only need storage plus comparison:
+ * `Trivial` and `Ordered`. The `Scalar` category is specialized below to add mutating
+ * arithmetic operators.
+ *
+ * @tparam T Underlying storage type.
+ * @tparam Tag Unique tag type that differentiates one safe type from another.
+ * @tparam category Operation category that controls which free operators are available.
  */
 template <typename T, typename Tag, impl::Category category>
-struct SafeType {
+struct SafeType final {
+    /// Type stored by the wrapper.
     using underlying_type = T;
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(std::is_trivially_constructible_v<T>);
+
+    /// Wrapped value. The field is intentionally public to preserve aggregate semantics.
     T value;
-    // This function is useful when a value to use to initialize the safe type needs a static_cast,
-    // because TYPE{value} wouldn't compile. In these cases, you would have to write
-    // TYPE{static_cast<underlying_type>(value)}. This function make it a little less verbose:
-    // TYPE.to_safe(value)
+
+    /**
+     * Creates a wrapper from an explicitly converted underlying value.
+     *
+     * This helper is mainly useful when the caller already needs to cast to
+     * `underlying_type` and aggregate initialization would become verbose.
+     */
     static constexpr SafeType to_safe(underlying_type v) { return SafeType{ v }; }
 };
 
-/// A wrapper that adds the ability to make arithmetic operations
+/**
+ * `SafeType` specialization for scalar values.
+ *
+ * Besides the operations inherited from `Ordered`, this specialization adds the mutating
+ * operators required by the free arithmetic operators declared later in the file.
+ */
 template <typename T, typename Tag>
-struct SafeType<T, Tag, impl::Category::Scalar> {
+struct SafeType<T, Tag, impl::Category::Scalar> final {
+    /// Type stored by the wrapper.
     using underlying_type = T;
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(std::is_trivially_constructible_v<T>);
+
+    /// Wrapped value. The field is intentionally public to preserve aggregate semantics.
     T value;
+
+    /// Creates a wrapper from an explicitly converted underlying value.
     static constexpr SafeType to_safe(underlying_type v) { return SafeType{ v }; }
 
+    /// Prefix increment of the wrapped value.
     SafeType& operator++() noexcept(noexcept(++value)) {
         ++value;
         return *this;
     }
 
+    /// Postfix increment of the wrapped value.
     SafeType operator++(int) noexcept(noexcept(value++)) {
         auto tmp = *this;
         value++;
         return tmp;
     }
 
+    /// Prefix decrement of the wrapped value.
     SafeType& operator--() noexcept(noexcept(--value)) {
         --value;
         return *this;
     }
 
+    /// Postfix decrement of the wrapped value.
     SafeType operator--(int) noexcept(noexcept(value--)) {
         auto tmp = *this;
         value--;
         return tmp;
     }
 
+    /// Adds another value of the same safe type.
     SafeType& operator+=(const SafeType& y) noexcept(noexcept(value += y.value)) {
         value += y.value;
         return *this;
     }
 
+    /// Subtracts another value of the same safe type.
     SafeType& operator-=(const SafeType& y) noexcept(noexcept(value -= y.value)) {
         value -= y.value;
         return *this;
     }
 
+    /// Multiplies by a raw underlying value.
     SafeType& operator*=(const T& y) noexcept(noexcept(value *= y)) {
         value *= y;
         return *this;
     }
 
+    /// Divides by a raw underlying value.
     SafeType& operator/=(const T& y) noexcept(noexcept(value /= y)) {
         value /= y;
         return *this;
     }
+
+    /// Unary minus
+    SafeType operator-() const noexcept(noexcept(-value)) { return SafeType{ -value }; }
+
+    /// Unary plus
+    SafeType operator+() const noexcept(noexcept(+value)) { return SafeType{ +value }; }
 };
 
 // ==================================================
@@ -94,12 +147,7 @@ template <typename T, typename Tag, impl::Category category, size_t N>
 constexpr bool operator==(
       const SafeType<T[N], Tag, category>& x,
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] == y.value[0])) {
-    for (size_t i = 0; i < N; ++i) {
-        if (not(x.value[i] == y.value[i])) {
-            return false;
-        }
-    }
-    return true;
+    return std::equal(x.value, x.value + N, y.value);
 }
 
 template <typename T, typename Tag, impl::Category category>
@@ -128,14 +176,7 @@ constexpr bool operator<(
       const SafeType<T[N], Tag, category>& y) noexcept(noexcept(x.value[0] < y.value[0]))
     requires(category == impl::Category::Ordered || category == impl::Category::Scalar)
 {
-    for (size_t i = 0; i < N; ++i) {
-        if (y.value[i] < x.value[i]) {
-            return false;
-        } else if (x.value[i] < y.value[i]) {
-            return true;
-        }
-    }
-    return false;
+    return std::lexicographical_compare(x.value, x.value + N, y.value, y.value + N);
 }
 
 template <typename T, typename Tag, impl::Category category>
