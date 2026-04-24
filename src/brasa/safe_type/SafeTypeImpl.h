@@ -41,6 +41,8 @@ template <typename T, typename Tag, impl::Category category>
 struct SafeType final {
     /// Type stored by the wrapper.
     using underlying_type = T;
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(std::is_trivially_constructible_v<T>);
 
     /// Wrapped value. The field is intentionally public to preserve aggregate semantics.
     T value;
@@ -64,6 +66,8 @@ template <typename T, typename Tag>
 struct SafeType<T, Tag, impl::Category::Scalar> final {
     /// Type stored by the wrapper.
     using underlying_type = T;
+    static_assert(std::is_trivially_copyable_v<T>);
+    static_assert(std::is_trivially_constructible_v<T>);
 
     /// Wrapped value. The field is intentionally public to preserve aggregate semantics.
     T value;
@@ -120,6 +124,12 @@ struct SafeType<T, Tag, impl::Category::Scalar> final {
         value /= y;
         return *this;
     }
+
+    /// Unary minus
+    SafeType operator-() const noexcept(noexcept(-value)) { return SafeType{ -value }; }
+
+    /// Unary plus
+    SafeType operator+() const noexcept(noexcept(+value)) { return SafeType{ +value }; }
 };
 
 // ==================================================
