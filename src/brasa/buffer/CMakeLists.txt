@@ -3,7 +3,6 @@ set(buffer_srcs
     Circular.cpp
     CircularReader.cpp
     CircularWriter.cpp
-    Copy.cpp
     CRC.cpp
 )
 

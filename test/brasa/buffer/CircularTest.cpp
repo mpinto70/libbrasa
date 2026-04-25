@@ -6,15 +6,17 @@
 
 #include <gtest/gtest.h>
 
-namespace brasa::buffer::impl {
+#include <source_location>
+
+namespace brasa::buffer::detail {
 
 namespace {
 
 using data = SimpleData;
 
 template <typename TYPE, uint32_t N>
-void initialize_buffer(uint8_t (&buffer)[Circular<TYPE, N>::BUFFER_SIZE], uint64_t key) {
-    static_assert(Circular<TYPE, N>::BUFFER_SIZE == sizeof(BufferData<TYPE, N>));
+void initialize_buffer(uint8_t (&buffer)[Circular<TYPE, N>::MIN_BUFFER_SIZE], uint64_t key) {
+    static_assert(Circular<TYPE, N>::MIN_BUFFER_SIZE > sizeof(BufferData<TYPE, N>));
     ::memset(buffer, 0, sizeof(buffer));
     CircularReader<TYPE, N>(buffer, key);
 }
@@ -38,7 +40,7 @@ template <typename CIRCULAR>
 void verify_create_uninitialized(const uint64_t KEY) {
     SCOPED_TRACE("key = " + std::to_string(KEY) + " for " + std::string(typeid(CIRCULAR).name()));
 
-    uint8_t buffer[CIRCULAR::BUFFER_SIZE];
+    uint8_t buffer[CIRCULAR::MIN_BUFFER_SIZE];
     ::memset(buffer, 0x55, sizeof(buffer));
 
     using BufferDataT = typename CircularMock<CIRCULAR>::BufferDataT;
@@ -52,7 +54,7 @@ void verify_create_uninitialized(const uint64_t KEY) {
     EXPECT_EQ(buffer_data->key, KEY);
     EXPECT_EQ(buffer_data->crc, crc32(KEY));
 
-    uint8_t buffer2[CIRCULAR::BUFFER_SIZE];
+    uint8_t buffer2[CIRCULAR::MIN_BUFFER_SIZE];
     ::memset(buffer2, 0x55, sizeof(buffer2));
     auto buffer_data2 = reinterpret_cast<BufferDataT*>(buffer2);
     compare(buffer_data->data, buffer_data2->data);
@@ -60,7 +62,28 @@ void verify_create_uninitialized(const uint64_t KEY) {
     const CIRCULAR circular2(buffer2, KEY);
     EXPECT_EQ(*buffer_data2, *buffer_data);
 }
+
+template <typename TYPE>
+void check_alignment(uint8_t* needle, std::source_location loc = std::source_location::current()) {
+    SCOPED_TRACE("From line: " + std::to_string(loc.line()));
+    using CC = Circular<TYPE, 10>;
+    auto aligned = CC::aligned_in_buffer(needle);
+    EXPECT_EQ(0u, reinterpret_cast<std::uintptr_t>(aligned) % alignof(TYPE));
+    EXPECT_GE(aligned, needle);
+}
 } // namespace
+
+TEST(CircularTest, aligned_in_buffer) {
+    uint8_t buffer[1024] = {};
+    check_alignment<int>(buffer);
+    check_alignment<int>(buffer + 1);
+    check_alignment<int>(buffer + 2);
+    check_alignment<int>(buffer + 3);
+    check_alignment<data>(buffer);
+    check_alignment<data>(buffer + 1);
+    check_alignment<data>(buffer + 2);
+    check_alignment<data>(buffer + 3);
+}
 
 TEST(CircularTest, create_uninitialized) {
     verify_create_uninitialized<CircularReader<data, 27>>(12'345);
@@ -76,7 +99,7 @@ void verify_create_initialized(const uint64_t KEY) {
 
     SCOPED_TRACE("key = " + std::to_string(KEY));
 
-    uint8_t buffer[CIRCULAR::BUFFER_SIZE];
+    uint8_t buffer[CIRCULAR::MIN_BUFFER_SIZE];
     ::memset(buffer, 0x55, sizeof(buffer));
 
     CIRCULAR circular(buffer, KEY);
@@ -118,8 +141,8 @@ TEST(CircularTest, read_fail) {
     using CircularBuffer = CircularReader<data, 15>;
     using BufferDataT = BufferData<data, 15>;
 
-    uint8_t buffer[CircularBuffer::BUFFER_SIZE];
-    uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
+    uint8_t buffer[CircularBuffer::MIN_BUFFER_SIZE];
+    uint8_t buffer2[CircularBuffer::MIN_BUFFER_SIZE];
     const uint64_t KEY = 0x1234'5678'90ab'cdefUL;
     initialize_buffer<data, 15>(buffer, KEY);
     initialize_buffer<data, 15>(buffer2, KEY);
@@ -140,8 +163,8 @@ TEST(CircularTest, write) {
     using CircularBuffer = CircularWriter<data, 15>;
     using BufferDataT = typename CircularMock<CircularBuffer>::BufferDataT;
 
-    uint8_t buffer[CircularBuffer::BUFFER_SIZE];
-    uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
+    uint8_t buffer[CircularBuffer::MIN_BUFFER_SIZE];
+    uint8_t buffer2[CircularBuffer::MIN_BUFFER_SIZE];
 
     constexpr uint64_t KEY = 0x1234'5678'90ab'cdefUL;
 
@@ -188,8 +211,8 @@ void verify_laps(const uint64_t key) {
 
     SCOPED_TRACE("For key " + std::to_string(key) + " / N = " + std::to_string(N));
 
-    uint8_t buffer1[CircularBuffer::BUFFER_SIZE];
-    uint8_t buffer2[CircularBuffer::BUFFER_SIZE];
+    uint8_t buffer1[CircularBuffer::MIN_BUFFER_SIZE];
+    uint8_t buffer2[CircularBuffer::MIN_BUFFER_SIZE];
 
     auto buffer_data1 = reinterpret_cast<BufferDataT*>(buffer1);
     auto buffer_data2 = reinterpret_cast<BufferDataT*>(buffer2);
@@ -240,7 +263,7 @@ void verify_many_laps_one_read(uint64_t key) {
 
     SCOPED_TRACE("For key " + std::to_string(key));
 
-    uint8_t buffer[CircularBuffer::BUFFER_SIZE];
+    uint8_t buffer[CircularBuffer::MIN_BUFFER_SIZE];
 
     initialize_buffer<TYPE, N>(buffer, key);
 
@@ -269,4 +292,4 @@ TEST(CircularTest, manyLapsOneRead) {
     verify_many_laps_one_read<int, 278>(14);
     verify_many_laps_one_read<int, 27>(15);
 }
-} // namespace brasa::buffer::impl
+} // namespace brasa::buffer::detail
