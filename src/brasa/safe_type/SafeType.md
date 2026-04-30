@@ -104,7 +104,7 @@ implementations.
 **Key Components**:
 
 - `SafeType<T, Tag, Category>` - Primary template class
-- `impl::Category` enum - Defines operation categories
+- `detail::Category` enum - Defines operation categories
 - Operator overloads for comparison, arithmetic, and ordering
 - Template specialization for `Scalar` category
 
@@ -129,7 +129,7 @@ implementations.
 
 ## Operation Categories
 
-The library provides three levels of operations through the `impl::Category`
+The library provides three levels of operations through the `detail::Category`
 enum:
 
 ### 1. Trivial Category
