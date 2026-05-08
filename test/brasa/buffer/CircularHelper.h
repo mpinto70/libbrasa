@@ -22,7 +22,7 @@ inline std::ostream& operator<<(std::ostream& out, const SimpleData& x) {
     return out;
 }
 
-namespace impl {
+namespace detail {
 constexpr bool operator==(const Head& x, const Head& y) {
     return x.index == y.index && x.lap == y.lap;
 }
@@ -66,5 +66,5 @@ inline std::ostream& operator<<(std::ostream& out, const BufferData<TYPE, N>& x)
     }
     return out;
 }
-} // namespace impl
+} // namespace detail
 } // namespace brasa::buffer

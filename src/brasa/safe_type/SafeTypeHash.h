@@ -29,7 +29,7 @@ namespace std {
  * @tparam Tag Unique tag type (does not affect hash computation)
  * @tparam category Operation category (does not affect hash computation)
  */
-template <typename T, typename Tag, ::brasa::safe_type::impl::Category category>
+template <typename T, typename Tag, ::brasa::safe_type::detail::Category category>
 struct hash<::brasa::safe_type::SafeType<T, Tag, category>> {
     /**
      * Computes hash value for a SafeType instance.

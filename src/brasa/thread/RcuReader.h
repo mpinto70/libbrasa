@@ -2,14 +2,18 @@
 
 namespace brasa::thread {
 
-/** Class responsible to hold the \b read-only reference of the current version of the value. */
+/**
+ * Class responsible to hold the \b read-only reference of the current version of the value.
+ */
 template <typename T, typename POOL>
 class RcuReader {
 public:
-    /** Creates the RcuReader object with the ref to the current value.
-     * @param t the pointer to the current value.
+    /**
+     * Creates the RcuReader object with the ref to the current value.
+     *
+     * @param t    the pointer to the current value.
      * @param pool the pointer to the pool that is the owner of the value and will receive it back
-     * via release.
+     *             via release.
      */
     RcuReader(const T* t, const POOL* pool) noexcept : value_(t), pool_(pool) {}
     ~RcuReader() noexcept;
@@ -18,9 +22,19 @@ public:
     RcuReader& operator=(const RcuReader&) = delete;
     RcuReader& operator=(RcuReader&&);
 
-    /** Return the read-only reference to the value stored in the pool. */
+    /**
+     * Return the read-only reference to the value stored in the pool.
+     *
+     * @return the read-only reference to the value.
+     * @warning Calling this on an invalid (moved-from) reader is undefined behavior.
+     *          Use `is_valid()` to check first.
+     */
     const T& value() const noexcept { return *value_; }
-    /** Return if the object has a valid value. */
+    /**
+     * Returns whether the object holds a valid value.
+     *
+     * @return true if the object holds a valid value, false otherwise.
+     */
     bool is_valid() const noexcept { return value_ != nullptr && pool_ != nullptr; }
 
 private:
@@ -48,6 +62,9 @@ RcuReader<T, POOL>::RcuReader(RcuReader&& other) : value_(other.value_),
 
 template <typename T, typename POOL>
 RcuReader<T, POOL>& RcuReader<T, POOL>::operator=(RcuReader&& other) {
+    if (value_ != nullptr && pool_ != nullptr) {
+        pool_->release(value_);
+    }
     value_ = other.value_;
     pool_ = other.pool_;
     other.value_ = nullptr;

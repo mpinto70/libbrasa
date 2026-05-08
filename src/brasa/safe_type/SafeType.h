@@ -24,7 +24,7 @@ namespace brasa::safe_type {
  * @tparam Tag Unique tag type that makes the wrapper distinct.
  */
 template <typename T, typename Tag>
-using Trivial = SafeType<T, Tag, impl::Category::Trivial>;
+using Trivial = SafeType<T, Tag, detail::Category::Trivial>;
 
 /**
  * Safe type with identity and ordering comparisons.
@@ -36,7 +36,7 @@ using Trivial = SafeType<T, Tag, impl::Category::Trivial>;
  * @tparam Tag Unique tag type that makes the wrapper distinct.
  */
 template <typename T, typename Tag>
-using Ordered = SafeType<T, Tag, impl::Category::Ordered>;
+using Ordered = SafeType<T, Tag, detail::Category::Ordered>;
 
 /**
  * Safe type with identity, ordering, and arithmetic operations.
@@ -48,5 +48,5 @@ using Ordered = SafeType<T, Tag, impl::Category::Ordered>;
  * @tparam Tag Unique tag type that makes the wrapper distinct.
  */
 template <typename T, typename Tag>
-using Scalar = SafeType<T, Tag, impl::Category::Scalar>;
+using Scalar = SafeType<T, Tag, detail::Category::Scalar>;
 } // namespace brasa::safe_type

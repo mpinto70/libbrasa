@@ -4,7 +4,7 @@
   - [Technical details](#technical-details)
     - [`CircularWriter` component](#circularwriter-component)
     - [`CircularReader` component](#circularreader-component)
-    - [`Circular` helper component (inside `impl` namespace)](#circular-helper-component-inside-impl-namespace)
+    - [`Circular` helper component (inside `detail` namespace)](#circular-helper-component-inside-detail-namespace)
 
 This is the package of buffering facilities. The driving idea behind this
 package is to allow communication between processes to allow monitoring. The
@@ -33,7 +33,7 @@ exposes the following member functions:
   identify the buffer.
 - `write`: that stores a `value` into `data`. It **always succeeds**.
 
-The buffer must be at least `CircularWriter::BUFFER_SIZE` bytes long.
+The buffer must be at least `CircularWriter::MIN_BUFFER_SIZE` bytes long.
 
 ### `CircularReader` component
 
@@ -45,9 +45,9 @@ exposes the following member functions:
 - `read`: that reads a `value` from `data`. If there are no value to be read,
   returns `false` and leaves `value` unchanged.
 
-The buffer must be at least `CircularReader::BUFFER_SIZE` bytes long.
+The buffer must be at least `CircularReader::MIN_BUFFER_SIZE` bytes long.
 
-### `Circular` helper component (inside `impl` namespace)
+### `Circular` helper component (inside `detail` namespace)
 
 `Circular` helper component is parameterized by the type of values (`TYPE_`)
 that it will store and the number of elements (`N_`) the buffer is capable to
@@ -59,15 +59,19 @@ In its `public` interface, `Circular` exposes:
 
 - `TYPE`: the type stored
 - `N`: the number of elements it is able to store (`data`)
-- `BUFFER_SIZE`: the minimum size of the buffer passed to it during construction
+- `MIN_BUFFER_SIZE`: the minimum size of the buffer passed to it during
+  construction
 
 In its `protected` interface, `Circular` exposes:
 
 - constructor: taking the buffer and a key number to use in validations. The key
-  number should be a unique number to avoid errors in reading/writing.
+  number is provided byt `Circular` clients and should be a unique number to
+  avoid errors in reading/writing.
 - `do_write`: writes a value to `data` (always succeeds).
 - `do_read`: reads a value from `data` into `value` and returns `true`. If there
   is no value available in `data`, returns `false` and does not change `value`.
 
-The buffer passed to Circular has to have at least `Circular::BUFFER_SIZE` bytes
-in it.
+The buffer passed to Circular has to have at least `Circular::MIN_BUFFER_SIZE`
+bytes in it. The value of `Circular::MIN_BUFFER_SIZE` is calculated to allow
+proper alignment for the internal structs that hold the client data and the
+metadata used by the class.

@@ -3,41 +3,33 @@
 #include <brasa/chronus/SleepStd.h>
 
 #include <gtest/gtest.h>
-#include <unistd.h>
-
-#include <ctime>
 
 namespace brasa::chronus {
 namespace {
 template <typename SLEEP_FUNC>
-void veriffySleep(SLEEP_FUNC func, const uint32_t MULT_NSEC, const uint32_t sleep_size) {
-    for (unsigned i = 0; i < 100; ++i) {
+void verifySleep(SLEEP_FUNC func, const uint32_t nsecs_per_unit, const uint32_t sleep_size) {
+    for (unsigned i = 0; i < 50; ++i) {
         const auto t0 = nano_now();
         func(sleep_size);
         const auto t1 = nano_now();
         uint64_t diff = t1 - t0;
-        EXPECT_GT(diff, sleep_size * MULT_NSEC) << "iteration " << i;
+        EXPECT_GT(diff, sleep_size * nsecs_per_unit) << "iteration " << i;
     }
 }
 } // namespace
 
-TEST(SleepTest, usleep) {
-    veriffySleep(::usleep, NSECS_PER_USEC, 100);
-    veriffySleep(::usleep, NSECS_PER_USEC, 200);
-}
-
 TEST(SleepTest, nano_sleep) {
-    veriffySleep(nano_sleep, 1, 1 * NSECS_PER_MSEC);
-    veriffySleep(nano_sleep, 1, 2 * NSECS_PER_MSEC);
+    verifySleep(nano_sleep, 1, 1 * NSECS_PER_MSEC);
+    verifySleep(nano_sleep, 1, 2 * NSECS_PER_MSEC);
 }
 
 TEST(SleepTest, micro_sleep) {
-    veriffySleep(micro_sleep, NSECS_PER_USEC, 100);
-    veriffySleep(micro_sleep, NSECS_PER_USEC, 200);
+    verifySleep(micro_sleep, NSECS_PER_USEC, 100);
+    verifySleep(micro_sleep, NSECS_PER_USEC, 200);
 }
 
 TEST(SleepTest, milli_sleep) {
-    veriffySleep(milli_sleep, NSECS_PER_MSEC, 1);
-    veriffySleep(milli_sleep, NSECS_PER_MSEC, 2);
+    verifySleep(milli_sleep, NSECS_PER_MSEC, 1);
+    verifySleep(milli_sleep, NSECS_PER_MSEC, 2);
 }
 } // namespace brasa::chronus

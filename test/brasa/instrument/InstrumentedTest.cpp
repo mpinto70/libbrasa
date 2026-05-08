@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <map>
 #include <random>
 #include <vector>
 
@@ -21,35 +22,35 @@ void Iota(I first, I last, N start = N(0), N step = N(1)) {
 } // namespace
 
 TEST(InstrumentedTest, names) {
-    EXPECT_EQ(
-          sizeof(InstrumentedCounter::counter_names),
-          InstrumentedCounter::NUMBER_OPS * sizeof(char*));
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::n);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::destruction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::default_construction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::conversion_construction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::conversion_move_construction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::copy_construction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::move_construction);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::conversion);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::assignment);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::equality);
-    ASSERT_GT(InstrumentedCounter::NUMBER_OPS, InstrumentedCounter::comparison);
+    using Iint = InstrumentedCounter<int>;
+    EXPECT_EQ(sizeof(Iint::counter_names), Iint::NUMBER_OPS * sizeof(char*));
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::n);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::destruction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::default_construction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::conversion_construction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::conversion_move_construction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::copy_construction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::move_construction);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::conversion);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::assignment);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::move_assignment);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::equality);
+    ASSERT_GT(Iint::NUMBER_OPS, Iint::comparison);
 
-    const char** names = InstrumentedCounter::counter_names;
-    EXPECT_EQ(std::string(names[InstrumentedCounter::n]), "n");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::destruction]), "dtor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::default_construction]), "default ctor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion_construction]), "conv ctor");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::n]), "n");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::destruction]), "dtor");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::default_construction]), "default ctor");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::conversion_construction]), "conv ctor");
     EXPECT_EQ(
-          std::string(names[InstrumentedCounter::conversion_move_construction]),
+          std::string(Iint::counter_names[Iint::conversion_move_construction]),
           "conv move ctor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::copy_construction]), "copy ctor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::move_construction]), "move ctor");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::conversion]), "conv");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::assignment]), "assign");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::equality]), "equal");
-    EXPECT_EQ(std::string(names[InstrumentedCounter::comparison]), "compare");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::copy_construction]), "copy ctor");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::move_construction]), "move ctor");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::conversion]), "conv");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::assignment]), "assign");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::move_assignment]), "move assign");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::equality]), "equal");
+    EXPECT_EQ(std::string(Iint::counter_names[Iint::comparison]), "compare");
 }
 
 namespace {
@@ -60,23 +61,31 @@ void run_sort() {
     std::mt19937 gen{ std::random_device{}() };
     std::ranges::shuffle(vec, gen);
 
-    InstrumentedCounter::initialize(N);
+    InstrumentedCounter<int>::initialize(N);
 
     std::sort(vec.begin(), vec.end());
 
-    EXPECT_EQ(N, InstrumentedCounter::counts[InstrumentedCounter::n]) << N;
-    EXPECT_NE(0u, InstrumentedCounter::counts[InstrumentedCounter::move_construction]) << N;
-    EXPECT_NE(0u, InstrumentedCounter::counts[InstrumentedCounter::destruction]) << N;
-    EXPECT_NE(0u, InstrumentedCounter::counts[InstrumentedCounter::assignment]) << N;
-    EXPECT_NE(0u, InstrumentedCounter::counts[InstrumentedCounter::comparison]) << N;
-
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion_construction]) << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion_move_construction])
+    EXPECT_EQ(N, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::n]) << N;
+    EXPECT_NE(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::move_construction])
           << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::conversion]) << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::copy_construction]) << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::default_construction]) << N;
-    EXPECT_EQ(0u, InstrumentedCounter::counts[InstrumentedCounter::equality]) << N;
+    EXPECT_NE(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::destruction]) << N;
+    EXPECT_NE(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::move_assignment]) << N;
+    EXPECT_NE(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::comparison]) << N;
+
+    EXPECT_EQ(
+          0u,
+          InstrumentedCounter<int>::counts[InstrumentedCounter<int>::conversion_construction])
+          << N;
+    EXPECT_EQ(
+          0u,
+          InstrumentedCounter<int>::counts[InstrumentedCounter<int>::conversion_move_construction])
+          << N;
+    EXPECT_EQ(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::conversion]) << N;
+    EXPECT_EQ(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::copy_construction])
+          << N;
+    EXPECT_EQ(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::default_construction])
+          << N;
+    EXPECT_EQ(0u, InstrumentedCounter<int>::counts[InstrumentedCounter<int>::equality]) << N;
 }
 } // namespace
 
@@ -92,15 +101,15 @@ void verify_operations(F f, const std::vector<int>& ops) {
     for (const auto op : ops) {
         operations[op]++;
     }
-    InstrumentedCounter::initialize(0);
+    InstrumentedCounter<int>::initialize(0);
     f();
-    for (int i = 0; i < InstrumentedCounter::NUMBER_OPS; ++i) {
-        const std::string msgi = InstrumentedCounter::counter_names[i];
+    for (int i = 0; i < InstrumentedCounter<int>::NUMBER_OPS; ++i) {
+        const std::string msgi = InstrumentedCounter<int>::counter_names[i];
         const auto it = operations.find(i);
         if (it == operations.end()) {
-            EXPECT_EQ(0u, InstrumentedCounter::counts[i]) << msgi;
+            EXPECT_EQ(0u, InstrumentedCounter<int>::counts[i]) << msgi;
         } else {
-            EXPECT_EQ(it->second, InstrumentedCounter::counts[i]) << msgi;
+            EXPECT_EQ(it->second, InstrumentedCounter<int>::counts[i]) << msgi;
         }
     }
 }
@@ -110,8 +119,8 @@ TEST(InstrumentedTest, count_default_construction) {
     verify_operations(
           []() { const Instrumented<int> x; },
           {
-                InstrumentedCounter::default_construction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::default_construction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -122,8 +131,8 @@ TEST(InstrumentedTest, count_conversion_construction) {
               const Instrumented<int> x(i);
           },
           {
-                InstrumentedCounter::conversion_construction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_construction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -131,8 +140,8 @@ TEST(InstrumentedTest, count_conversion_move_construction) {
     verify_operations(
           []() { const auto x = Instrumented<int>(129); },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -143,10 +152,10 @@ TEST(InstrumentedTest, count_copy_construction) {
               const Instrumented<int> y(x);
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::copy_construction,
-                InstrumentedCounter::destruction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::copy_construction,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -157,10 +166,10 @@ TEST(InstrumentedTest, count_move_construction) {
               Instrumented<int> b(std::move(a));
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::move_construction,
-                InstrumentedCounter::destruction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::move_construction,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -171,9 +180,9 @@ TEST(InstrumentedTest, count_conversion) {
               (void) static_cast<int>(x);
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::conversion,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::conversion,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -185,11 +194,27 @@ TEST(InstrumentedTest, count_assignment) {
               y = x;
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::default_construction,
-                InstrumentedCounter::assignment,
-                InstrumentedCounter::destruction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::default_construction,
+                InstrumentedCounter<int>::assignment,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
+          });
+}
+
+TEST(InstrumentedTest, count_move_assignment) {
+    verify_operations(
+          []() {
+              Instrumented<int> x(129);
+              Instrumented<int> y;
+              y = std::move(x);
+          },
+          {
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::default_construction,
+                InstrumentedCounter<int>::move_assignment,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -203,13 +228,13 @@ TEST(InstrumentedTest, count_equality) {
               (void) (y != x);
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::default_construction,
-                InstrumentedCounter::assignment,
-                InstrumentedCounter::equality,
-                InstrumentedCounter::equality,
-                InstrumentedCounter::destruction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::default_construction,
+                InstrumentedCounter<int>::assignment,
+                InstrumentedCounter<int>::equality,
+                InstrumentedCounter<int>::equality,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 
@@ -225,15 +250,15 @@ TEST(InstrumentedTest, count_comparison) {
               (void) (y >= x);
           },
           {
-                InstrumentedCounter::conversion_move_construction,
-                InstrumentedCounter::default_construction,
-                InstrumentedCounter::assignment,
-                InstrumentedCounter::comparison,
-                InstrumentedCounter::comparison,
-                InstrumentedCounter::comparison,
-                InstrumentedCounter::comparison,
-                InstrumentedCounter::destruction,
-                InstrumentedCounter::destruction,
+                InstrumentedCounter<int>::conversion_move_construction,
+                InstrumentedCounter<int>::default_construction,
+                InstrumentedCounter<int>::assignment,
+                InstrumentedCounter<int>::comparison,
+                InstrumentedCounter<int>::comparison,
+                InstrumentedCounter<int>::comparison,
+                InstrumentedCounter<int>::comparison,
+                InstrumentedCounter<int>::destruction,
+                InstrumentedCounter<int>::destruction,
           });
 }
 } // namespace brasa::instrument

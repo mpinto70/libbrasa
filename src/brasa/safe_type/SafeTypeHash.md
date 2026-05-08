@@ -42,7 +42,7 @@ provides that specialization.
 
 ```cpp
 namespace std {
-template <typename T, typename Tag, ::brasa::safe_type::impl::Category category>
+template <typename T, typename Tag, ::brasa::safe_type::detail::Category category>
 struct hash<::brasa::safe_type::SafeType<T, Tag, category>> {
     size_t operator()(const ::brasa::safe_type::SafeType<T, Tag, category>& x) const
         noexcept(noexcept(hash<T>{}(x.value)));

@@ -5,17 +5,24 @@
 #include <gtest/gtest.h>
 
 #include <ctime>
+#include <source_location>
 
 namespace brasa::chronus {
 namespace {
 template <typename NOW_FUNC, typename SLEEPER_FUNC>
-void verifyWait(NOW_FUNC now_func, SLEEPER_FUNC sleeper_func, const uint32_t wait_size) {
+void verifyWait(
+      NOW_FUNC now_func,
+      SLEEPER_FUNC sleeper_func,
+      const uint32_t wait_size,
+      const std::source_location loc = std::source_location::current()) {
+    SCOPED_TRACE("From line " + std::to_string(loc.line()));
     NOW_FUNC now = now_func;
     auto waiter = make_waiter<NOW_FUNC, SLEEPER_FUNC>(
           std::move(now_func),
           wait_size,
           std::move(sleeper_func));
     for (unsigned i = 0; i < 100; ++i) {
+        SCOPED_TRACE("From iteration " + std::to_string(i));
         const auto t0 = now();
         waiter.reset();
         EXPECT_FALSE(waiter.elapsed());
@@ -23,7 +30,7 @@ void verifyWait(NOW_FUNC now_func, SLEEPER_FUNC sleeper_func, const uint32_t wai
         EXPECT_TRUE(waiter.elapsed());
         const auto t1 = now();
         uint64_t diff = t1 - t0;
-        EXPECT_GE(diff, wait_size) << "iteration " << i;
+        EXPECT_GE(diff, wait_size);
     }
 }
 } // namespace
