@@ -11,35 +11,35 @@ namespace brasa::pattern {
 /**
  * A class that implements an object repository.
  * The objects are identified by a value of type \b TYPE_ID.
- * This class is not thread safe.
+ * This class is thread safe.
  */
 template <typename BASE, typename TYPE_ID>
 class ObjectRepository final {
 public:
-    // Non-copyable and movable
+    // Non-copyable, non-movable
     ObjectRepository() noexcept = default;
     ~ObjectRepository() noexcept = default;
     ObjectRepository(const ObjectRepository&) = delete;
-    ObjectRepository(ObjectRepository&&) = default;
+    ObjectRepository(ObjectRepository&&) = delete;
     ObjectRepository& operator=(const ObjectRepository&) = delete;
-    ObjectRepository& operator=(ObjectRepository&&) = default;
+    ObjectRepository& operator=(ObjectRepository&&) = delete;
     /**
      * Create a new object inside the repository, constructing it with args.
      *
-     * @tparam U    type of concrete object derived from T
+     * @tparam U    type of concrete object derived from BASE
      * @param id    object identifier
      * @param args  args passed to constructor
-     * @return if object was added to the repository
+     * @return true if added, false if an object with that id already existed
      */
     template <typename U, typename... ARGS>
     bool add(TYPE_ID id, ARGS&&... args);
     /**
      * Add an object to the repository indexed by \b id.
      *
-     * @tparam U    type of concrete object derived from T
+     * @tparam U    type of concrete object derived from BASE
      * @param id    object identifier
      * @param u     the object
-     * @return if object was added to the repository
+     * @return true if added, false if an object with that id already existed
      */
     template <typename U>
     bool add(TYPE_ID id, std::unique_ptr<U> u);
@@ -47,7 +47,7 @@ public:
      * Remove object identified by \b id.
      *
      * @param id    object identifier
-     * @return if object was removed from the repository
+     * @return true if removed, false if no object existed for identifier \b id
      */
     bool remove(TYPE_ID id);
     /**
@@ -56,13 +56,25 @@ public:
      * @param id    object identifier
      * @return the object
      * @throw std::logic_error if no object exists for identifier \b id
+     * @warning The returned reference becomes dangling if the object is removed
+     *          from the repository while the reference is still in use.
      */
     BASE& get(TYPE_ID id);
     /**
-     * Return if object identified by \b id exists.
+     * Get the object identified by \b id (const overload).
      *
      * @param id    object identifier
-     * @return if object exists
+     * @return the object
+     * @throw std::logic_error if no object exists for identifier \b id
+     * @warning The returned reference becomes dangling if the object is removed
+     *          from the repository while the reference is still in use.
+     */
+    const BASE& get(TYPE_ID id) const;
+    /**
+     * Returns whether the object identified by \b id exists.
+     *
+     * @param id    object identifier
+     * @return true if the object exists, false otherwise
      */
     bool has(TYPE_ID id) const;
 
@@ -92,6 +104,20 @@ bool ObjectRepository<BASE, TYPE_ID>::remove(TYPE_ID id) {
 
 template <typename BASE, typename TYPE_ID>
 BASE& ObjectRepository<BASE, TYPE_ID>::get(TYPE_ID id) {
+    std::shared_lock lock(mutex_);
+    auto it = objects_.find(id);
+    if (it == objects_.end()) {
+        using std::to_string;
+        using namespace std::string_literals;
+        throw std::logic_error(
+              "brasa::pattern::ObjectRepository::get object not found for "s + typeid(BASE).name()
+              + " and id " + to_string(id));
+    }
+    return *it->second;
+}
+
+template <typename BASE, typename TYPE_ID>
+const BASE& ObjectRepository<BASE, TYPE_ID>::get(TYPE_ID id) const {
     std::shared_lock lock(mutex_);
     auto it = objects_.find(id);
     if (it == objects_.end()) {

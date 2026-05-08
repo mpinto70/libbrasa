@@ -10,42 +10,49 @@
 namespace brasa::pattern {
 
 /**
- * A class that implements an object repository.
- * The objects are identified by a value of type \b TYPE_ID.
- * This class is not thread safe.
+ * A class that implements an object factory.
+ * Objects are created by registered creator functions identified by a value of type \b TYPE_ID.
+ * This class is thread safe.
  */
 template <typename BASE, typename TYPE_ID>
 class ObjectFactory final {
 public:
     using creator_t = std::function<std::unique_ptr<BASE>()>;
-    // Non-copyable and movable
+    // Non-copyable, non-movable
     ObjectFactory() noexcept = default;
     ~ObjectFactory() noexcept = default;
     ObjectFactory(const ObjectFactory&) = delete;
-    ObjectFactory(ObjectFactory&&) = default;
+    ObjectFactory(ObjectFactory&&) = delete;
     ObjectFactory& operator=(const ObjectFactory&) = delete;
-    ObjectFactory& operator=(ObjectFactory&&) = default;
+    ObjectFactory& operator=(ObjectFactory&&) = delete;
+    /**
+     * Register a creator function for objects identified by \b id.
+     *
+     * @param id      object identifier
+     * @param creator function that creates a new instance of BASE
+     * @return true if added, false if a creator for that id already existed
+     */
     bool add(TYPE_ID id, creator_t creator);
     /**
-     * Remove object identified by \b id.
+     * Remove the creator registered for \b id.
      *
      * @param id    object identifier
-     * @return if object was removed from the repository
+     * @return true if removed, false if no creator existed for identifier \b id
      */
     bool remove(TYPE_ID id);
     /**
-     * Get the object identified by \b id.
+     * Create and return a new object using the creator registered for \b id.
      *
      * @param id    object identifier
-     * @return the object
-     * @throw std::logic_error if no object exists for identifier \b id
+     * @return a newly created object
+     * @throw std::logic_error if no creator is registered for identifier \b id
      */
     std::unique_ptr<BASE> get(TYPE_ID id) const;
     /**
-     * Return if object identified by \b id exists.
+     * Returns whether a creator is registered for \b id.
      *
      * @param id    object identifier
-     * @return if object exists
+     * @return true if a creator exists, false otherwise
      */
     bool has(TYPE_ID id) const;
 
@@ -77,7 +84,9 @@ std::unique_ptr<BASE> ObjectFactory<BASE, TYPE_ID>::get(TYPE_ID id) const {
               "brasa::pattern::ObjectFactory::get object not found for "s + typeid(BASE).name()
               + " and id " + to_string(id));
     }
-    return it->second();
+    auto creator = it->second;
+    lock.unlock();
+    return creator();
 }
 
 template <typename BASE, typename TYPE_ID>
